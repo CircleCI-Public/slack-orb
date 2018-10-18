@@ -10,7 +10,7 @@ This repo is for the active testing and development for an official [orb](https:
 Example config:
 ```yaml
 orbs:
-  slack: sandbox/slack@<version>
+  slack: circleci/slack@1.0.0
 
 jobs:
   build:
