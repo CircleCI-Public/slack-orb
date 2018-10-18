@@ -5,7 +5,7 @@ Easily integrate custom [Slack](https://slack.com/ "Slack") notifications into y
 
 This repo is for the active testing and development for an official [orb](https://github.com/CircleCI-Public/config-preview-sdk/blob/master/docs/using-orbs.md "orb") for [CircleCI](https://circleci.com/ "CircleCI"). 
 
-### Usage
+## Usage
 
 Example config:
 ```yaml
@@ -22,15 +22,15 @@ jobs:
 ```
 `slack@dev:<version>` from the `sandbox` namespace is imported into `slack` which can then be referenced in a step in any job you require.
 
-### Commands
-- #### Notify
+## Commands
+- ### Notify
 
 |  Usage | slack/notify   |
 | ------------ | ------------ |
 | **Description:**  | Notify a slack channel with a custom message  |   
 |  **Parameters:** | - **webhook:**  Enter either your Webhook value or use the CircleCI UI to add your token under the `SLACK_WEBHOOK` environment variable <br><br> - **message:** Enter your custom message to send to your Slack channel.  <br> <br> - **mentions:** A comma separated list of Slack user IDs. example 'USER1,USER2,USER3'. Note, these are Slack User IDs, not usernames. The user ID can be found on the user's profile. <br> <br> - **color:** Color can be set for a notification to help differentiate alerts.|
 
-- #### Status
+- ### Status
 
 |  Usage | slack/status   |
 | ------------ | ------------ |
