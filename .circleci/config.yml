@@ -1,0 +1,36 @@
+version: 2.1
+orbs:
+  slack: sandbox/slack@dev:1.2.0
+
+jobs:
+  notifytest:
+    docker: 
+      - image: circleci/node
+    steps:
+      - run: exit 0 #toggle this to force success or status for testing
+      - slack/notify:
+          message: "This is a custom notification. With orange color"
+          color: "#f4aa42"
+          mentions: "USLACKBOT"
+
+  statustestpass:
+    docker: 
+      - image: circleci/node
+    steps:
+      - run: exit 0 #toggle this to force success or status for testing
+      - slack/status:
+          mentions: "USLACKBOT,USER1,USER2,USER3"
+
+  statustestfail:
+    docker: 
+      - image: circleci/node
+    steps:
+      - run: exit 1 #toggle this to force success or status for testing
+      - slack/status:
+          mentions: "USLACKBOT,USER1,USER2,USER3"
+
+workflows:
+  TestSlack:
+    jobs:
+      - notifytest
+      - statustestpass
