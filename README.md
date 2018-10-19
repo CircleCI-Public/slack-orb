@@ -45,6 +45,7 @@ jobs:
         color: "#42e2f4" #Assign custom colors for each notification
         webhook: "webhook" #Enter a specific webhook here or the default will use $SLACK_WEBHOOK 
 ```
+![Custom Message Example](/img/notifyMessage.PNG)
 
 - ### Status
 
@@ -66,3 +67,6 @@ jobs:
         fail_only: "true" #Optional: if set to "true" then only failure messages will occur.
         webhook: "webhook" #Enter a specific webhook here or the default will use $SLACK_WEBHOOK 
 ```
+
+![Status Success Example](/img/statusSuccess.PNG)
+![Status Fail Example](/img/statusFail.PNG)
