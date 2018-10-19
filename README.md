@@ -62,7 +62,7 @@ jobs:
     docker: 
       - image: circleci/node
     steps:
-      - slack/notify:
+      - slack/status:
         mentions: "USERID1,USERID2" #Enter the Slack IDs of any users who should be alerted to this message.
         fail_only: "true" #Optional: if set to "true" then only failure messages will occur.
         webhook: "webhook" #Enter a specific webhook here or the default will use $SLACK_WEBHOOK 
