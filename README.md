@@ -21,7 +21,7 @@ jobs:
       - slack/<command>
 
 ```
-`slack@dev:<version>` from the `sandbox` namespace is imported into `slack` which can then be referenced in a step in any job you require.
+`slack@1.0.0` from the `circleci` namespace is imported into `slack` which can then be referenced in a step in any job you require.
 
 ## Commands
 - ### Notify
