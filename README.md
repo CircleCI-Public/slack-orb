@@ -74,7 +74,7 @@ jobs:
 
 ## Help
 
-**How to get your Slack Webhook:**  Full sintructions can be found at Slack: https://api.slack.com/incoming-webhooks
+**How to get your Slack Webhook:**  Full instructions can be found at Slack: https://api.slack.com/incoming-webhooks
 1. [Create Slack App](https://api.slack.com/docs/slack-button#register_your_slack_app). This will also be the name of the "user" that posts alerts to Slack. You'll be asked for which Workspace this app belongs to.
 2. In the settings for the app, enable `Incoming Webhooks`
 3. In the left hand panel of your Slack app settings, under `Features` click `Incoming Webhooks`
