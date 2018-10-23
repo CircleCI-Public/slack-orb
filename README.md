@@ -11,7 +11,7 @@ Learn more about [orbs](https://github.com/CircleCI-Public/config-preview-sdk/bl
 Example config:
 ```yaml
 orbs:
-  slack: circleci/slack@1.0.0
+  slack: circleci/slack@0.1.0
 
 jobs:
   build:
