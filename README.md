@@ -40,10 +40,10 @@ jobs:
       - image: circleci/node
     steps:
       - slack/notify:
-        message: "This is a custom message notification" #Enter your own message
-        mentions: "USERID1,USERID2" #Enter the Slack IDs of any users who should be alerted to this message.
-        color: "#42e2f4" #Assign custom colors for each notification
-        webhook: "webhook" #Enter a specific webhook here or the default will use $SLACK_WEBHOOK 
+            message: "This is a custom message notification" #Enter your own message
+            mentions: "USERID1,USERID2" #Enter the Slack IDs of any users who should be alerted to this message.
+            color: "#42e2f4" #Assign custom colors for each notification
+            webhook: "webhook" #Enter a specific webhook here or the default will use $SLACK_WEBHOOK 
 ```
 ![Custom Message Example](/img/notifyMessage.PNG)
 
@@ -63,9 +63,9 @@ jobs:
       - image: circleci/node
     steps:
       - slack/status:
-        mentions: "USERID1,USERID2" #Enter the Slack IDs of any users who should be alerted to this message.
-        fail_only: "true" #Optional: if set to "true" then only failure messages will occur.
-        webhook: "webhook" #Enter a specific webhook here or the default will use $SLACK_WEBHOOK 
+            mentions: "USERID1,USERID2" #Enter the Slack IDs of any users who should be alerted to this message.
+            fail_only: "true" #Optional: if set to "true" then only failure messages will occur.
+            webhook: "webhook" #Enter a specific webhook here or the default will use $SLACK_WEBHOOK 
 ```
 
 ![Status Success Example](/img/statusSuccess.PNG)
