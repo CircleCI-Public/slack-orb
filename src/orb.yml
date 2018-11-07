@@ -1,8 +1,10 @@
 version: 2.1
-#slack orb 1.0
-#Create your key here: https://api.slack.com/incoming-webhooks
-orbs:
-description: A notification orb for slack. Submit messages to your slack channels.
+
+description: |
+  Create custom Slack notifications for CircleCI job statuses
+
+# Create your key here: https://api.slack.com/incoming-webhooks
+
 commands:
   ## NOTIFY ##
   notify:
@@ -25,7 +27,7 @@ commands:
         type: string
         default: ""
     steps:
-      - run: 
+      - run:
           name: Slack Notification
           command: |
             # Provide error if no webhook is set and error. Otherwise continue
@@ -45,7 +47,7 @@ commands:
               fi
               curl -X POST -H 'Content-type: application/json' --data "{ \"attachments\": [ { \"fallback\": \"<< parameters.message >> - $CIRCLE_BUILD_URL\", \"text\": \"<< parameters.message >> $SLACK_MENTIONS\", \"fields\": [ { \"title\": \"Project\", \"value\": \"$CIRCLE_PROJECT_REPONAME\", \"short\": true }, { \"title\": \"Job Number\", \"value\": \"$CIRCLE_BUILD_NUM\", \"short\": true } ], \"actions\": [ { \"type\": \"button\", \"text\": \"Visit Job\", \"url\": \"$CIRCLE_BUILD_URL\" } ], \"color\": \"<< parameters.color >>\" } ] } " << parameters.webhook >>
             fi
-            
+
   ## STATUS ##
   status:
     description: Send a status alert at the end of a job based on success or failure. Must be the last step in a job.
@@ -73,7 +75,7 @@ commands:
           command: |
             echo 'export SLACK_BUILD_STATUS="success"' >> $BASH_ENV
           when: on_success
-      - run: 
+      - run:
           name: Slack - Sending Status Alert
           command: |
             # Provide error if no webhook is set and error. Otherwise continue
