@@ -20,10 +20,12 @@ workflows:
       - notifytest:
           requires:
             - validate
+          context: orb-publishing
 
       - statustestpass:
           requires:
             - validate
+          context: orb-publishing
 
       - publish-dev:
           requires:
@@ -59,9 +61,9 @@ jobs:
     steps:
       - run: exit 0 #toggle this to force success or status for testing
       - slack/notify:
-          message: "This is a custom notification. With orange color"
+          message: "notification test for the Slack orb, triggered by commit ${CIRCLE_SHA1} on ${CIRCLE_PROJECT_REPONAME}'s ${CIRCLE_BRANCH} branch (workflow here: https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID})"
           color: "#f4aa42"
-          mentions: SEBESSETS,D69QYQZBP
+          mentions: "${ROSE_SLACK_UUID},${KYLE_SLACK_UUID}"
 
   statustestpass:
     docker:
@@ -69,7 +71,7 @@ jobs:
     steps:
       - run: exit 0 #toggle this to force success or status for testing
       - slack/status:
-          mentions: SEBESSETS,D69QYQZBP
+          mentions: "${ROSE_SLACK_UUID},${KYLE_SLACK_UUID}"
 
   statustestfail:
     docker:
@@ -77,7 +79,7 @@ jobs:
     steps:
       - run: exit 1 #toggle this to force success or status for testing
       - slack/status:
-          mentions: SEBESSETS,D69QYQZBP
+          mentions: "${ROSE_SLACK_UUID},${KYLE_SLACK_UUID}"
 
   publish-dev:
     executor: cli
