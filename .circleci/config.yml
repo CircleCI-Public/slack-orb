@@ -1,10 +1,60 @@
 version: 2.1
+
 orbs:
-  slack: sandbox/slack@dev:1.2.0
+  slack: circleci/slack@volatile
+
+executors:
+  cli:
+    docker:
+      - image: circleci/circleci-cli:latest
+
+workflows:
+  validate-test-deploy:
+    jobs:
+      - lint
+
+      - validate
+          requires:
+            - lint
+
+      - notifytest
+          requires:
+            - validate
+
+      - statustestpass
+          requires:
+            - validate
+
+      - publish-dev:
+          requires:
+            - notifytest
+            - statustestpass
+          context: orb-publishing
+
+      - promote-prod:
+          requires:
+            - publish-dev
+          filters:
+            branches:
+              only: master
+          context: orb-publishing
 
 jobs:
+  lint:
+    docker:
+      - image: singapore/lint-condo
+    steps:
+      - checkout
+      - run: yamllint .
+
+  validate:
+    executor: cli
+    steps:
+      - checkout
+      - run: circleci orb validate src/@orb.yml
+
   notifytest:
-    docker: 
+    docker:
       - image: circleci/node
     steps:
       - run: exit 0 #toggle this to force success or status for testing
@@ -14,7 +64,7 @@ jobs:
           mentions: "USLACKBOT"
 
   statustestpass:
-    docker: 
+    docker:
       - image: circleci/node
     steps:
       - run: exit 0 #toggle this to force success or status for testing
@@ -22,15 +72,21 @@ jobs:
           mentions: "USLACKBOT,USER1,USER2,USER3"
 
   statustestfail:
-    docker: 
+    docker:
       - image: circleci/node
     steps:
       - run: exit 1 #toggle this to force success or status for testing
       - slack/status:
           mentions: "USLACKBOT,USER1,USER2,USER3"
 
-workflows:
-  TestSlack:
-    jobs:
-      - notifytest
-      - statustestpass
+  publish-dev:
+    executor: cli
+    steps:
+      - checkout
+      - run: circleci orb publish src/@orb.yml circleci/slack@dev:$CIRCLE_BRANCH-$CIRCLE_SHA1 --token $CIRCLE_TOKEN
+
+  promote-prod:
+    executor: cli
+    steps:
+      - checkout
+      - run: circleci orb publish promote circleci/slack@dev:$CIRCLE_BRANCH-$CIRCLE_SHA1 patch --token $CIRCLE_TOKEN
