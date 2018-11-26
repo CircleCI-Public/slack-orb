@@ -13,15 +13,15 @@ workflows:
     jobs:
       - lint
 
-      - validate
+      - validate:
           requires:
             - lint
 
-      - notifytest
+      - notifytest:
           requires:
             - validate
 
-      - statustestpass
+      - statustestpass:
           requires:
             - validate
 
