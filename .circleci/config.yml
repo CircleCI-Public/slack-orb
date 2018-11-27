@@ -61,7 +61,7 @@ jobs:
     steps:
       - run: exit 0 #toggle this to force success or status for testing
       - slack/notify:
-          message: "UserID mentioning is the only valid form. link_names still works but is depricated. <!here> !here !orbs  "
+          message: "UserID mentioning is the only valid form. link_names still works but is depricated. <!subteam^SEBESSETS> <!subteam^SEBESSETS|orbs>"
           color: "#f4aa42"
           mentions: ""
 
