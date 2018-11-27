@@ -85,7 +85,7 @@ jobs:
     executor: cli
     steps:
       - checkout
-      - run: circleci orb publish src/@orb.yml circleci/slack@dev:$CIRCLE_BRANCH-$CIRCLE_SHA1 --token $CIRCLE_TOKEN
+      - run: circleci orb publish src/@orb.yml circleci/slack@dev:feature-group-mention --token $CIRCLE_TOKEN
 
   promote-prod:
     executor: cli
