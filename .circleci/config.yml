@@ -61,9 +61,9 @@ jobs:
     steps:
       - run: exit 0 #toggle this to force success or status for testing
       - slack/notify:
-          message: "UserID mentioning is the only valid form. link_names still works but is depricated. <!subteam^SEBESSETS> <!subteam^SEBESSETS|orbs>"
+          message: "Testing Group Mention In Mentions"
           color: "#f4aa42"
-          mentions: ""
+          mentions: "${KYLE_SLACK_UUID},SEBESSETS"
 
   statustestpass:
     docker:
