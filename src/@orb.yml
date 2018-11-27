@@ -42,7 +42,9 @@ commands:
               if [ -n "<< parameters.mentions >>" ]; then
                 IFS="," read -ra SLACK_MEMBERS \<<< "<< parameters.mentions >>"
                 for i in "${SLACK_MEMBERS[@]}"; do
-                  if [$(echo $i | head -c 1) = "S"]; then
+                  echo "Looping: ${i}"
+                  echo $(echo ${i} | head -c 1)
+                  if [$(echo ${i} | head -c 1) == "S"]; then
                     SLACK_MENTIONS="${SLACK_MENTIONS}<!subteam^${i}> "
                   else
                     SLACK_MENTIONS="${SLACK_MENTIONS}<@${i}> "
