@@ -44,7 +44,8 @@ commands:
                 for i in "${SLACK_MEMBERS[@]}"; do
                   echo "Looping:\ ${i}"
                   echo $(echo ${i} | head -c 1)
-                  if [$(echo ${i} | head -c 1) == "S"]; then
+                  if [ $(echo ${i} | head -c 1) == "S" ]; then
+                    echo "This item starts with an S"
                     SLACK_MENTIONS="${SLACK_MENTIONS}<!subteam^${i}> "
                   else
                     SLACK_MENTIONS="${SLACK_MENTIONS}<@${i}> "
