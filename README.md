@@ -29,7 +29,7 @@ jobs:
 |  Usage | slack/notify   |
 | ------------ | ------------ |
 | **Description:**  | Notify a slack channel with a custom message  |
-|  **Parameters:** | - **webhook:**  Enter either your Webhook value or use the CircleCI UI to add your token under the `SLACK_WEBHOOK` environment variable <br><br> - **message:** Enter your custom message to send to your Slack channel.  <br> <br> - **mentions:** A comma separated list of Slack user IDs. example 'USER1,USER2,USER3'. Note, these are Slack User IDs, not usernames. The user ID can be found on the user's profile. <br> <br> - **color:** Color can be set for a notification to help differentiate alerts.|
+|  **Parameters:** | - **webhook:**  Enter either your Webhook value or use the CircleCI UI to add your token under the `SLACK_WEBHOOK` environment variable <br><br> - **message:** Enter your custom message to send to your Slack channel.  <br> <br> - **mentions:** A comma separated list of Slack user IDs, or Group (SubTeam) IDs. example 'USER1,USER2,USER3'. Note, these are Slack User IDs, not usernames. The user ID can be found on the user's profile. Look below for infomration on obtaining Group ID. <br> <br> - **color:** Color can be set for a notification to help differentiate alerts.|
 
 Example:
 
@@ -54,7 +54,7 @@ See Slack's [Basic message formatting](https://api.slack.com/docs/message-format
 |  Usage | slack/status   |
 | ------------ | ------------ |
 | **Description:**  | Send a status alert at the end of a job based on success or failure. Must be last step in job  |
-|  **Parameters:** | -  **webhook:** Enter either your Webhook value or use the CircleCI UI to add your token under the `SLACK_WEBHOOK` environment variable <br> <br> -  **fail_only:** `false` by default. If set to `true, successful jobs will _not_ send alerts <br> <br> - **mentions:** A comma separated list of Slack user IDs. example 'USER1,USER2,USER3'. Note, these are Slack User IDs, not usernames. The user ID can be found on the user's profile. |
+|  **Parameters:** | -  **webhook:** Enter either your Webhook value or use the CircleCI UI to add your token under the `SLACK_WEBHOOK` environment variable <br> <br> -  **fail_only:** `false` by default. If set to `true, successful jobs will _not_ send alerts <br> <br> - **mentions:**  comma separated list of Slack user IDs, or Group (SubTeam) IDs. example 'USER1,USER2,USER3'. Note, these are Slack User IDs, not usernames. The user ID can be found on the user's profile. Look below for infomration on obtaining Group ID. |
 
 Example:
 
@@ -82,6 +82,12 @@ jobs:
 3. In the left hand panel of your Slack app settings, under `Features` click `Incoming Webhooks`
 4. Click `Add New Webhook to Workspace`. You will be asked to pick a channel for the webhook here.
 5. Done! A webhook URL will be created.
+
+**How To Get Your Group ID:**
+1. Navigate to https://api.slack.com/methods/usergroups.list/test
+2. Select the correct application under "token"
+3. Press "Test Method"
+4. Find your group below and copy the value for "ID"
 
 **What to do with Slack Webhook:** You can implement the Webhook in one of two ways, as an environment variable, or as a parameter.
 1. In the settings page for your project on CircleCI, click `Environment Variables`. From that page you can click the `Add Variable` button. Finally, enter your webhook as the value, and `SLACK_WEBHOOK` as the name.
