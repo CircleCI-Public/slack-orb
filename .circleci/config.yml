@@ -63,7 +63,7 @@ jobs:
       - slack/notify:
           message: "notification test for the Slack orb, triggered by *<https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/commit/${CIRCLE_SHA1}|commit ${CIRCLE_SHA1}>* on ${CIRCLE_PROJECT_REPONAME}'s *${CIRCLE_BRANCH}* branch (<https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}|workflow here>)"
           color: "#f4aa42"
-          mentions: "${ROSE_SLACK_UUID},${KYLE_SLACK_UUID},SEBESSETS"
+          mentions: "${ORBS_USER_GROUP_UUID}"
 
   statustestpass:
     docker:
@@ -71,7 +71,7 @@ jobs:
     steps:
       - run: exit 0 #toggle this to force success or status for testing
       - slack/status:
-          mentions: "${ROSE_SLACK_UUID},${KYLE_SLACK_UUID}"
+          mentions: "${ORBS_USER_GROUP_UUID}"
 
   statustestfail:
     docker:
@@ -79,7 +79,7 @@ jobs:
     steps:
       - run: exit 1 #toggle this to force success or status for testing
       - slack/status:
-          mentions: "${ROSE_SLACK_UUID},${KYLE_SLACK_UUID}"
+          mentions: "${ORBS_USER_GROUP_UUID}"
 
   publish-dev:
     executor: cli
