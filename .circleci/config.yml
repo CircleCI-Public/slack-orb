@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  slack: circleci/slack@dev:volatile
+  slack: circleci/slack@dev:feature-group-mention
 
 executors:
   cli:
