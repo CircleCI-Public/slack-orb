@@ -98,12 +98,12 @@ commands:
                   echo "The job completed successfully"
                   echo '"fail_only" is set to "true". No Slack notification sent.'
                 else
-                  curl -X POST -H 'Content-type: application/json' --data "{ \"attachments\": [ { \"fallback\": \"A job has succeeded - $CIRCLE_BUILD_URL\", \"text\": \":tada: A `$CIRCLE_JOB` job has succeeded! $SLACK_MENTIONS\", \"fields\": [ { \"title\": \"Project\", \"value\": \"$CIRCLE_PROJECT_REPONAME\", \"short\": true }, { \"title\": \"Job Number\", \"value\": \"$CIRCLE_BUILD_NUM\", \"short\": true } ], \"actions\": [ { \"type\": \"button\", \"text\": \"Visit Job\", \"url\": \"$CIRCLE_BUILD_URL\" } ], \"color\": \"#1CBF43\" } ] } " << parameters.webhook >>
+                  curl -X POST -H 'Content-type: application/json' --data "{ \"attachments\": [ { \"fallback\": \"A job has succeeded - $CIRCLE_BUILD_URL\", \"text\": \":tada: A $CIRCLE_JOB job has succeeded! $SLACK_MENTIONS\", \"fields\": [ { \"title\": \"Project\", \"value\": \"$CIRCLE_PROJECT_REPONAME\", \"short\": true }, { \"title\": \"Job Number\", \"value\": \"$CIRCLE_BUILD_NUM\", \"short\": true } ], \"actions\": [ { \"type\": \"button\", \"text\": \"Visit Job\", \"url\": \"$CIRCLE_BUILD_URL\" } ], \"color\": \"#1CBF43\" } ] } " << parameters.webhook >>
                   echo "Job completed successfully. Alert sent."
                 fi
               else
                 #If Failed
-                curl -X POST -H 'Content-type: application/json' --data "{ \"attachments\": [ { \"fallback\": \"A job has failed - $CIRCLE_BUILD_URL\", \"text\": \":red_circle: A `$CIRCLE_JOB` job has failed! $SLACK_MENTIONS\", \"fields\": [ { \"title\": \"Project\", \"value\": \"$CIRCLE_PROJECT_REPONAME\", \"short\": true }, { \"title\": \"Job Number\", \"value\": \"$CIRCLE_BUILD_NUM\", \"short\": true } ], \"actions\": [ { \"type\": \"button\", \"text\": \"Visit Job\", \"url\": \"$CIRCLE_BUILD_URL\" } ], \"color\": \"#ed5c5c\" } ] } " << parameters.webhook >>
+                curl -X POST -H 'Content-type: application/json' --data "{ \"attachments\": [ { \"fallback\": \"A job has failed - $CIRCLE_BUILD_URL\", \"text\": \":red_circle: A $CIRCLE_JOB job has failed! $SLACK_MENTIONS\", \"fields\": [ { \"title\": \"Project\", \"value\": \"$CIRCLE_PROJECT_REPONAME\", \"short\": true }, { \"title\": \"Job Number\", \"value\": \"$CIRCLE_BUILD_NUM\", \"short\": true } ], \"actions\": [ { \"type\": \"button\", \"text\": \"Visit Job\", \"url\": \"$CIRCLE_BUILD_URL\" } ], \"color\": \"#ed5c5c\" } ] } " << parameters.webhook >>
                 echo "Job failed. Alert sent."
               fi
             fi
