@@ -1,14 +1,13 @@
 # Slack Orb
 
-
 Easily integrate custom [Slack](https://slack.com/ "Slack") notifications into your [CircleCI](https://circleci.com/ "CircleCI") projects. Create custom alert messages for any job or receive status updates.
 
 Learn more about [Orbs](https://github.com/CircleCI-Public/config-preview-sdk/blob/master/docs/using-orbs.md "orb").
 
-
 ## Usage
 
 Example config:
+
 ```yaml
 orbs:
   slack: circleci/slack@0.1.0
@@ -21,9 +20,11 @@ jobs:
       - slack/<command>
 
 ```
+
 `slack@1.0.0` from the `circleci` namespace is imported into `slack` which can then be referenced in a step in any job you require.
 
 ## Commands
+
 - ### Notify
 
 |  Usage | slack/notify   |
@@ -45,6 +46,7 @@ jobs:
             color: "#42e2f4" #Assign custom colors for each notification
             webhook: "webhook" #Enter a specific webhook here or the default will use $SLACK_WEBHOOK
 ```
+
 ![Custom Message Example](/img/notifyMessage.PNG)
 
 See Slack's [Basic message formatting](https://api.slack.com/docs/message-formatting) documentation for guidance on formatting notification messages.
@@ -77,7 +79,7 @@ jobs:
 
 - ### Bash Shell
 
-Due to the limitations of the `sh` shell, at this time a shell that supports nested if statements (example: Bash). `Bash` is the default shell used on CircleCI and will be compatible with most images. Images such as `Alpine` do not contain the `Bash` shell by default and so without modification are incompatible. You may install the Bash shell through your package manager (example: `apk add bash`) in the Dockerfile for the image you are using.
+Due to the limitations of the `sh` shell, `Bash` is required. `Bash` is the default shell used on CircleCI and the Orb will be compatible with most images. Images such as `Alpine` that do not contain the `Bash` shell by default are incompatible and en error message will be logged. You may install the Bash shell through your package manager (example: `apk add bash`) in the Dockerfile for the image you are using.
 
 - ### cURL
 
@@ -86,6 +88,7 @@ cURL is used to post the Webhook data and must be installed in the container to 
 ## Help
 
 **How to get your Slack Webhook:**  Full instructions can be found at Slack: https://api.slack.com/incoming-webhooks
+
 1. [Create Slack App](https://api.slack.com/docs/slack-button#register_your_slack_app). This will also be the name of the "user" that posts alerts to Slack. You'll be asked for which Workspace this app belongs to.
 2. In the settings for the app, enable `Incoming Webhooks`
 3. In the left hand panel of your Slack app settings, under `Features` click `Incoming Webhooks`
@@ -93,11 +96,13 @@ cURL is used to post the Webhook data and must be installed in the container to 
 5. Done! A webhook URL will be created.
 
 **How To Get Your Group ID:**
+
 1. Navigate to https://api.slack.com/methods/usergroups.list/test
 2. Select the correct application under "token"
 3. Press "Test Method"
 4. Find your group below and copy the value for "ID"
 
 **What to do with Slack Webhook:** You can implement the Webhook in one of two ways, as an environment variable, or as a parameter.
+
 1. In the settings page for your project on CircleCI, click `Environment Variables`. From that page you can click the `Add Variable` button. Finally, enter your webhook as the value, and `SLACK_WEBHOOK` as the name.
 2. You can enter the Webhook for the individual status or alert by entering is at the `webhook` parameter, as shown above.
