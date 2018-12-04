@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  slack: circleci/slack@volatile
+  slack: circleci/slack@dev:feature-fail-non-bash
 
 executors:
   cli:
@@ -57,7 +57,7 @@ jobs:
 
   notifytest:
     docker:
-      - image: circleci/node
+      - image: alpine
     steps:
       - run: exit 0 #toggle this to force success or status for testing
       - slack/notify:
@@ -85,7 +85,7 @@ jobs:
     executor: cli
     steps:
       - checkout
-      - run: circleci orb publish src/@orb.yml circleci/slack@dev:$CIRCLE_BRANCH-$CIRCLE_SHA1 --token $CIRCLE_TOKEN
+      - run: circleci orb publish src/@orb.yml circleci/slack@dev:feature-fail-non-bash --token $CIRCLE_TOKEN
 
   promote-prod:
     executor: cli
