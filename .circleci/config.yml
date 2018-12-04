@@ -57,7 +57,7 @@ jobs:
 
   notifytest:
     docker:
-      - image: alpine
+      - image: circleci/node
     steps:
       - run: exit 0 #toggle this to force success or status for testing
       - slack/notify:
@@ -67,7 +67,7 @@ jobs:
 
   statustestpass:
     docker:
-      - image: alpine
+      - image: circleci/node
     steps:
       - run: exit 0 #toggle this to force success or status for testing
       - slack/status:
@@ -75,7 +75,7 @@ jobs:
 
   statustestfail:
     docker:
-      - image: alpine
+      - image: circleci/node
     steps:
       - run: exit 1 #toggle this to force success or status for testing
       - slack/status:
