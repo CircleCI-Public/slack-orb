@@ -37,7 +37,6 @@ commands:
             # Provide error if non-bash shell
             if [ $(echo $SHELL | grep -c bash) -ne 1 ]; then
               echo Bash not installed.
-              echo $SHELL | grep -c bash
               exit 1
             fi
             # Provide error if no webhook is set and error. Otherwise continue
@@ -92,6 +91,11 @@ commands:
       - run:
           name: Slack - Sending Status Alert
           command: |
+            # Provide error if non-bash shell
+            if [ $(echo $SHELL | grep -c bash) -ne 1 ]; then
+              echo Bash not installed.
+              exit 1
+            fi
             # Provide error if no webhook is set and error. Otherwise continue
             if [ -z "<< parameters.webhook >>" ]; then
               echo "NO SLACK WEBHOOK SET"
