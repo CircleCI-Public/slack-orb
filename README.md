@@ -73,6 +73,15 @@ jobs:
 ![Status Success Example](/img/statusSuccess.PNG)
 ![Status Fail Example](/img/statusFail.PNG)
 
+## Dependencies / Requirements
+
+- ### Bash Shell
+
+Due to the limitations of the `sh` shell, at this time a shell that supports nested if statements (example: Bash). `Bash` is the default shell used on CircleCI and will be compatible with most images. Images such as `Alpine` do not contain the `Bash` shell by default and so without modification are incompatible. You may install the Bash shell through your package manager (example: `apk add bash`) in the Dockerfile for the image you are using.
+
+- ### cURL
+
+cURL is used to post the Webhook data and must be installed in the container to function properly.
 
 ## Help
 
