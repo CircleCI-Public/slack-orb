@@ -10,7 +10,7 @@ Example config:
 
 ```yaml
 orbs:
-  slack: circleci/slack@0.1.0
+  slack: circleci/slack@volatile
 
 jobs:
   build:
@@ -21,7 +21,7 @@ jobs:
 
 ```
 
-`slack@1.0.0` from the `circleci` namespace is imported into `slack` which can then be referenced in a step in any job you require.
+`slack@volatile` from the `circleci` namespace is imported into `slack` which can then be referenced in a step in any job you require.
 
 ## Commands
 
@@ -29,22 +29,25 @@ jobs:
 
 |  Usage | slack/notify   |
 | ------------ | ------------ |
-| **Description:**  | Notify a slack channel with a custom message  |
+| **Description:**  | Notify a slack channel with a custom message at any point in a job with this custom step. |
 |  **Parameters:** | - **webhook:**  Enter either your Webhook value or use the CircleCI UI to add your token under the `SLACK_WEBHOOK` environment variable <br><br> - **message:** Enter your custom message to send to your Slack channel.  <br> <br> - **mentions:** A comma separated list of Slack user IDs, or Group (SubTeam) IDs. example 'USER1,USER2,USER3'. Note, these are Slack User IDs, not usernames. The user ID can be found on the user's profile. Look below for infomration on obtaining Group ID. <br> <br> - **color:** Color can be set for a notification to help differentiate alerts.|
 
 Example:
 
 ```yaml
-jobs:
-  alertme:
-    docker:
-      - image: circleci/node
-    steps:
-      - slack/notify:
-            message: "This is a custom message notification" #Enter your own message
-            mentions: "USERID1,USERID2" #Enter the Slack IDs of any users who should be alerted to this message.
-            color: "#42e2f4" #Assign custom colors for each notification
-            webhook: "webhook" #Enter a specific webhook here or the default will use $SLACK_WEBHOOK
+version: 2.1
+      orbs:
+        slack: circleci/slack@volatile
+      jobs:
+        build:
+          docker:
+            - image: <docker image>
+          steps:
+            - slack/notify:
+                message: "This is a custom message notification" # Optional: Enter your own message
+                mentions: "USERID1,USERID2," # Optional: Enter the Slack IDs of any user or group (sub_team) to be mentioned
+                color: "#42e2f4" # Optional: Assign custom colors for each notification
+                webhook: "webhook" # Optional: Enter a specific webhook here or the default will use $SLACK_WEBHOOK
 ```
 
 ![Custom Message Example](/img/notifyMessage.PNG)
@@ -55,21 +58,26 @@ See Slack's [Basic message formatting](https://api.slack.com/docs/message-format
 
 |  Usage | slack/status   |
 | ------------ | ------------ |
-| **Description:**  | Send a status alert at the end of a job based on success or failure. Must be last step in job  |
-|  **Parameters:** | -  **webhook:** Enter either your Webhook value or use the CircleCI UI to add your token under the `SLACK_WEBHOOK` environment variable <br> <br> -  **fail_only:** `false` by default. If set to `true, successful jobs will _not_ send alerts <br> <br> - **mentions:**  comma separated list of Slack user IDs, or Group (SubTeam) IDs. example 'USER1,USER2,USER3'. Note, these are Slack User IDs, not usernames. The user ID can be found on the user's profile. Look below for infomration on obtaining Group ID. |
+| **Description:** | Send a status alert at the end of a job based on success or failure. This must be the last step in a job. |
+|  **Parameters:** | -  **webhook:** Enter either your Webhook value or use the CircleCI UI to add your token under the `SLACK_WEBHOOK` environment variable <br> <br> - **fail_only:** `false` by default. If set to `true, successful jobs will _not_ send alerts <br> <br> - **mentions:**  comma separated list of Slack user IDs, or Group (SubTeam) IDs. example 'USER1,USER2,USER3'. Note, these are Slack User IDs, not usernames. The user ID can be found on the user's profile. Look below for infomration on obtaining Group ID. |
 
 Example:
 
 ```yaml
-jobs:
-  alertme:
-    docker:
-      - image: circleci/node
-    steps:
-      - slack/status:
-            mentions: "USERID1,USERID2" #Enter the Slack IDs of any users who should be alerted to this message.
-            fail_only: "true" #Optional: if set to "true" then only failure messages will occur.
-            webhook: "webhook" #Enter a specific webhook here or the default will use $SLACK_WEBHOOK
+version: 2.1
+      orbs:
+        slack: circleci/slack@volatile
+      jobs:
+        build:
+          docker:
+            - image: <docker image>
+          steps:
+            # With fail_only set to true, no alert will be sent in this example. Change the exit status on the next line to produce an error.
+            - run: exit 0
+            - slack/status:
+                mentions: "USERID1,USERID2" # Optional: Enter the Slack IDs of any user or group (sub_team) to be mentioned
+                fail_only: "true" # Optional: if set to "true" then only failure messages will occur.
+                webhook: "webhook" # Optional: Enter a specific webhook here or the default will use $SLACK_WEBHOOK
 ```
 
 ![Status Success Example](/img/statusSuccess.PNG)
