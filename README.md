@@ -9,6 +9,8 @@ Learn more about [Orbs](https://github.com/CircleCI-Public/config-preview-sdk/bl
 Example config:
 
 ```yaml
+version: 2.1
+
 orbs:
   slack: circleci/slack@volatile
 
@@ -18,7 +20,6 @@ jobs:
       - image: <docker image>
     steps:
       - slack/<command>
-
 ```
 
 `slack@volatile` from the `circleci` namespace is imported into `slack` which can then be referenced in a step in any job you require.
@@ -36,18 +37,20 @@ Example:
 
 ```yaml
 version: 2.1
-      orbs:
-        slack: circleci/slack@volatile
-      jobs:
-        build:
-          docker:
-            - image: <docker image>
-          steps:
-            - slack/notify:
-                message: "This is a custom message notification" # Optional: Enter your own message
-                mentions: "USERID1,USERID2," # Optional: Enter the Slack IDs of any user or group (sub_team) to be mentioned
-                color: "#42e2f4" # Optional: Assign custom colors for each notification
-                webhook: "webhook" # Optional: Enter a specific webhook here or the default will use $SLACK_WEBHOOK
+
+orbs:
+  slack: circleci/slack@volatile
+  
+jobs:
+  build:
+    docker:
+      - image: <docker image>
+    steps:
+      - slack/notify:
+          message: "This is a custom message notification" # Optional: Enter your own message
+          mentions: "USERID1,USERID2," # Optional: Enter the Slack IDs of any user or group (sub_team) to be mentioned
+          color: "#42e2f4" # Optional: Assign custom colors for each notification
+          webhook: "webhook" # Optional: Enter a specific webhook here or the default will use $SLACK_WEBHOOK
 ```
 
 ![Custom Message Example](/img/notifyMessage.PNG)
@@ -65,19 +68,22 @@ Example:
 
 ```yaml
 version: 2.1
-      orbs:
-        slack: circleci/slack@volatile
-      jobs:
-        build:
-          docker:
-            - image: <docker image>
-          steps:
-            # With fail_only set to true, no alert will be sent in this example. Change the exit status on the next line to produce an error.
-            - run: exit 0
-            - slack/status:
-                mentions: "USERID1,USERID2" # Optional: Enter the Slack IDs of any user or group (sub_team) to be mentioned
-                fail_only: "true" # Optional: if set to "true" then only failure messages will occur.
-                webhook: "webhook" # Optional: Enter a specific webhook here or the default will use $SLACK_WEBHOOK
+
+orbs:
+  slack: circleci/slack@volatile
+
+jobs:
+  build:
+    docker:
+      - image: <docker image>
+    steps:
+      # With fail_only set to true, no alert will be sent in this example. Change the exit status on the next line to produce an error.
+      - run: exit 0
+      
+      - slack/status:
+          mentions: "USERID1,USERID2" # Optional: Enter the Slack IDs of any user or group (sub_team) to be mentioned
+          fail_only: "true" # Optional: if set to "true" then only failure messages will occur.
+          webhook: "webhook" # Optional: Enter a specific webhook here or the default will use $SLACK_WEBHOOK
 ```
 
 ![Status Success Example](/img/statusSuccess.PNG)
