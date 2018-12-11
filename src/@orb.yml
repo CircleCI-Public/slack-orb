@@ -1,7 +1,12 @@
 version: 2.1
 
+###########################################################
+## GitHub: https://github.com/CircleCI-Public/slack-orb ##
+###########################################################
+
+
 description: |
-  Create custom Slack notifications for CircleCI job statuses
+  Easily integrate custom Slack notifications into your CircleCI projects. Create custom alert messages for any job or receive status updates.
 
 # Create your key here: https://api.slack.com/incoming-webhooks
 
@@ -130,3 +135,40 @@ commands:
               fi
             fi
           when: always
+#
+# Usage examples of Slack Orb
+#
+examples:
+  notify:
+    description: "Notify a slack channel with a custom message at any point in a job with this custom step. More docs here: https://github.com/CircleCI-Public/slack-orb"
+    usage:
+      version: 2.1
+      orbs:
+        slack: circleci/slack@volatile
+      jobs:
+        build:
+          docker:
+            - image: <docker image>
+          steps:
+            - slack/notify:
+                message: "This is a custom message notification" # Optional: Enter your own message
+                mentions: "USERID1,USERID2," # Optional: Enter the Slack IDs of any user or group (sub_team) to be mentioned
+                color: "#42e2f4" # Optional: Assign custom colors for each notification
+                webhook: "webhook" # Optional: Enter a specific webhook here or the default will use $SLACK_WEBHOOK
+  status:
+    description: "Send a status alert at the end of a job based on success or failure. This must be the last step in a job."
+    usage:
+      version: 2.1
+      orbs:
+        slack: circleci/slack@volatile
+      jobs:
+        build:
+          docker:
+            - image: <docker image>
+          steps:
+            # With fail_only set to true, no alert will be sent in this example. Change the exit status on the next line to produce an error.
+            - run: exit 0
+            - slack/status:
+                mentions: "USERID1,USERID2" # Optional: Enter the Slack IDs of any user or group (sub_team) to be mentioned
+                fail_only: "true" # Optional: if set to "true" then only failure messages will occur.
+                webhook: "webhook" # Optional: Enter a specific webhook here or the default will use $SLACK_WEBHOOK
