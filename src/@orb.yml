@@ -37,6 +37,14 @@ commands:
         default: ""
     steps:
       - run:
+          name: Provide error if non-bash shell	
+          command: |
+            if [ $(echo $SHELL | grep -c bash) -ne 1 ]; then	
+              echo Bash not installed.	
+              exit 1	
+            fi
+             
+      - run:
           name: Slack Notification
           shell: /bin/bash
           command: |
@@ -89,6 +97,15 @@ commands:
           command: |
             echo 'export SLACK_BUILD_STATUS="success"' >> $BASH_ENV
           when: on_success
+          
+      - run:
+          name: Provide error if non-bash shell	
+          command: |
+            if [ $(echo $SHELL | grep -c bash) -ne 1 ]; then	
+              echo Bash not installed.	
+              exit 1	
+            fi
+            
       - run:
           name: Slack - Sending Status Alert
           shell: /bin/bash
