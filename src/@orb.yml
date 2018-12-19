@@ -38,12 +38,8 @@ commands:
     steps:
       - run:
           name: Slack Notification
+          shell: /bin/bash
           command: |
-            # Provide error if non-bash shell
-            if [ $(echo $SHELL | grep -c bash) -ne 1 ]; then
-              echo Bash not installed.
-              exit 1
-            fi
             # Provide error if no webhook is set and error. Otherwise continue
             if [ -z "<< parameters.webhook >>" ]; then
               echo "NO SLACK WEBHOOK SET"
@@ -95,12 +91,8 @@ commands:
           when: on_success
       - run:
           name: Slack - Sending Status Alert
+          shell: /bin/bash
           command: |
-            # Provide error if non-bash shell
-            if [ $(echo $SHELL | grep -c bash) -ne 1 ]; then
-              echo Bash not installed.
-              exit 1
-            fi
             # Provide error if no webhook is set and error. Otherwise continue
             if [ -z "<< parameters.webhook >>" ]; then
               echo "NO SLACK WEBHOOK SET"
