@@ -62,7 +62,7 @@ See Slack's [Basic message formatting](https://api.slack.com/docs/message-format
 |  Usage | slack/status   |
 | ------------ | ------------ |
 | **Description:** | Send a status alert at the end of a job based on success or failure. This must be the last step in a job. |
-|  **Parameters:** | -  **webhook:** Enter either your Webhook value or use the CircleCI UI to add your token under the `SLACK_WEBHOOK` environment variable <br> <br> - **fail_only:** `false` by default. If set to `true, successful jobs will _not_ send alerts <br> <br> - **mentions:**  comma separated list of Slack user IDs, or Group (SubTeam) IDs. example 'USER1,USER2,USER3'. Note, these are Slack User IDs, not usernames. The user ID can be found on the user's profile. Look below for infomration on obtaining Group ID. |
+|  **Parameters:** | -  **webhook:** Enter either your Webhook value or use the CircleCI UI to add your token under the `SLACK_WEBHOOK` environment variable <br> <br> - **fail_only:** `false` by default. If set to `true, successful jobs will _not_ send alerts <br> <br> - **mentions:**  comma separated list of Slack user IDs, or Group (SubTeam) IDs. example 'USER1,USER2,USER3'. Note, these are Slack User IDs, not usernames. The user ID can be found on the user's profile. Look below for infomration on obtaining Group ID. <br> <br> - **only_for_branch**: Optional: If set, a specific branch for which status updates will be sent. |
 
 Example:
 
@@ -84,6 +84,7 @@ jobs:
           mentions: "USERID1,USERID2" # Optional: Enter the Slack IDs of any user or group (sub_team) to be mentioned
           fail_only: "true" # Optional: if set to "true" then only failure messages will occur.
           webhook: "webhook" # Optional: Enter a specific webhook here or the default will use $SLACK_WEBHOOK
+          only_for_branch: "master" # Optional: If set, a specific branch for which status updates will be sent. In this case, only for pushes to master branch.
 ```
 
 ![Status Success Example](/img/statusSuccess.PNG)
