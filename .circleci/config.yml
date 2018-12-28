@@ -47,12 +47,6 @@ jobs:
             # for potentially promoting to prod
             circleci orb publish src/@orb.yml circleci/slack@dev:${CIRCLE_SHA1:0:7} --token $CIRCLE_TOKEN
 
-      - run:
-          name: publish alpha (for immediate integration testing)
-          command:
-
-
-
   trigger-integration:
     executor: node
     parameters:
