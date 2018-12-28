@@ -128,14 +128,6 @@ workflows:
             branches:
               only: master
 
-      - promote-prod:
-          requires:
-            - publish-dev
-          filters:
-            branches:
-              only: master
-          context: orb-publishing
-
   integration_test-prod_deploy:
     jobs:
       - notifytest:
