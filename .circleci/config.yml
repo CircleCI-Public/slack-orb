@@ -36,12 +36,16 @@ jobs:
       - checkout
 
       - run:
-          name: publish w/branch & sha (for transparency)
-          command: circleci orb publish src/@orb.yml circleci/slack@dev:$CIRCLE_BRANCH-${CIRCLE_SHA1:0:7} --token $CIRCLE_TOKEN
+          name: publish dev versions
+          command: |
+            # for integration testing
+            circleci orb publish src/@orb.yml circleci/slack@dev:alpha --token $CIRCLE_TOKEN
 
-      - run:
-          name: publish alpha (for immediate integration testing)
-          command: circleci orb publish src/@orb.yml circleci/slack@dev:alpha --token $CIRCLE_TOKEN
+            # for transparency
+            circleci orb publish src/@orb.yml circleci/slack@dev:$CIRCLE_BRANCH-${CIRCLE_SHA1:0:7} --token $CIRCLE_TOKEN
+
+            # for potentially promoting to prod
+            circleci orb publish src/@orb.yml circleci/slack@dev:${CIRCLE_SHA1:0:7} --token $CIRCLE_TOKEN
 
   trigger-integration:
     executor: node
@@ -95,7 +99,7 @@ jobs:
     executor: cli
     steps:
       - checkout
-      - run: circleci orb publish promote circleci/slack@dev:$CIRCLE_BRANCH-${CIRCLE_SHA1:0:7} patch --token $CIRCLE_TOKEN
+      - run: circleci orb publish promote circleci/slack@dev:${CIRCLE_SHA1:0:7} patch --token $CIRCLE_TOKEN
 
 workflows:
   validate_unit-test_dev-deploy:
