@@ -12,10 +12,10 @@ executors:
     resource_class: small
     docker:
       - image: singapore/lint-condo
-  ci-base:
+  node:
     resource_class: small
     docker:
-      - image: cibuilds/base
+      - image: circleci/node
 
 jobs:
   lint:
@@ -44,7 +44,7 @@ jobs:
           command: circleci orb publish src/@orb.yml circleci/slack@dev:alpha --token $CIRCLE_TOKEN
 
   trigger-integration:
-    executor: ci-base
+    executor: node
     parameters:
       tag:
         type: enum
@@ -69,7 +69,7 @@ jobs:
           git push origin $INTEGRATION_TAG
 
   notifytest:
-    executor: ci-base
+    executor: node
     steps:
       - run: exit 0 #toggle this to force success or status for testing
       - slack/notify:
@@ -78,14 +78,14 @@ jobs:
           mentions: "${ORBS_USER_GROUP_UUID}"
 
   statustestpass:
-    executor: ci-base
+    executor: node
     steps:
       - run: exit 0 #toggle this to force success or status for testing
       - slack/status:
           mentions: "${ORBS_USER_GROUP_UUID}"
 
   # statustestfail:
-  #   executor: ci-base
+  #   executor: node
   #   steps:
   #     - run: exit 1 #toggle this to force success or status for testing
   #     - slack/status:
