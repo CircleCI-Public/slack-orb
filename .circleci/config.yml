@@ -1,50 +1,25 @@
 version: 2.1
 
 orbs:
-  slack: circleci/slack@volatile
+  slack: circleci/slack@dev:alpha
 
 executors:
   cli:
+    resource_class: small
     docker:
-      - image: circleci/circleci-cli:latest
-
-workflows:
-  validate-test-deploy:
-    jobs:
-      - lint
-
-      - validate:
-          requires:
-            - lint
-
-      - notifytest:
-          requires:
-            - validate
-          context: orb-publishing
-
-      - statustestpass:
-          requires:
-            - validate
-          context: orb-publishing
-
-      - publish-dev:
-          requires:
-            - notifytest
-            - statustestpass
-          context: orb-publishing
-
-      - promote-prod:
-          requires:
-            - publish-dev
-          filters:
-            branches:
-              only: master
-          context: orb-publishing
+      - image: circleci/circleci-cli
+  lint-condo:
+    resource_class: small
+    docker:
+      - image: singapore/lint-condo
+  node:
+    resource_class: small
+    docker:
+      - image: circleci/node
 
 jobs:
   lint:
-    docker:
-      - image: singapore/lint-condo
+    executor: lint-condo
     steps:
       - checkout
       - run: yamllint .
@@ -55,9 +30,46 @@ jobs:
       - checkout
       - run: circleci orb validate src/@orb.yml
 
+  publish-dev:
+    executor: cli
+    steps:
+      - checkout
+
+      - run:
+          name: publish w/branch & sha (for transparency)
+          command: circleci orb publish src/@orb.yml circleci/slack@dev:$CIRCLE_BRANCH-${CIRCLE_SHA1:0:7} --token $CIRCLE_TOKEN
+
+      - run:
+          name: publish alpha (for immediate integration testing)
+          command: circleci orb publish src/@orb.yml circleci/slack@dev:alpha --token $CIRCLE_TOKEN
+
+  trigger-integration:
+    executor: node
+    parameters:
+      tag:
+        type: enum
+        default: "integration"
+        enum: ["integration", master]
+    steps:
+      - checkout
+
+      - add_ssh_keys:
+          fingerprints:
+            - "79:ae:f5:10:17:8a:d2:9a:ed:63:5c:b0:92:66:23:49"
+
+      - run:
+          name: git config
+          command: |
+            git config --global user.email "$CIRCLE_USERNAME@users.noreply.github.com"
+            git config --global user.name "$CIRCLE_USERNAME"
+
+      - run: |
+          INTEGRATION_TAG=<<parameters.tag>>-$CIRCLE_BRANCH-${CIRCLE_SHA1:0:7}
+          git tag $INTEGRATION_TAG
+          git push origin $INTEGRATION_TAG
+
   notifytest:
-    docker:
-      - image: circleci/node
+    executor: node
     steps:
       - run: exit 0 #toggle this to force success or status for testing
       - slack/notify:
@@ -66,29 +78,101 @@ jobs:
           mentions: "${ORBS_USER_GROUP_UUID}"
 
   statustestpass:
-    docker:
-      - image: circleci/node
+    executor: node
     steps:
       - run: exit 0 #toggle this to force success or status for testing
       - slack/status:
           mentions: "${ORBS_USER_GROUP_UUID}"
 
-  statustestfail:
-    docker:
-      - image: circleci/node
-    steps:
-      - run: exit 1 #toggle this to force success or status for testing
-      - slack/status:
-          mentions: "${ORBS_USER_GROUP_UUID}"
+  # statustestfail:
+  #   executor: node
+  #   steps:
+  #     - run: exit 1 #toggle this to force success or status for testing
+  #     - slack/status:
+  #         mentions: "${ORBS_USER_GROUP_UUID}"
 
-  publish-dev:
+  dev-promote-prod:
     executor: cli
     steps:
       - checkout
-      - run: circleci orb publish src/@orb.yml circleci/slack@dev:$CIRCLE_BRANCH-$CIRCLE_SHA1 --token $CIRCLE_TOKEN
+      - run: circleci orb publish promote circleci/slack@dev:$CIRCLE_BRANCH-${CIRCLE_SHA1:0:7} patch --token $CIRCLE_TOKEN
 
-  promote-prod:
-    executor: cli
-    steps:
-      - checkout
-      - run: circleci orb publish promote circleci/slack@dev:$CIRCLE_BRANCH-$CIRCLE_SHA1 patch --token $CIRCLE_TOKEN
+workflows:
+  validate_unit-test_dev-deploy:
+    jobs:
+      - lint
+
+      - validate:
+          requires:
+            - lint
+
+      - publish-dev:
+          requires:
+            - validate
+          context: orb-publishing
+
+      - trigger-integration:
+          name: trigger-integration-dev
+          requires:
+            - publish-dev
+          filters:
+            branches:
+              ignore: master
+
+      - trigger-integration:
+          name: trigger-integration-master
+          tag: master
+          requires:
+            - publish-dev
+          filters:
+            branches:
+              only: master
+
+  integration_test-prod_deploy:
+    jobs:
+      - notifytest:
+          name: notifytest-dev
+          context: orb-publishing
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /integration-.*/
+
+      - statustestpass:
+          name: statustestpass-dev
+          context: orb-publishing
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /integration-.*/
+
+      - notifytest:
+          name: notifytest-master
+          context: orb-publishing
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /master-.*/
+
+      - statustestpass:
+          name: statustestpass-master
+          context: orb-publishing
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /master-.*/
+
+      - dev-promote-prod:
+          context: orb-publishing
+          requires:
+            - notifytest-master
+            - statustestpass-master
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /master-.*/
