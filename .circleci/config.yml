@@ -91,11 +91,11 @@ jobs:
   #     - slack/status:
   #         mentions: "${ORBS_USER_GROUP_UUID}"
 
-  promote-prod:
+  dev-promote-prod:
     executor: cli
     steps:
       - checkout
-      - run: circleci orb publish promote circleci/slack@dev:$CIRCLE_BRANCH-$CIRCLE_SHA1 patch --token $CIRCLE_TOKEN
+      - run: circleci orb publish promote circleci/slack@dev:$CIRCLE_BRANCH-${CIRCLE_SHA1:0:7} patch --token $CIRCLE_TOKEN
 
 workflows:
   validate_unit-test_dev-deploy:
