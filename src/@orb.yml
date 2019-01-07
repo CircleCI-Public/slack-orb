@@ -14,6 +14,13 @@ description: |
 ## - Bash
 ## - cURL
 
+executors:
+  alpine:
+    docker:
+      - image: spotify/alpine:latest
+        environment:
+          TERM: dumb
+
 commands:
   ## NOTIFY ##
   notify:
@@ -39,11 +46,10 @@ commands:
       - run:
           name: Provide error if non-bash shell
           command: |
-            if [ $(echo $SHELL | grep -c bash) -ne 1 ]; then
+            if [ -z "$BASH" ]; then
               echo Bash not installed.
               exit 1
             fi
-
       - run:
           name: Slack Notification
           shell: /bin/bash
@@ -134,7 +140,7 @@ commands:
       - run:
           name: Provide error if non-bash shell
           command: |
-            if [ $(echo $SHELL | grep -c bash) -ne 1 ]; then
+            if [ -z "$BASH" ]; then
               echo Bash not installed.
               exit 1
             fi
@@ -233,6 +239,133 @@ commands:
               fi
             fi
           when: always
+
+  ## APPROVAL ##
+  approval:
+    description: Send a notification that an approval is required.
+    parameters:
+      webhook:
+        description: Enter either your Webhook value or use the CircleCI UI to add your token under the 'SLACK_WEBHOOK' env var
+        type: string
+        default: ${SLACK_WEBHOOK}
+      message:
+        description: Enter custom message.
+        type: string
+        default: A workflow in CircleCI is awaiting your approval.
+      color:
+        description: Hex color value for notification attachment color.
+        type: string
+        default: "#3AA3E3"
+      mentions:
+        description: A comma separated list of user IDs. No spaces.
+        type: string
+        default: ""
+      url:
+        description: The URL to link back to.
+        type: string
+        default: https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}
+    steps:
+      - run:
+          name: Provide error if non-bash shell
+          command: |
+            if [ -z "$BASH" ]; then
+              echo Bash not installed.
+              exit 1
+            fi
+
+      - run:
+          name: Slack - Sending Approval Notification
+          shell: /bin/bash
+          command: |
+            # Provide error if non-bash shell
+            if [ -z "$BASH" ]; then
+              echo Bash not installed.
+              exit 1
+            fi
+            # Provide error if no webhook is set and error. Otherwise continue
+            if [ -z "<< parameters.webhook >>" ]; then
+              echo "NO SLACK WEBHOOK SET"
+              echo "Please input your SLACK_WEBHOOK value either in the settings for this project, or as a parameter for this orb."
+              exit 1
+            else
+              #Create Members string
+              if [ -n "<< parameters.mentions >>" ]; then
+                IFS="," read -ra SLACK_MEMBERS \<<< "<< parameters.mentions >>"
+                for i in "${SLACK_MEMBERS[@]}"; do
+                  if [ $(echo ${i} | head -c 1) == "S" ]; then
+                    SLACK_MENTIONS="${SLACK_MENTIONS}<!subteam^${i}> "
+                  else
+                    SLACK_MENTIONS="${SLACK_MENTIONS}<@${i}> "
+                  fi
+                done
+              fi
+
+              curl -X POST -H 'Content-type: application/json' \
+                --data \
+                "{ \
+                  \"attachments\": [ \
+                    { \
+                      \"fallback\": \"<< parameters.message >> - << parameters.url >>\", \
+                      \"text\": \"<< parameters.message >> $SLACK_MENTIONS\", \
+                      \"fields\": [ \
+                        { \
+                          \"title\": \"Project\", \
+                          \"value\": \"$CIRCLE_PROJECT_REPONAME\", \
+                          \"short\": true \
+                        }, \
+                        { \
+                          \"title\": \"Job Number\", \
+                          \"value\": \"$CIRCLE_BUILD_NUM\", \
+                          \"short\": true \
+                        } \
+                      ], \
+                      \"actions\": [ \
+                        { \
+                          \"type\": \"button\", \
+                          \"text\": \"Open workflow\", \
+                          \"url\": \"<< parameters.url >>\" \
+                        } \
+                      ], \
+                      \"color\": \"<< parameters.color >>\" \
+                    } \
+                  ] \
+                }" << parameters.webhook >>
+              echo "Awaiting approval notified."
+            fi
+
+jobs:
+  approval-notification:
+    description: Notify slack about awaiting approval
+    parameters:
+      webhook:
+        description: Enter either your Webhook value or use the CircleCI UI to add your token under the 'SLACK_WEBHOOK' env var
+        type: string
+        default: ${SLACK_WEBHOOK}
+      message:
+        description: Enter custom message.
+        type: string
+        default: A workflow in CircleCI is awaiting your approval.
+      color:
+        description: Hex color value for notification attachment color.
+        type: string
+        default: "#3AA3E3"
+      mentions:
+        description: A comma separated list of user IDs. No spaces.
+        type: string
+        default: ""
+      url:
+        description: The URL to link back to.
+        type: string
+        default: https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}
+    executor: alpine
+    steps:
+      - approval:
+          webhook: << parameters.webhook >>
+          message: << parameters.message >>
+          color: << parameters.color >>
+          mentions: << parameters.mentions >>
+          url: << parameters.url >>
+
 #
 # Usage examples of Slack Orb
 #
@@ -271,3 +404,13 @@ examples:
                 fail_only: "true" # Optional: if set to "true" then only failure messages will occur.
                 webhook: "webhook" # Optional: Enter a specific webhook here or the default will use $SLACK_WEBHOOK
                 only_for_branch: "only_for_branch" # Optional: If set, a specific branch for which status updates will be sent.
+  approval:
+    description: "Notify a slack channel of a pending approval."
+    usage:
+      version: 2.1
+      orbs:
+        slack: circleci/slack@volatile
+      jobs:
+        slack/notify-job:
+          message: "Pending approval"
+          webhook: "webhook" # Optional: Enter a specific webhook here or the default will use $SLACK_WEBHOOK
