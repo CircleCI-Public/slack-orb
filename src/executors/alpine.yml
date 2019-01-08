@@ -1,0 +1,5 @@
+alpine:
+  docker:
+    - image: cibuilds/base:latest
+      environment:
+        TERM: dumb
