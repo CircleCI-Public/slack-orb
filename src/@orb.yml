@@ -17,7 +17,7 @@ description: |
 executors:
   alpine:
     docker:
-      - image: spotify/alpine:latest
+      - image: cibuilds/base:latest
         environment:
           TERM: dumb
 
