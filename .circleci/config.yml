@@ -11,7 +11,7 @@ executors:
     docker:
       - image: circleci/circleci-cli
 
-  cibuilds/base:
+  ci-base:
     resource_class: small
     docker:
       - image: cibuilds/base
@@ -54,7 +54,7 @@ jobs:
           path: workspace/orb.yml
 
   trigger-integration:
-    executor: cibuilds/base
+    executor: ci-base
     parameters:
       tag:
         type: enum
@@ -96,7 +96,7 @@ jobs:
             git push origin $INTEGRATION_TAG
 
   notifytest:
-    executor: cibuilds/base
+    executor: ci-base
     steps:
       - run: exit 0 #toggle this to force success or status for testing
       - slack/notify:
@@ -105,21 +105,21 @@ jobs:
           mentions: "${ORBS_USER_GROUP_UUID}"
 
   statustestpass:
-    executor: cibuilds/base
+    executor: ci-base
     steps:
       - run: exit 0 #toggle this to force success or status for testing
       - slack/status:
           mentions: "${ORBS_USER_GROUP_UUID}"
 
   # statustestfail:
-  #   executor: cibuilds/base
+  #   executor: ci-base
   #   steps:
   #     - run: exit 1 #toggle this to force success or status for testing
   #     - slack/status:
   #         mentions: "${ORBS_USER_GROUP_UUID}"
 
   approvaltest:
-    executor: cibuilds/base
+    executor: ci-base
     steps:
       - slack/approval:
           mentions: "${ORBS_USER_GROUP_UUID}"
