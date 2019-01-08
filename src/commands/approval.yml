@@ -84,7 +84,7 @@ steps:
                   \"actions\": [ \
                     { \
                       \"type\": \"button\", \
-                      \"text\": \"Open workflow\", \
+                      \"text\": \"Visit Workflow\", \
                       \"url\": \"<< parameters.url >>\" \
                     } \
                   ], \
