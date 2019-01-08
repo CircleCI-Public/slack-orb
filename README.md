@@ -12,7 +12,7 @@ Example config:
 version: 2.1
 
 orbs:
-  slack: circleci/slack@volatile
+  slack: circleci/slack@1.0.0
 
 jobs:
   build:
@@ -22,7 +22,7 @@ jobs:
       - slack/<command>
 ```
 
-`slack@volatile` from the `circleci` namespace is imported into `slack` which can then be referenced in a step in any job you require.
+`slack@1.0.0` from the `circleci` namespace is imported into the config.yml as `slack` and can then be referenced as such in any job or workflow.
 
 ## Commands
 
@@ -39,8 +39,8 @@ Example:
 version: 2.1
 
 orbs:
-  slack: circleci/slack@volatile
-  
+  slack: circleci/slack@1.0.0
+
 jobs:
   build:
     docker:
@@ -70,7 +70,7 @@ Example:
 version: 2.1
 
 orbs:
-  slack: circleci/slack@volatile
+  slack: circleci/slack@1.0.0
 
 jobs:
   build:
@@ -79,7 +79,7 @@ jobs:
     steps:
       # With fail_only set to true, no alert will be sent in this example. Change the exit status on the next line to produce an error.
       - run: exit 0
-      
+
       - slack/status:
           mentions: "USERID1,USERID2" # Optional: Enter the Slack IDs of any user or group (sub_team) to be mentioned
           fail_only: "true" # Optional: if set to "true" then only failure messages will occur.
