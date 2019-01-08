@@ -1,0 +1,96 @@
+description: Send a notification that an approval is required.
+
+parameters:
+  webhook:
+    description: Enter either your Webhook value or use the CircleCI UI to add your token under the 'SLACK_WEBHOOK' env var
+    type: string
+    default: ${SLACK_WEBHOOK}
+
+  message:
+    description: Enter custom message.
+    type: string
+    default: A workflow in CircleCI is awaiting your approval.
+
+  color:
+    description: Hex color value for notification attachment color.
+    type: string
+    default: "#3AA3E3"
+
+  mentions:
+    description: A comma separated list of user IDs. No spaces.
+    type: string
+    default: ""
+
+  url:
+    description: The URL to link back to.
+    type: string
+    default: https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}
+
+steps:
+  - run:
+      name: Provide error if non-bash shell
+      command: |
+        if [ -z "$BASH" ]; then
+          echo Bash not installed.
+          exit 1
+        fi
+
+  - run:
+      name: Slack - Sending Approval Notification
+      shell: /bin/bash
+      command: |
+        # Provide error if non-bash shell
+        if [ -z "$BASH" ]; then
+          echo Bash not installed.
+          exit 1
+        fi
+        # Provide error if no webhook is set and error. Otherwise continue
+        if [ -z "<< parameters.webhook >>" ]; then
+          echo "NO SLACK WEBHOOK SET"
+          echo "Please input your SLACK_WEBHOOK value either in the settings for this project, or as a parameter for this orb."
+          exit 1
+        else
+          #Create Members string
+          if [ -n "<< parameters.mentions >>" ]; then
+            IFS="," read -ra SLACK_MEMBERS \<<< "<< parameters.mentions >>"
+            for i in "${SLACK_MEMBERS[@]}"; do
+              if [ $(echo ${i} | head -c 1) == "S" ]; then
+                SLACK_MENTIONS="${SLACK_MENTIONS}<!subteam^${i}> "
+              else
+                SLACK_MENTIONS="${SLACK_MENTIONS}<@${i}> "
+              fi
+            done
+          fi
+
+          curl -X POST -H 'Content-type: application/json' \
+            --data \
+            "{ \
+              \"attachments\": [ \
+                { \
+                  \"fallback\": \"<< parameters.message >> - << parameters.url >>\", \
+                  \"text\": \"<< parameters.message >> $SLACK_MENTIONS\", \
+                  \"fields\": [ \
+                    { \
+                      \"title\": \"Project\", \
+                      \"value\": \"$CIRCLE_PROJECT_REPONAME\", \
+                      \"short\": true \
+                    }, \
+                    { \
+                      \"title\": \"Job Number\", \
+                      \"value\": \"$CIRCLE_BUILD_NUM\", \
+                      \"short\": true \
+                    } \
+                  ], \
+                  \"actions\": [ \
+                    { \
+                      \"type\": \"button\", \
+                      \"text\": \"Visit Workflow\", \
+                      \"url\": \"<< parameters.url >>\" \
+                    } \
+                  ], \
+                  \"color\": \"<< parameters.color >>\" \
+                } \
+              ] \
+            }" << parameters.webhook >>
+          echo "Awaiting approval notified."
+        fi

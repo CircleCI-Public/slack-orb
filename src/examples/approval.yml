@@ -1,0 +1,14 @@
+description: "Notify a slack channel of a pending approval."
+
+usage:
+  version: 2.1
+
+  orbs:
+    slack: circleci/slack@1.0.0
+
+  workflows:
+    your-workflow:
+      jobs:
+        - slack/notify-job:
+            message: "Pending approval"
+            webhook: "webhook" # Optional: Enter a specific webhook here or the default will use $SLACK_WEBHOOK

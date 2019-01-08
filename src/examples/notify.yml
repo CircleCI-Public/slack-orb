@@ -1,0 +1,18 @@
+description: "Notify a slack channel with a custom message at any point in a job with this custom step. More docs here: https://github.com/CircleCI-Public/slack-orb"
+
+usage:
+  version: 2.1
+
+  orbs:
+    slack: circleci/slack@1.0.0
+
+  jobs:
+    build:
+      docker:
+        - image: <docker image>
+      steps:
+        - slack/notify:
+            message: "This is a custom message notification" # Optional: Enter your own message
+            mentions: "USERID1,USERID2," # Optional: Enter the Slack IDs of any user or group (sub_team) to be mentioned
+            color: "#42e2f4" # Optional: Assign custom colors for each notification
+            webhook: "webhook" # Optional: Enter a specific webhook here or the default will use $SLACK_WEBHOOK
