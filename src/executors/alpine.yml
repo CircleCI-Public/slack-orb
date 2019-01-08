@@ -1,5 +1,5 @@
-alpine:
-  docker:
-    - image: cibuilds/base:latest
-      environment:
-        TERM: dumb
+resource_class: small
+docker:
+  - image: cibuilds/base:latest
+    environment:
+      TERM: dumb
