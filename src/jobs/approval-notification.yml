@@ -1,4 +1,4 @@
-description: Notify slack about awaiting approval
+description: Notify Slack about an awaiting approval job
 
 parameters:
   webhook:

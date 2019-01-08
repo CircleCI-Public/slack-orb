@@ -249,6 +249,7 @@ workflows:
 
       - dev-promote-prod:
           name: dev-promote-minor
+          release: minor
           context: orb-publishing
           requires: *prod-deploy_requires
           filters:
@@ -259,6 +260,7 @@ workflows:
 
       - dev-promote-prod:
           name: dev-promote-major
+          release: major
           context: orb-publishing
           requires: *prod-deploy_requires
           filters:

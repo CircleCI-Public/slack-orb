@@ -1,4 +1,4 @@
-description: Send a notification that an approval is required.
+description: Send a notification that a manual approval job is ready
 
 parameters:
   webhook:

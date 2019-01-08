@@ -1,4 +1,6 @@
-description: Send a status alert at the end of a job based on success or failure. Must be the last step in a job.
+description: >
+  Send a status alert at the end of a job based on success or failure.
+  Must be the last step in a job.
 
 parameters:
   webhook:
