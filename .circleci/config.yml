@@ -1,100 +1,17 @@
 version: 2.1
 
 orbs:
-  circle-compare-url: iynere/compare-url@0.4.5
-  orb-tools: circleci/orb-tools@2.0.2
+  circle-compare-url: iynere/compare-url@0.4.8
+  orb-tools: circleci/orb-tools@7.3.0
   slack: circleci/slack@dev:alpha
 
 executors:
-  cli:
-    resource_class: small
-    docker:
-      - image: circleci/circleci-cli
-
   ci-base:
     resource_class: small
     docker:
       - image: cibuilds/base
 
-  lint:
-    resource_class: small
-    docker:
-      - image: singapore/lint-condo
-
 jobs:
-  lint:
-    executor: lint
-    steps:
-      - checkout
-      - run: yamllint .
-
-  # validate goes here: see workflow
-
-  publish-dev:
-    executor: cli
-    steps:
-      - checkout
-
-      - attach_workspace:
-          at: workspace
-
-      - run:
-          name: publish dev versions
-          command: |
-            # for integration testing
-            circleci orb publish workspace/orb.yml circleci/slack@dev:alpha --token $CIRCLE_TOKEN
-
-            # for transparency
-            circleci orb publish workspace/orb.yml circleci/slack@dev:$CIRCLE_BRANCH-${CIRCLE_SHA1:0:7} --token $CIRCLE_TOKEN
-
-            # for potentially promoting to prod
-            circleci orb publish workspace/orb.yml circleci/slack@dev:${CIRCLE_SHA1:0:7} --token $CIRCLE_TOKEN
-
-      - store_artifacts:
-          path: workspace/orb.yml
-
-  trigger-integration:
-    executor: ci-base
-    parameters:
-      tag:
-        type: enum
-        default: "integration"
-        enum: ["integration", master]
-    steps:
-      - checkout
-
-      - add_ssh_keys:
-          fingerprints:
-            - "79:ae:f5:10:17:8a:d2:9a:ed:63:5c:b0:92:66:23:49"
-
-      - run:
-          name: git config
-          command: |
-            git config --global user.email "$CIRCLE_USERNAME@users.noreply.github.com"
-            git config --global user.name "$CIRCLE_USERNAME"
-
-      - circle-compare-url/reconstruct
-
-      - run:
-          name: trigger integration workflow, possible patch / minor / major release
-          command: |
-            CIRCLE_COMPARE_URL=$(cat CIRCLE_COMPARE_URL.txt)
-
-            COMMIT_RANGE=$(echo $CIRCLE_COMPARE_URL | sed 's:^.*/compare/::g')
-
-            echo "Commit range: $COMMIT_RANGE"
-
-            if [[ $(git diff $COMMIT_RANGE --name-status | grep -e "src/commands" -e "src/jobs") ]]; then
-              INTEGRATION_TAG=<<parameters.tag>>-major-$CIRCLE_BRANCH-${CIRCLE_SHA1:0:7}
-            elif [[ $(git diff $COMMIT_RANGE --name-status | grep -e "src/executors" -e "src/examples" -e "src/@orb.yml") ]]; then
-              INTEGRATION_TAG=<<parameters.tag>>-minor-$CIRCLE_BRANCH-${CIRCLE_SHA1:0:7}
-            else
-              INTEGRATION_TAG=<<parameters.tag>>-patch-$CIRCLE_BRANCH-${CIRCLE_SHA1:0:7}
-            fi
-
-            git tag $INTEGRATION_TAG
-            git push origin $INTEGRATION_TAG
-
   notifytest:
     executor: ci-base
     steps:
@@ -124,18 +41,6 @@ jobs:
       - slack/approval:
           mentions: "${ORBS_USER_GROUP_UUID}"
 
-  dev-promote-prod:
-    executor: cli
-    parameters:
-      release:
-        type: enum
-        default: "patch"
-        enum: ["patch", "minor", "major"]
-    steps:
-      - run:
-          name: major release if changes to src/commands or src/jobs; minor if to src/examples, src/executors, or src/@orb.yml; otherwise patch
-          command: circleci orb publish promote circleci/slack@dev:${CIRCLE_SHA1:0:7} <<parameters.release>> --token $CIRCLE_TOKEN
-
 # yaml anchor filters
 integration-dev_filters: &integration-dev_filters
   branches:
@@ -155,43 +60,41 @@ prod-deploy_requires: &prod-deploy_requires
 add-ssh-keys: &add-ssh-keys
   [add_ssh_keys: {fingerprints: ["40:21:b7:d7:fe:ea:dd:80:ca:c8:34:7a:37:b4:b4:d2"]}]
 
-cleanup-git-tag: &cleanup-git-tag
-  [run: {when: "always", name: "cleanup tag", command: "git config --global user.email $CIRCLE_USERNAME@users.noreply.github.com && git config --global user.name $CIRCLE_USERNAME && git push --delete origin $CIRCLE_TAG"}]
+# not in use yet—add this functionality to git-tools-orb when it's ready
+# cleanup-git-tag: &cleanup-git-tag
+#   [run: {when: "always", name: "cleanup tag", command: "git config --global user.email $CIRCLE_USERNAME@users.noreply.github.com && git config --global user.name $CIRCLE_USERNAME && git push --delete origin $CIRCLE_TAG"}]
 
 workflows:
   lint_pack-validate_publish-dev:
     jobs:
-      - lint
+      - orb-tools/lint
 
       - orb-tools/pack:
-          name: pack-validate
-          source-dir: src
-          destination-orb-path: orb.yml
-          workspace-path: orb.yml
-          artifact-path: orb.yml
           requires:
-            - lint
+            - orb-tools/lint
 
-      - publish-dev:
+      - orb-tools/publish-dev:
           context: orb-publishing
+          orb-name: circleci/slack-orb
           requires:
-            - pack-validate
+            - orb-tools/pack
 
-      - trigger-integration:
+      - orb-tools/trigger-integration-workflow:
+          context: orb-publishing
           name: trigger-integration-dev
-          context: orb-publishing
+          ssh-fingerprints: 79:ae:f5:10:17:8a:d2:9a:ed:63:5c:b0:92:66:23:49
           requires:
-            - publish-dev
+            - orb-tools/publish-dev
           filters:
             branches:
               ignore: master
 
-      - trigger-integration:
+      - orb-tools/trigger-integration-workflow:
           name: trigger-integration-master
-          context: orb-publishing
+          ssh-fingerprints: 79:ae:f5:10:17:8a:d2:9a:ed:63:5c:b0:92:66:23:49
           tag: master
           requires:
-            - publish-dev
+            - orb-tools/publish-dev
           filters:
             branches:
               only: master
@@ -243,9 +146,10 @@ workflows:
           filters: *integration-master_filters
 
       # patch, minor, or major publishing
-      - dev-promote-prod:
+      - orb-tools/dev-promote-prod:
           name: dev-promote-patch
           context: orb-publishing
+          orb-name: circleci/slack-orb
           requires: *prod-deploy_requires
           filters:
             branches:
@@ -253,10 +157,11 @@ workflows:
             tags:
               only: /master-patch.*/
 
-      - dev-promote-prod:
+      - orb-tools/dev-promote-prod:
           name: dev-promote-minor
           release: minor
           context: orb-publishing
+          orb-name: circleci/slack-orb
           requires: *prod-deploy_requires
           filters:
             branches:
@@ -264,10 +169,11 @@ workflows:
             tags:
               only: /master-minor.*/
 
-      - dev-promote-prod:
+      - orb-tools/dev-promote-prod:
           name: dev-promote-major
           release: major
           context: orb-publishing
+          orb-name: circleci/slack-orb
           requires: *prod-deploy_requires
           filters:
             branches:
