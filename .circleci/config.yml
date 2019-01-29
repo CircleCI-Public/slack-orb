@@ -75,7 +75,7 @@ workflows:
 
       - orb-tools/publish-dev:
           context: orb-publishing
-          orb-name: circleci/slack-orb
+          orb-name: circleci/slack
           requires:
             - orb-tools/pack
 
@@ -149,7 +149,7 @@ workflows:
       - orb-tools/dev-promote-prod:
           name: dev-promote-patch
           context: orb-publishing
-          orb-name: circleci/slack-orb
+          orb-name: circleci/slack
           requires: *prod-deploy_requires
           filters:
             branches:
@@ -161,7 +161,7 @@ workflows:
           name: dev-promote-minor
           release: minor
           context: orb-publishing
-          orb-name: circleci/slack-orb
+          orb-name: circleci/slack
           requires: *prod-deploy_requires
           filters:
             branches:
@@ -173,7 +173,7 @@ workflows:
           name: dev-promote-major
           release: major
           context: orb-publishing
-          orb-name: circleci/slack-orb
+          orb-name: circleci/slack
           requires: *prod-deploy_requires
           filters:
             branches:
