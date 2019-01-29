@@ -152,6 +152,12 @@ integration-master_filters: &integration-master_filters
 prod-deploy_requires: &prod-deploy_requires
   [notifytest-master, statustestpass-master, approvaltest-master, approval-notification-job-master]
 
+add-ssh-keys: &add-ssh-keys
+  [add_ssh_keys: {fingerprints: ["40:21:b7:d7:fe:ea:dd:80:ca:c8:34:7a:37:b4:b4:d2"]}]
+
+cleanup-git-tag: &cleanup-git-tag
+  [run: {when: "always", name: "cleanup tag", command: "git config --global user.email $CIRCLE_USERNAME@users.noreply.github.com && git config --global user.name $CIRCLE_USERNAME && git push --delete origin $CIRCLE_TAG"}]
+
 workflows:
   lint_pack-validate_publish-dev:
     jobs:
