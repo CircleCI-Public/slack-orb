@@ -19,9 +19,14 @@ parameters:
     default: ""
 
   only_for_branch:
-    description: If, set, a specific branch for which slack status updates will be sent.
+    description: If set, a specific branch for which slack status updates will be sent.
     type: string
     default: ""
+
+  only_for_tag:
+    description: If set, status updates will be sent to any tag.
+    type: boolean
+    default: false
 
 steps:
   - run:
@@ -49,7 +54,9 @@ steps:
       shell: /bin/bash
       when: always
       command: |
-        if [ "x" == "x<< parameters.only_for_branch>>" ] || [ "${CIRCLE_BRANCH}" == "<< parameters.only_for_branch>>" ]; then
+        if [[ "x" == "x<< parameters.only_for_branch >>" && "${CIRCLE_BRANCH}" == "<< parameters.only_for_branch >>" ]] ||
+           << parameters.only_for_tag >> && [ -n "${CIRCLE_TAG}" ] ||
+           [[ -z "<< parameters.only_for_branch >>" && ! << parameters.only_for_tag >> ]]; then
           # Provide error if no webhook is set and error. Otherwise continue
           if [ -z "<< parameters.webhook >>" ]; then
             echo "NO SLACK WEBHOOK SET"
