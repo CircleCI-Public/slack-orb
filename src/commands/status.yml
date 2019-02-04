@@ -54,9 +54,9 @@ steps:
       shell: /bin/bash
       when: always
       command: |
-        if [[ "x" == "x<< parameters.only_for_branch >>" && "${CIRCLE_BRANCH}" == "<< parameters.only_for_branch >>" ]] ||
-           << parameters.only_for_tag >> && [ -n "${CIRCLE_TAG}" ] ||
-           [[ -z "<< parameters.only_for_branch >>" && ! << parameters.only_for_tag >> ]]; then
+        if [[ -n "${CIRCLE_BRANCH}" && "x" == "x<< parameters.only_for_branch >>" && "${CIRCLE_BRANCH}" == "<< parameters.only_for_branch >>" ]] ||
+           [[ -n "${CIRCLE_TAG}" && "xtrue" == "x<< parameters.only_for_tag >>" ]] ||
+           [[ "x" == "x<< parameters.only_for_branch >>" && "x" == "x<< parameters.only_for_tag >>" ]]; then
           # Provide error if no webhook is set and error. Otherwise continue
           if [ -z "<< parameters.webhook >>" ]; then
             echo "NO SLACK WEBHOOK SET"
