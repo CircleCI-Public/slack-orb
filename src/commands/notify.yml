@@ -51,6 +51,21 @@ parameters:
     type: string
     default: ""
 
+  include_project_field:
+    description: Whether or not to include the Project field in the message
+    type: boolean
+    default: true
+
+  include_job_number_field:
+    description: Whether or not to include the Job Number field in the message
+    type: boolean
+    default: true
+
+  include_visit_job_action:
+    description: Whether or not to include the Visit Job action in the message
+    type: boolean
+    default: true
+
 steps:
   - run:
       name: Provide error if non-bash shell
@@ -97,23 +112,29 @@ steps:
                   \"footer\": \"<< parameters.footer >>\", \
                   \"ts\": \"<< parameters.ts >>\", \
                   \"fields\": [ \
+                    <<# parameters.include_project_field >>
                     { \
                       \"title\": \"Project\", \
                       \"value\": \"$CIRCLE_PROJECT_REPONAME\", \
                       \"short\": true \
                     }, \
+                    <</ parameters.include_project_field >>
+                    <<# parameters.include_job_number_field >>
                     { \
                       \"title\": \"Job Number\", \
                       \"value\": \"$CIRCLE_BUILD_NUM\", \
                       \"short\": true \
                     } \
+                    <</ parameters.include_job_number_field >>
                   ], \
                   \"actions\": [ \
+                    <<# parameters.include_visit_job_action >>
                     { \
                       \"type\": \"button\", \
                       \"text\": \"Visit Job\", \
                       \"url\": \"$CIRCLE_BUILD_URL\" \
                     } \
+                    <</ parameters.include_visit_job_action >>
                   ], \
                   \"color\": \"<< parameters.color >>\" \
                 } \
