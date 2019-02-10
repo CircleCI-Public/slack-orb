@@ -31,7 +31,9 @@ jobs:
 |  Usage | slack/notify   |
 | ------------ | ------------ |
 | **Description:**  | Notify a slack channel with a custom message at any point in a job with this custom step. |
-|  **Parameters:** | - **webhook:**  Enter either your Webhook value or use the CircleCI UI to add your token under the `SLACK_WEBHOOK` environment variable <br><br> - **message:** Enter your custom message to send to your Slack channel.  <br> <br> - **mentions:** A comma separated list of Slack user IDs, or Group (SubTeam) IDs. example 'USER1,USER2,USER3'. Note, these are Slack User IDs, not usernames. The user ID can be found on the user's profile. Look below for infomration on obtaining Group ID. <br> <br> - **color:** Color can be set for a notification to help differentiate alerts.|
+|  **Parameters:** | - **webhook:**  Enter either your Webhook value or use the CircleCI UI to add your token under the `SLACK_WEBHOOK` environment variable <br><br> - **message:** Enter your custom message to send to your Slack channel.  <br> <br> - **mentions:** A comma separated list of Slack user IDs, or Group (SubTeam) IDs. example 'USER1,USER2,USER3'. Note, these are Slack User IDs, not usernames. The user ID can be found on the user's profile. Look below for infomration on obtaining Group ID. <br> <br> - **color:** Color can be set for a notification to help differentiate alerts. <br><br> - **author_name:** Optional author name property for the [Slack message attachment]. <br><br> - **author_link:** Optional author link property for the [Slack message attachment]. <br><br> - **title:** Optional title property for the [Slack message attachment]. <br><br> - **title_link:** Optional title link property for the [Slack message attachment]. <br><br> - **footer:** Optional footer property for the [Slack message attachment]. <br><br> - **ts:** Optional timestamp property for the [Slack message attachment].|
+
+[Slack message attachment]: https://api.slack.com/docs/message-attachments
 
 Example:
 

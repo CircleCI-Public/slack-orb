@@ -21,6 +21,36 @@ parameters:
     type: string
     default: ""
 
+  author_name:
+    description: Optional author name
+    type: string
+    default: ""
+
+  author_link:
+    description: Optional author link
+    type: string
+    default: ""
+
+  title:
+    description: Optional title
+    type: string
+    default: ""
+
+  title_link:
+    description: Optional title link
+    type: string
+    default: ""
+
+  footer:
+    description: Optional footer
+    type: string
+    default: ""
+
+  ts:
+    description: Optional timestamp
+    type: string
+    default: ""
+
 steps:
   - run:
       name: Provide error if non-bash shell
@@ -60,6 +90,12 @@ steps:
                 { \
                   \"fallback\": \"<< parameters.message >> - $CIRCLE_BUILD_URL\", \
                   \"text\": \"<< parameters.message >> $SLACK_MENTIONS\", \
+                  \"author_name\": \"<< parameters.author_name >>\", \
+                  \"author_link\": \"<< parameters.author_link >>\", \
+                  \"title\": \"<< parameters.title >>\", \
+                  \"title_link\": \"<< parameters.title_link >>\", \
+                  \"footer\": \"<< parameters.footer >>\", \
+                  \"ts\": \"<< parameters.ts >>\", \
                   \"fields\": [ \
                     { \
                       \"title\": \"Project\", \
