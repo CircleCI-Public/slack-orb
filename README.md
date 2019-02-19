@@ -1,11 +1,9 @@
 # Slack Orb ![CircleCI status](https://circleci.com/gh/CircleCI-Public/slack-orb.svg "CircleCI status")
-
 Easily integrate custom [Slack](https://slack.com/ "Slack") notifications into your [CircleCI](https://circleci.com/ "CircleCI") projects. Create custom alert messages for any job or receive status updates.
 
 Learn more about [Orbs](https://circleci.com/docs/2.0/using-orbs/ "Using Orbs").
 
 ## Usage
-
 Example config:
 
 ```yaml
@@ -27,7 +25,6 @@ jobs:
 ## Commands
 
 ### Notify
-
 Notify a slack channel with a custom message at any point in a job with this custom step.
 
 | Parameter | Type | Default | Description |
@@ -73,7 +70,6 @@ jobs:
 See Slack's [Basic message formatting](https://api.slack.com/docs/message-formatting) documentation for guidance on formatting notification messages.
 
 ### Status
-
 Send a status alert at the end of a job based on success or failure. This must be the last step in a job.
 
 | Parameter | Type | Default | Description |
@@ -112,17 +108,14 @@ jobs:
 ## Dependencies / Requirements
 
 ### Bash Shell
-
 Due to the limitations of the `sh` shell, `Bash` is required. `Bash` is the default shell used on CircleCI and the Orb will be compatible with most images. Images such as `Alpine` that do not contain the `Bash` shell by default are incompatible and en error message will be logged. You may install the Bash shell through your package manager (example: `apk add bash`) in the Dockerfile for the image you are using.
 
 ### cURL
-
 cURL is used to post the Webhook data and must be installed in the container to function properly.
 
 ## Help
 
 ### How to get your Slack Webhook
-
 Full instructions can be found at Slack: https://api.slack.com/incoming-webhooks
 
 1. [Create Slack App](https://api.slack.com/docs/slack-button#register_your_slack_app). This will also be the name of the "user" that posts alerts to Slack. You'll be asked for which Workspace this app belongs to.
@@ -132,15 +125,16 @@ Full instructions can be found at Slack: https://api.slack.com/incoming-webhooks
 5. Done! A webhook URL will be created.
 
 ### How To Get Your Group ID
-
 1. Navigate to https://api.slack.com/methods/usergroups.list/test
 2. Select the correct application under "token"
 3. Press "Test Method"
 4. Find your group below and copy the value for "ID"
 
 ### What to do with Slack Webhook
-
 You can implement the Webhook in one of two ways, as an environment variable, or as a parameter.
 
 1. In the settings page for your project on CircleCI, click `Environment Variables`. From that page you can click the `Add Variable` button. Finally, enter your webhook as the value, and `SLACK_WEBHOOK` as the name.
 2. You can enter the Webhook for the individual status or alert by entering is at the `webhook` parameter, as shown above.
+
+## Contributing
+We welcome [issues](https://github.com/CircleCI-Public/slack-orb/issues) to and [pull requests](https://github.com/CircleCI-Public/slack-orb/pulls) against this repository! For further questions/comments about this or other orbs, visit [CircleCI's Orbs discussion forum](https://discuss.circleci.com/c/orbs).
