@@ -2,7 +2,7 @@
 
 Easily integrate custom [Slack](https://slack.com/ "Slack") notifications into your [CircleCI](https://circleci.com/ "CircleCI") projects. Create custom alert messages for any job or receive status updates.
 
-Learn more about [Orbs](https://github.com/CircleCI-Public/config-preview-sdk/blob/master/docs/using-orbs.md "orb").
+Learn more about [Orbs](https://circleci.com/docs/2.0/using-orbs/ "Using Orbs").
 
 ## Usage
 
@@ -26,12 +26,25 @@ jobs:
 
 ## Commands
 
-- ### Notify
+### Notify
 
-|  Usage | slack/notify   |
-| ------------ | ------------ |
-| **Description:**  | Notify a slack channel with a custom message at any point in a job with this custom step. |
-|  **Parameters:** | - **webhook:**  Enter either your Webhook value or use the CircleCI UI to add your token under the `SLACK_WEBHOOK` environment variable <br><br> - **message:** Enter your custom message to send to your Slack channel.  <br> <br> - **mentions:** A comma separated list of Slack user IDs, or Group (SubTeam) IDs. example 'USER1,USER2,USER3'. Note, these are Slack User IDs, not usernames. The user ID can be found on the user's profile. Look below for infomration on obtaining Group ID. <br> <br> - **color:** Color can be set for a notification to help differentiate alerts. <br><br> - **author_name:** Optional author name property for the [Slack message attachment]. <br><br> - **author_link:** Optional author link property for the [Slack message attachment]. <br><br> - **title:** Optional title property for the [Slack message attachment]. <br><br> - **title_link:** Optional title link property for the [Slack message attachment]. <br><br> - **footer:** Optional footer property for the [Slack message attachment]. <br><br> - **ts:** Optional timestamp property for the [Slack message attachment]. <br><br> - **include_project_field:** Whether or not to include the _Project_ field in the message. <br><br> - **include_job_number_field:** Whether or not to include the _Job Number_ field in the message. <br><br> - **include_visit_job_action:** Whether or not to include the _Visit Job_ action in the message.|
+Notify a slack channel with a custom message at any point in a job with this custom step.
+
+| Parameter | type | default | description |
+|-----------|------|---------|-------------|
+| `webhook` | `string` | ${SLACK_WEBHOOK} | Enter either your webhook value or use the CircleCI UI to add your token under the `SLACK_WEBHOOK` environment variable |
+| `message` | `string` | Your job on CircleCI has completed. | Enter your custom message to send to your Slack channel |
+| `mentions` | `string` | `false` | Comma-separated list of Slack User or Group (SubTeam) IDs (e.g., "USER1,USER2,USER3"). _**Note:** these are Slack User IDs, not usernames. The user ID can be found on the user's profile. Look below for information on obtaining Group ID._ |
+| `color` | `string` | #333333 |  Hex color value for notification attachment color |
+| `author_name` | `string` |  | Optional author name property for the [Slack message attachment] |
+| `author_link` | `string` |  | Optional author link property for the [Slack message attachment] |
+| `title` | `string` |  | Optional title property for the [Slack message attachment] |
+| `title_link` | `string` |  | Optional title link property for the [Slack message attachment] |
+| `footer` | `string` |  | Optional footer property for the [Slack message attachment] |
+| `ts` | `string` |  | Optional timestamp property for the [Slack message attachment] |
+| `include_project_field` | `boolean` | `true` | Whether or not to include the _Project_ field in the message |
+| `include_job_number_field` | `boolean` | `true` | Whether or not to include the _Job Number_ field in the message |
+| `include_visit_job_action` | `boolean` | `true` | Whether or not to include the _Visit Job_ action in the message |
 
 [Slack message attachment]: https://api.slack.com/docs/message-attachments
 
@@ -59,12 +72,16 @@ jobs:
 
 See Slack's [Basic message formatting](https://api.slack.com/docs/message-formatting) documentation for guidance on formatting notification messages.
 
-- ### Status
+### Status
 
-|  Usage | slack/status   |
-| ------------ | ------------ |
-| **Description:** | Send a status alert at the end of a job based on success or failure. This must be the last step in a job. |
-|  **Parameters:** | -  **webhook:** Enter either your Webhook value or use the CircleCI UI to add your token under the `SLACK_WEBHOOK` environment variable <br> <br> - **fail_only:** `false` by default. If set to `true, successful jobs will _not_ send alerts <br> <br> - **mentions:**  comma separated list of Slack user IDs, or Group (SubTeam) IDs. example 'USER1,USER2,USER3'. Note, these are Slack User IDs, not usernames. The user ID can be found on the user's profile. Look below for infomration on obtaining Group ID. <br> <br> - **only_for_branch**: Optional: If set, a specific branch for which status updates will be sent. |
+Send a status alert at the end of a job based on success or failure. This must be the last step in a job.
+
+| Parameter | type | default | description |
+|-----------|------|---------|-------------|
+| `webhook` | `string` | ${SLACK_WEBHOOK} | Enter either your webhook value or use the CircleCI UI to add your token under the `SLACK_WEBHOOK` environment variable |
+| `mentions` | `string` |  | Comma-separated list of Slack User or Group (SubTeam) IDs (e.g., "USER1,USER2,USER3"). _**Note:** these are Slack User IDs, not usernames. The user ID can be found on the user's profile. Look below for information on obtaining Group ID._ |
+| `fail_only` | `string` | false | If set to "true," successful jobs will _not_ send alerts |
+| `only_for_branch` |  | ${SLACK_WEBHOOK} | Enter either your webhook value or use the CircleCI UI to add your token under the `SLACK_WEBHOOK` environment variable |
 
 Example:
 
@@ -94,17 +111,19 @@ jobs:
 
 ## Dependencies / Requirements
 
-- ### Bash Shell
+### Bash Shell
 
 Due to the limitations of the `sh` shell, `Bash` is required. `Bash` is the default shell used on CircleCI and the Orb will be compatible with most images. Images such as `Alpine` that do not contain the `Bash` shell by default are incompatible and en error message will be logged. You may install the Bash shell through your package manager (example: `apk add bash`) in the Dockerfile for the image you are using.
 
-- ### cURL
+### cURL
 
 cURL is used to post the Webhook data and must be installed in the container to function properly.
 
 ## Help
 
-**How to get your Slack Webhook:**  Full instructions can be found at Slack: https://api.slack.com/incoming-webhooks
+### How to get your Slack Webhook
+
+Full instructions can be found at Slack: https://api.slack.com/incoming-webhooks
 
 1. [Create Slack App](https://api.slack.com/docs/slack-button#register_your_slack_app). This will also be the name of the "user" that posts alerts to Slack. You'll be asked for which Workspace this app belongs to.
 2. In the settings for the app, enable `Incoming Webhooks`
@@ -112,14 +131,16 @@ cURL is used to post the Webhook data and must be installed in the container to 
 4. Click `Add New Webhook to Workspace`. You will be asked to pick a channel for the webhook here.
 5. Done! A webhook URL will be created.
 
-**How To Get Your Group ID:**
+### How To Get Your Group ID
 
 1. Navigate to https://api.slack.com/methods/usergroups.list/test
 2. Select the correct application under "token"
 3. Press "Test Method"
 4. Find your group below and copy the value for "ID"
 
-**What to do with Slack Webhook:** You can implement the Webhook in one of two ways, as an environment variable, or as a parameter.
+### What to do with Slack Webhook
+
+You can implement the Webhook in one of two ways, as an environment variable, or as a parameter.
 
 1. In the settings page for your project on CircleCI, click `Environment Variables`. From that page you can click the `Add Variable` button. Finally, enter your webhook as the value, and `SLACK_WEBHOOK` as the name.
 2. You can enter the Webhook for the individual status or alert by entering is at the `webhook` parameter, as shown above.
