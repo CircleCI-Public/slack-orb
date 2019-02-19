@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   circle-compare-url: iynere/compare-url@0.4.8
-  orb-tools: circleci/orb-tools@7.3.0
+  orb-tools: circleci/orb-tools@8.1.0
   slack: circleci/slack@dev:alpha
 
 executors:
@@ -83,6 +83,7 @@ workflows:
           context: orb-publishing
           name: trigger-integration-dev
           ssh-fingerprints: 79:ae:f5:10:17:8a:d2:9a:ed:63:5c:b0:92:66:23:49
+          cleanup-tags: true
           requires:
             - orb-tools/publish-dev
           filters:
@@ -92,6 +93,7 @@ workflows:
       - orb-tools/trigger-integration-workflow:
           name: trigger-integration-master
           ssh-fingerprints: 79:ae:f5:10:17:8a:d2:9a:ed:63:5c:b0:92:66:23:49
+          cleanup-tags: true
           tag: master
           requires:
             - orb-tools/publish-dev
