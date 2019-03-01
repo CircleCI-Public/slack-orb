@@ -10,7 +10,7 @@ Example config:
 version: 2.1
 
 orbs:
-  slack: circleci/slack@1.0.0
+  slack: circleci/slack@2.0.0
 
 jobs:
   build:
@@ -20,7 +20,7 @@ jobs:
       - slack/<command>
 ```
 
-`slack@1.0.0` from the `circleci` namespace is imported into the config.yml as `slack` and can then be referenced as such in any job or workflow.
+`slack@2.0.0` from the `circleci` namespace is imported into the config.yml as `slack` and can then be referenced as such in any job or workflow.
 
 ## Commands
 
@@ -51,7 +51,7 @@ Example:
 version: 2.1
 
 orbs:
-  slack: circleci/slack@1.0.0
+  slack: circleci/slack@2.0.0
 
 jobs:
   build:
@@ -85,7 +85,7 @@ Example:
 version: 2.1
 
 orbs:
-  slack: circleci/slack@1.0.0
+  slack: circleci/slack@2.0.0
 
 jobs:
   build:
