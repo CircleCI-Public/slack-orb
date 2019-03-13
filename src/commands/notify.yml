@@ -75,13 +75,13 @@ steps:
   - run:
       name: Slack - Setting Failure Condition
       command: |
-        echo 'export SLACK_BUILD_STATUS="on_fail"' >> $BASH_ENV
+        echo 'export CIRCLE_BUILD_STATUS="on_fail"' >> $BASH_ENV
       when: on_fail
 
   - run:
       name: Slack - Setting Success Condition
       command: |
-        echo 'export SLACK_BUILD_STATUS="on_success"' >> $BASH_ENV
+        echo 'export CIRCLE_BUILD_STATUS="on_success"' >> $BASH_ENV
       when: on_success
 
   - run:
@@ -103,7 +103,7 @@ steps:
           exit 1
         else
           if [ -n "<< parameters.when >>" ]; then
-            if [ << parameters.when >> != $SLACK_BUILD_STATUS ]; then
+            if [ << parameters.when >> != $CIRCLE_BUILD_STATUS ]; then
               exit 0
             fi
           fi
