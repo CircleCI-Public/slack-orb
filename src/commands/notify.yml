@@ -73,13 +73,13 @@ parameters:
 
 steps:
   - run:
-      name: Slack - Setting Failure Condition
+      name: Circle - Setting Failure Condition
       command: |
         echo 'export CIRCLE_BUILD_STATUS="on_fail"' >> $BASH_ENV
       when: on_fail
 
   - run:
-      name: Slack - Setting Success Condition
+      name: Circle - Setting Success Condition
       command: |
         echo 'export CIRCLE_BUILD_STATUS="on_success"' >> $BASH_ENV
       when: on_success
