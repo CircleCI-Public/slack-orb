@@ -8,6 +8,16 @@ parameters:
     type: string
     default: ${SLACK_WEBHOOK}
 
+  success_message:
+    description: Enter custom message.
+    type: string
+    default: :tada: A $CIRCLE_JOB job has succeeded! $SLACK_MENTIONS
+
+  failure_message:
+    description: Enter custom message.
+    type: string
+    default: :red_circle: A $CIRCLE_JOB job has failed! $SLACK_MENTIONS
+
   fail_only:
     description: If 'true', notifications successful jobs will not be sent
     type: string
@@ -79,7 +89,7 @@ steps:
                             \"attachments\": [ \
                               { \
                                 \"fallback\": \"A job has succeeded - $CIRCLE_BUILD_URL\", \
-                                \"text\": \":tada: A $CIRCLE_JOB job has succeeded! $SLACK_MENTIONS\", \
+                                \"text\": \"<< parameters.success_message >>\", \
                                 \"fields\": [ \
                                   { \
                                     \"title\": \"Project\", \
@@ -111,7 +121,7 @@ steps:
                   \"attachments\": [ \
                     { \
                       \"fallback\": \"A job has failed - $CIRCLE_BUILD_URL\", \
-                      \"text\": \":red_circle: A $CIRCLE_JOB job has failed! $SLACK_MENTIONS\", \
+                      \"text\": \"<< parameters.failure_message >>\", \
                       \"fields\": [ \
                         { \
                           \"title\": \"Project\", \
