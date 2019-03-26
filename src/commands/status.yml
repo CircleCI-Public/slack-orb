@@ -11,12 +11,12 @@ parameters:
   success_message:
     description: Enter custom message.
     type: string
-    default: :tada: A $CIRCLE_JOB job has succeeded! $SLACK_MENTIONS
+    default: ":tada: A $CIRCLE_JOB job has succeeded! $SLACK_MENTIONS"
 
   failure_message:
     description: Enter custom message.
     type: string
-    default: :red_circle: A $CIRCLE_JOB job has failed! $SLACK_MENTIONS
+    default: ":red_circle: A $CIRCLE_JOB job has failed! $SLACK_MENTIONS"
 
   fail_only:
     description: If 'true', notifications successful jobs will not be sent
