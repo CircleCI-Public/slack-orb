@@ -76,6 +76,8 @@ Send a status alert at the end of a job based on success or failure. This must b
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `webhook` | `string` | ${SLACK_WEBHOOK} | Enter either your webhook value or use the CircleCI UI to add your token under the `SLACK_WEBHOOK` environment variable |
+| `success_message` | `string` | :tada: A $CIRCLE_JOB job has succeeded! $SLACK_MENTIONS | Enter your custom message to send to your Slack channel |
+| `failure_message` | `string` | :red_circle: A $CIRCLE_JOB job has failed! $SLACK_MENTIONS | Enter your custom message to send to your Slack channel |
 | `mentions` | `string` |  | Comma-separated list of Slack User or Group (SubTeam) IDs (e.g., "USER1,USER2,USER3"). _**Note:** these are Slack User IDs, not usernames. The user ID can be found on the user's profile. Look below for information on obtaining Group ID._ |
 | `fail_only` | `string` | false | If set to "true," successful jobs will _not_ send alerts |
 | `only_for_branch` | `string` |  | If set, a specific branch for which slack status updates will be sent |
