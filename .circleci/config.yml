@@ -1,8 +1,7 @@
 version: 2.1
 
 orbs:
-  circle-compare-url: iynere/compare-url@0.4.8
-  orb-tools: circleci/orb-tools@8.1.0
+  orb-tools: circleci/orb-tools@8.5.0
   slack: circleci/slack@dev:alpha
 
 executors:
