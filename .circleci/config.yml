@@ -20,6 +20,16 @@ jobs:
           color: "#f4aa42"
           mentions: "${ORBS_USER_GROUP_UUID}"
 
+  notifymastertest:
+    executor: ci-base
+    steps:
+      - run: exit 0 #toggle this to force success or status for testing
+      - slack/notify:
+          message: "notification test for the Slack orb, triggered by *<https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/commit/${CIRCLE_SHA1}|commit ${CIRCLE_SHA1}>* on ${CIRCLE_PROJECT_REPONAME}'s *${CIRCLE_BRANCH}* branch (<https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}|workflow here>)"
+          color: "#f4aa42"
+          mentions: "${ORBS_USER_GROUP_UUID}"
+          only_for_branch: "master"
+
   statustestpass:
     executor: ci-base
     steps:
@@ -127,6 +137,11 @@ workflows:
       # triggered by master branch commits
       - notifytest:
           name: notifytest-master
+          context: orb-publishing
+          filters: *integration-master_filters
+      
+      - notifymastertest:
+          name: notifymastertest-master
           context: orb-publishing
           filters: *integration-master_filters
 
