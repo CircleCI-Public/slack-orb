@@ -65,6 +65,11 @@ parameters:
     description: Whether or not to include the Visit Job action in the message
     type: boolean
     default: true
+  
+  only_for_branch:
+    description: If, set, a specific branch for which slack notifcations will be sent.
+    type: string
+    default: ""
 
 steps:
   - run:
@@ -79,65 +84,67 @@ steps:
       name: Slack Notification
       shell: /bin/bash
       command: |
-        # Provide error if no webhook is set and error. Otherwise continue
-        if [ -z "<< parameters.webhook >>" ]; then
-          echo "NO SLACK WEBHOOK SET"
-          echo "Please input your SLACK_WEBHOOK value either in the settings for this project, or as a parameter for this orb."
-          exit 1
-        else
-          # Webhook properly set.
-          echo Notifying Slack Channel
-          #Create Members string
-          if [ -n "<< parameters.mentions >>" ]; then
-            IFS="," read -ra SLACK_MEMBERS \<<< "<< parameters.mentions >>"
-            for i in "${SLACK_MEMBERS[@]}"; do
-              if [ $(echo ${i} | head -c 1) == "S" ]; then
-                SLACK_MENTIONS="${SLACK_MENTIONS}<!subteam^${i}> "
-              else
-                SLACK_MENTIONS="${SLACK_MENTIONS}<@${i}> "
-              fi
-            done
+        if [ "x" == "x<< parameters.only_for_branch>>" ] || [ "${CIRCLE_BRANCH}" == "<< parameters.only_for_branch>>" ]; then
+          # Provide error if no webhook is set and error. Otherwise continue
+          if [ -z "<< parameters.webhook >>" ]; then
+            echo "NO SLACK WEBHOOK SET"
+            echo "Please input your SLACK_WEBHOOK value either in the settings for this project, or as a parameter for this orb."
+            exit 1
+          else
+            # Webhook properly set.
+            echo Notifying Slack Channel
+            #Create Members string
+            if [ -n "<< parameters.mentions >>" ]; then
+              IFS="," read -ra SLACK_MEMBERS \<<< "<< parameters.mentions >>"
+              for i in "${SLACK_MEMBERS[@]}"; do
+                if [ $(echo ${i} | head -c 1) == "S" ]; then
+                  SLACK_MENTIONS="${SLACK_MENTIONS}<!subteam^${i}> "
+                else
+                  SLACK_MENTIONS="${SLACK_MENTIONS}<@${i}> "
+                fi
+              done
+            fi
+            curl -X POST -H 'Content-type: application/json' \
+              --data \
+              "{ \
+                \"attachments\": [ \
+                  { \
+                    \"fallback\": \"<< parameters.message >> - $CIRCLE_BUILD_URL\", \
+                    \"text\": \"<< parameters.message >> $SLACK_MENTIONS\", \
+                    \"author_name\": \"<< parameters.author_name >>\", \
+                    \"author_link\": \"<< parameters.author_link >>\", \
+                    \"title\": \"<< parameters.title >>\", \
+                    \"title_link\": \"<< parameters.title_link >>\", \
+                    \"footer\": \"<< parameters.footer >>\", \
+                    \"ts\": \"<< parameters.ts >>\", \
+                    \"fields\": [ \
+                      <<# parameters.include_project_field >>
+                      { \
+                        \"title\": \"Project\", \
+                        \"value\": \"$CIRCLE_PROJECT_REPONAME\", \
+                        \"short\": true \
+                      }, \
+                      <</ parameters.include_project_field >>
+                      <<# parameters.include_job_number_field >>
+                      { \
+                        \"title\": \"Job Number\", \
+                        \"value\": \"$CIRCLE_BUILD_NUM\", \
+                        \"short\": true \
+                      } \
+                      <</ parameters.include_job_number_field >>
+                    ], \
+                    \"actions\": [ \
+                      <<# parameters.include_visit_job_action >>
+                      { \
+                        \"type\": \"button\", \
+                        \"text\": \"Visit Job\", \
+                        \"url\": \"$CIRCLE_BUILD_URL\" \
+                      } \
+                      <</ parameters.include_visit_job_action >>
+                    ], \
+                    \"color\": \"<< parameters.color >>\" \
+                  } \
+                ] \
+              }" << parameters.webhook >>
           fi
-          curl -X POST -H 'Content-type: application/json' \
-            --data \
-            "{ \
-              \"attachments\": [ \
-                { \
-                  \"fallback\": \"<< parameters.message >> - $CIRCLE_BUILD_URL\", \
-                  \"text\": \"<< parameters.message >> $SLACK_MENTIONS\", \
-                  \"author_name\": \"<< parameters.author_name >>\", \
-                  \"author_link\": \"<< parameters.author_link >>\", \
-                  \"title\": \"<< parameters.title >>\", \
-                  \"title_link\": \"<< parameters.title_link >>\", \
-                  \"footer\": \"<< parameters.footer >>\", \
-                  \"ts\": \"<< parameters.ts >>\", \
-                  \"fields\": [ \
-                    <<# parameters.include_project_field >>
-                    { \
-                      \"title\": \"Project\", \
-                      \"value\": \"$CIRCLE_PROJECT_REPONAME\", \
-                      \"short\": true \
-                    }, \
-                    <</ parameters.include_project_field >>
-                    <<# parameters.include_job_number_field >>
-                    { \
-                      \"title\": \"Job Number\", \
-                      \"value\": \"$CIRCLE_BUILD_NUM\", \
-                      \"short\": true \
-                    } \
-                    <</ parameters.include_job_number_field >>
-                  ], \
-                  \"actions\": [ \
-                    <<# parameters.include_visit_job_action >>
-                    { \
-                      \"type\": \"button\", \
-                      \"text\": \"Visit Job\", \
-                      \"url\": \"$CIRCLE_BUILD_URL\" \
-                    } \
-                    <</ parameters.include_visit_job_action >>
-                  ], \
-                  \"color\": \"<< parameters.color >>\" \
-                } \
-              ] \
-            }" << parameters.webhook >>
         fi
