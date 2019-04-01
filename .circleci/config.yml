@@ -20,19 +20,22 @@ jobs:
           color: "#f4aa42"
           mentions: "${ORBS_USER_GROUP_UUID}"
 
-  statustestpass:
+  statustestpass-full:
     executor: ci-base
     steps:
       - run: exit 0 #toggle this to force success or status for testing
       - slack/status:
           mentions: "${ORBS_USER_GROUP_UUID}"
 
-  # statustestfail:
-  #   executor: ci-base
-  #   steps:
-  #     - run: exit 1 #toggle this to force success or status for testing
-  #     - slack/status:
-  #         mentions: "${ORBS_USER_GROUP_UUID}"
+  statustestpass-minimal:
+    executor: ci-base
+    steps:
+      - run: exit 0 #toggle this to force success or status for testing
+      - slack/status:
+          mentions: "${ORBS_USER_GROUP_UUID}"
+          include_project_field: false
+          include_job_number_field: false
+          include_visit_job_action: false
 
   approvaltest:
     executor: ci-base
@@ -54,7 +57,13 @@ integration-master_filters: &integration-master_filters
     only: /master-.*/
 
 prod-deploy_requires: &prod-deploy_requires
-  [notifytest-master, statustestpass-master, approvaltest-master, approval-notification-job-master]
+  [
+    notifytest-master,
+    statustestpass-full-master,
+    statustestpass-minimal-master,
+    approvaltest-master,
+    approval-notification-job-master
+  ]
 
 add-ssh-keys: &add-ssh-keys
   [add_ssh_keys: {fingerprints: ["40:21:b7:d7:fe:ea:dd:80:ca:c8:34:7a:37:b4:b4:d2"]}]
@@ -108,8 +117,13 @@ workflows:
           context: orb-publishing
           filters: *integration-dev_filters
 
-      - statustestpass:
-          name: statustestpass-dev
+      - statustestpass-full:
+          name: statustestpass-full-dev
+          context: orb-publishing
+          filters: *integration-dev_filters
+
+      - statustestpass-minimal:
+          name: statustestpass-minimal-dev
           context: orb-publishing
           filters: *integration-dev_filters
 
@@ -130,8 +144,13 @@ workflows:
           context: orb-publishing
           filters: *integration-master_filters
 
-      - statustestpass:
-          name: statustestpass-master
+      - statustestpass-full:
+          name: statustestpass-full-master
+          context: orb-publishing
+          filters: *integration-master_filters
+
+      - statustestpass-minimal:
+          name: statustestpass-minimal-master
           context: orb-publishing
           filters: *integration-master_filters
 
