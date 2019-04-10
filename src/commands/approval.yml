@@ -56,6 +56,8 @@ steps:
             for i in "${SLACK_MEMBERS[@]}"; do
               if [ $(echo ${i} | head -c 1) == "S" ]; then
                 SLACK_MENTIONS="${SLACK_MENTIONS}<!subteam^${i}> "
+              elif echo ${i} | grep -E "here|channel|everyone" > /dev/null; then
+                SLACK_MENTIONS="${SLACK_MENTIONS}<!${i}> "
               else
                 SLACK_MENTIONS="${SLACK_MENTIONS}<@${i}> "
               fi
