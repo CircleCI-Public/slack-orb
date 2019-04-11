@@ -43,6 +43,12 @@ jobs:
       - slack/approval:
           mentions: "${ORBS_USER_GROUP_UUID}"
 
+  approvaltest-mention-here:
+    executor: ci-base
+    steps:
+      - slack/approval:
+          mentions: "here"
+
 # yaml anchor filters
 integration-dev_filters: &integration-dev_filters
   branches:
@@ -62,6 +68,7 @@ prod-deploy_requires: &prod-deploy_requires
     statustestpass-full-master,
     statustestpass-minimal-master,
     approvaltest-master,
+    approvaltest-mention-here-master,
     approval-notification-job-master
   ]
 
@@ -132,6 +139,11 @@ workflows:
           context: orb-publishing
           filters: *integration-dev_filters
 
+      - approvaltest-mention-here:
+          name: approvaltest-mention-here-dev
+          context: orb-publishing
+          filters: *integration-dev_filters
+
       - slack/approval-notification:
           name: approval-notification-job-dev
           context: orb-publishing
@@ -156,6 +168,11 @@ workflows:
 
       - approvaltest:
           name: approvaltest-master
+          context: orb-publishing
+          filters: *integration-master_filters
+
+      - approvaltest-mention-here:
+          name: approvaltest-mention-here-master
           context: orb-publishing
           filters: *integration-master_filters
 
