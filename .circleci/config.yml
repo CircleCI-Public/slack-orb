@@ -68,6 +68,7 @@ prod-deploy_requires: &prod-deploy_requires
     statustestpass-full-master,
     statustestpass-minimal-master,
     approvaltest-master,
+    approvaltest-mention-here-master,
     approval-notification-job-master
   ]
 
