@@ -11,7 +11,7 @@ Example config:
 version: 2.1
 
 orbs:
-  slack: circleci/slack@1.0.0
+  slack: circleci/slack@x.y.z
 
 jobs:
   build:
@@ -52,7 +52,7 @@ Example:
 version: 2.1
 
 orbs:
-  slack: circleci/slack@1.0.0
+  slack: circleci/slack@x.y.z
 
 jobs:
   build:
@@ -91,7 +91,7 @@ Example:
 version: 2.1
 
 orbs:
-  slack: circleci/slack@1.0.0
+  slack: circleci/slack@x.y.z
 
 jobs:
   build:
