@@ -105,7 +105,7 @@ steps:
                   --data "{ \
                             \"attachments\": [ \
                               { \
-                                \"fallback\": \"A job has succeeded - $CIRCLE_BUILD_URL\", \
+                                \"fallback\": \"<< parameters.success_message >>\", \
                                 \"text\": \"<< parameters.success_message >>\", \
                                 \"fields\": [ \
                                   <<# parameters.include_project_field >>
@@ -144,7 +144,7 @@ steps:
                 --data "{ \
                   \"attachments\": [ \
                     { \
-                      \"fallback\": \"A job has failed - $CIRCLE_BUILD_URL\", \
+                      \"fallback\": \"<< parameters.failure_message >>\", \
                       \"text\": \"<< parameters.failure_message >>\", \
                       \"fields\": [ \
                         <<# parameters.include_project_field >>
