@@ -22,17 +22,31 @@ jobs:
 
   statustestpass-full:
     executor: ci-base
+
+    parameters:
+      only_for_branches:
+        type: string
+        default: ""
+
     steps:
       - run: exit 0 #toggle this to force success or status for testing
       - slack/status:
           mentions: "${ORBS_USER_GROUP_UUID}"
+          only_for_branches: <<parameters.only_for_branches>>
 
   statustestpass-minimal:
     executor: ci-base
+
+    parameters:
+      only_for_branches:
+        type: string
+        default: ""
+
     steps:
       - run: exit 0 #toggle this to force success or status for testing
       - slack/status:
           mentions: "${ORBS_USER_GROUP_UUID}"
+          only_for_branches: <<parameters.only_for_branches>>
           include_project_field: false
           include_job_number_field: false
           include_visit_job_action: false
@@ -73,6 +87,7 @@ prod-deploy_requires: &prod-deploy_requires
     notifytest-master,
     statustestpass-full-master,
     statustestpass-minimal-master,
+    statustestpass-shouldnt-trigger-master,
     approvaltest-master,
     approvaltest-mention-here-master,
     approvaltest-mention-here-2-master,
@@ -82,32 +97,25 @@ prod-deploy_requires: &prod-deploy_requires
 add-ssh-keys: &add-ssh-keys
   [add_ssh_keys: {fingerprints: ["40:21:b7:d7:fe:ea:dd:80:ca:c8:34:7a:37:b4:b4:d2"]}]
 
-# not in use yet—add this functionality to git-tools-orb when it's ready
-# cleanup-git-tag: &cleanup-git-tag
-#   [run: {when: "always", name: "cleanup tag", command: "git config --global user.email $CIRCLE_USERNAME@users.noreply.github.com && git config --global user.name $CIRCLE_USERNAME && git push --delete origin $CIRCLE_TAG"}]
-
 workflows:
   lint_pack-validate_publish-dev:
     jobs:
       - orb-tools/lint
 
       - orb-tools/pack:
-          requires:
-            - orb-tools/lint
+          requires: [orb-tools/lint]
 
       - orb-tools/publish-dev:
           context: orb-publishing
           orb-name: circleci/slack
-          requires:
-            - orb-tools/pack
+          requires: [orb-tools/pack]
 
       - orb-tools/trigger-integration-workflow:
           context: orb-publishing
           name: trigger-integration-dev
           ssh-fingerprints: 79:ae:f5:10:17:8a:d2:9a:ed:63:5c:b0:92:66:23:49
           cleanup-tags: true
-          requires:
-            - orb-tools/publish-dev
+          requires: [orb-tools/publish-dev]
           filters:
             branches:
               ignore: master
@@ -117,8 +125,7 @@ workflows:
           ssh-fingerprints: 79:ae:f5:10:17:8a:d2:9a:ed:63:5c:b0:92:66:23:49
           cleanup-tags: true
           tag: master
-          requires:
-            - orb-tools/publish-dev
+          requires: [orb-tools/publish-dev]
           filters:
             branches:
               only: master
@@ -139,6 +146,12 @@ workflows:
       - statustestpass-minimal:
           name: statustestpass-minimal-dev
           context: orb-publishing
+          filters: *integration-dev_filters
+
+      - statustestpass-minimal:
+          name: statustestpass-shouldnt-trigger-dev
+          context: orb-publishing
+          only_for_branches: master,staging
           filters: *integration-dev_filters
 
       - approvaltest:
@@ -176,6 +189,12 @@ workflows:
       - statustestpass-minimal:
           name: statustestpass-minimal-master
           context: orb-publishing
+          filters: *integration-master_filters
+
+      - statustestpass-minimal:
+          name: statustestpass-shouldnt-trigger-master
+          context: orb-publishing
+          only_for_branches: master,staging
           filters: *integration-master_filters
 
       - approvaltest:
