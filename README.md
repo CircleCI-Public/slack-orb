@@ -79,7 +79,7 @@ Send a status alert at the end of a job based on success or failure. This must b
 | `success_message` | `string` | :tada: A $CIRCLE_JOB job has succeeded! $SLACK_MENTIONS | Enter your custom message to send to your Slack channel |
 | `failure_message` | `string` | :red_circle: A $CIRCLE_JOB job has failed! $SLACK_MENTIONS | Enter your custom message to send to your Slack channel |
 | `mentions` | `string` |  | Comma-separated list of Slack User or Group (SubTeam) IDs (e.g., "USER1,USER2,USER3"). _**Note:** these are Slack User IDs, not usernames. The user ID can be found on the user's profile. Look below for information on obtaining Group ID._ |
-| `fail_only` | `string` | false | If set to "true," successful jobs will _not_ send alerts |
+| `fail_only` | `boolean` | `false` | If set to `true`, successful jobs will _not_ send alerts |
 | `only_for_branch` | `string` |  | If set, a specific branch for which slack status updates will be sent |
 | `include_project_field` | `boolean` | `true` | Whether or not to include the _Project_ field in the message |
 | `include_job_number_field` | `boolean` | `true` | Whether or not to include the _Job Number_ field in the message |
@@ -98,12 +98,12 @@ jobs:
     docker:
       - image: <docker image>
     steps:
-      # With fail_only set to true, no alert will be sent in this example. Change the exit status on the next line to produce an error.
+      # With fail_only set to `true`, no alert will be sent in this example. Change the exit status on the next line to produce an error.
       - run: exit 0
 
       - slack/status:
           mentions: "USERID1,USERID2" # Optional: Enter the Slack IDs of any user or group (sub_team) to be mentioned
-          fail_only: "true" # Optional: if set to "true" then only failure messages will occur.
+          fail_only: true # Optional: if set to `true` then only failure messages will occur.
           webhook: "webhook" # Optional: Enter a specific webhook here or the default will use $SLACK_WEBHOOK
           only_for_branch: "master" # Optional: If set, a specific branch for which status updates will be sent. In this case, only for pushes to master branch.
 ```
@@ -143,4 +143,4 @@ You can implement the Webhook in one of two ways, as an environment variable, or
 2. You can enter the Webhook for the individual status or alert by entering is at the `webhook` parameter, as shown above.
 
 ## Contributing
-We welcome [issues](https://github.com/CircleCI-Public/slack-orb/issues) to and [pull requests](https://github.com/CircleCI-Public/slack-orb/pulls) against this repository! For further questions/comments about this or other orbs, visit [CircleCI's Orbs discussion forum](https://discuss.circleci.com/c/orbs).
+We welcome [issues](https://github.com/CircleCI-Public/slack-orb/issues) to and [pull requests](https://github.com/CircleCI-Public/slack-orb/pulls) against this repository! For further questions/comments about this or other orbs, visit [CircleCI's Orbs discussion forum](https://discuss.circleci.com/c/ecosystem/orbs).
