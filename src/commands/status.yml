@@ -198,5 +198,5 @@ steps:
             fi
           fi
         else
-          echo "Current branch is not included in `only_for_branches` filter; no status alert will be sent"
+          echo "Current branch is not included in only_for_branches filter; no status alert will be sent"
         fi
