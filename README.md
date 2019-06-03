@@ -80,7 +80,7 @@ Send a status alert at the end of a job based on success or failure. This must b
 | `failure_message` | `string` | :red_circle: A $CIRCLE_JOB job has failed! $SLACK_MENTIONS | Enter your custom message to send to your Slack channel |
 | `mentions` | `string` |  | Comma-separated list of Slack User or Group (SubTeam) IDs (e.g., "USER1,USER2,USER3"). _**Note:** these are Slack User IDs, not usernames. The user ID can be found on the user's profile. Look below for information on obtaining Group ID._ |
 | `fail_only` | `boolean` | `false` | If set to `true`, successful jobs will _not_ send alerts |
-| `only_for_branch` | `string` |  | If set, a specific branch for which slack status updates will be sent |
+| `only_for_branches` | `string` |  | If set, a comma-separated list of branches for which to send notifications |
 | `include_project_field` | `boolean` | `true` | Whether or not to include the _Project_ field in the message |
 | `include_job_number_field` | `boolean` | `true` | Whether or not to include the _Job Number_ field in the message |
 | `include_visit_job_action` | `boolean` | `true` | Whether or not to include the _Visit Job_ action in the message |

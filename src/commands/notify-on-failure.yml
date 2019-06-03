@@ -3,13 +3,14 @@ description: >
   master branch
 
 parameters:
-  only_for_branch:
+  only_for_branches:
     type: string
-    default: master
+    default: ""
     description: >
-      If set, a specific branch for which slack status updates will be sent
+      If set, a comma-separated list of branches for which to send
+      notifications. No spaces.
 
 steps:
   - status:
       fail_only: true
-      only_for_branch: <<parameters.only_for_branch>>
+      only_for_branches: <<parameters.only_for_branches>>
