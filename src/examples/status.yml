@@ -16,6 +16,6 @@ usage:
 
         - slack/status:
             mentions: "USERID1,USERID2" # Optional: Enter the Slack IDs of any user or group (sub_team) to be mentioned
-            fail_only: "true" # Optional: if set to "true" then only failure messages will occur.
+            fail_only: true # Optional: if set to `true` then only failure messages will occur.
             webhook: "webhook" # Optional: Enter a specific webhook here or the default will use $SLACK_WEBHOOK
             only_for_branch: "only_for_branch" # Optional: If set, a specific branch for which status updates will be sent.

@@ -1,0 +1,15 @@
+description: >
+  A handy command to notify a Slack channel on failure in the default
+  master branch
+
+parameters:
+  only_for_branch:
+    type: string
+    default: master
+    description: >
+      If set, a specific branch for which slack status updates will be sent
+
+steps:
+  - status:
+      fail_only: true
+      only_for_branch: <<parameters.only_for_branch>>

@@ -19,9 +19,9 @@ parameters:
     default: ":red_circle: A $CIRCLE_JOB job has failed! $SLACK_MENTIONS"
 
   fail_only:
-    description: If 'true', notifications successful jobs will not be sent
-    type: string
-    default: "false"
+    description: If `true`, notifications successful jobs will not be sent
+    type: boolean
+    default: false
 
   mentions:
     description: A comma separated list of user IDs. No spaces.
