@@ -11,5 +11,5 @@ parameters:
 
 steps:
   - status:
-      fail_only: "true"
+      fail_only: true
       only_for_branch: <<parameters.only_for_branch>>
