@@ -22,17 +22,31 @@ jobs:
 
   statustestpass-full:
     executor: ci-base
+
+    parameters:
+      only_for_branches:
+        type: string
+        default: ""
+
     steps:
       - run: exit 0 #toggle this to force success or status for testing
       - slack/status:
           mentions: "${ORBS_USER_GROUP_UUID}"
+          only_for_branches: <<parameters.only_for_branches>>
 
   statustestpass-minimal:
     executor: ci-base
+
+    parameters:
+      only_for_branches:
+        type: string
+        default: ""
+
     steps:
       - run: exit 0 #toggle this to force success or status for testing
       - slack/status:
           mentions: "${ORBS_USER_GROUP_UUID}"
+          only_for_branches: <<parameters.only_for_branches>>
           include_project_field: false
           include_job_number_field: false
           include_visit_job_action: false
@@ -73,6 +87,7 @@ prod-deploy_requires: &prod-deploy_requires
     notifytest-master,
     statustestpass-full-master,
     statustestpass-minimal-master,
+    statustestpass-shouldnt-trigger-master,
     approvaltest-master,
     approvaltest-mention-here-master,
     approvaltest-mention-here-2-master,
@@ -141,6 +156,12 @@ workflows:
           context: orb-publishing
           filters: *integration-dev_filters
 
+      - statustestpass-minimal:
+          name: statustestpass-shouldnt-trigger-dev
+          context: orb-publishing
+          only_for_branches: master,staging
+          filters: *integration-dev_filters
+
       - approvaltest:
           name: approvaltest-dev
           context: orb-publishing
@@ -176,6 +197,12 @@ workflows:
       - statustestpass-minimal:
           name: statustestpass-minimal-master
           context: orb-publishing
+          filters: *integration-master_filters
+
+      - statustestpass-minimal:
+          name: statustestpass-shouldnt-trigger-master
+          context: orb-publishing
+          only_for_branches: master,staging
           filters: *integration-master_filters
 
       - approvaltest:

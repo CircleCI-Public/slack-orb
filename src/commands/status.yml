@@ -32,11 +32,12 @@ parameters:
     description: >
       A comma separated list of user IDs. No spaces.
 
-  only_for_branch:
+  only_for_branches:
     type: string
     default: ""
     description: >
-      If set, a specific branch for which slack status updates will be sent.
+      If set, a comma-separated list of branches for which to send
+      notifications. No spaces.
 
   include_project_field:
     type: boolean
@@ -82,7 +83,17 @@ steps:
       shell: /bin/bash
       when: always
       command: |
-        if [ "x" == "x<< parameters.only_for_branch>>" ] || [ "${CIRCLE_BRANCH}" == "<< parameters.only_for_branch>>" ]; then
+        current_branch_in_filter=false
+
+        IFS="," read -ra BRANCH_FILTERS \<<< "<< parameters.only_for_branches >>"
+
+        for i in "${BRANCH_FILTERS[@]}"; do
+          if [ "${i}" == "${CIRCLE_BRANCH}" ]; then
+            current_branch_in_filter=true
+          fi
+        done
+
+        if [ "x" == "x<< parameters.only_for_branches>>" ] || [ "$current_branch_in_filter" = true ]; then
           # Provide error if no webhook is set and error. Otherwise continue
           if [ -z "<< parameters.webhook >>" ]; then
             echo "NO SLACK WEBHOOK SET"
