@@ -4,49 +4,57 @@ description: >
 
 parameters:
   webhook:
-    description: Enter either your Webhook value or use the CircleCI UI to add your token under the 'SLACK_WEBHOOK' env var
     type: string
     default: ${SLACK_WEBHOOK}
+    description: >
+      Enter either your Webhook value or use the CircleCI UI to add your
+      token under the 'SLACK_WEBHOOK' env var
 
   success_message:
-    description: Enter custom message.
     type: string
     default: ":tada: A $CIRCLE_JOB job has succeeded! $SLACK_MENTIONS"
+    description: Enter custom message.
 
   failure_message:
-    description: Enter custom message.
     type: string
     default: ":red_circle: A $CIRCLE_JOB job has failed! $SLACK_MENTIONS"
+    description: Enter custom message.
 
   fail_only:
-    description: If `true`, notifications successful jobs will not be sent
     type: boolean
     default: false
+    description: >
+      If `true`, notifications successful jobs will not be sent
 
   mentions:
-    description: A comma separated list of user IDs. No spaces.
     type: string
     default: ""
+    description: >
+      A comma separated list of user IDs. No spaces.
 
   only_for_branch:
-    description: If, set, a specific branch for which slack status updates will be sent.
     type: string
     default: ""
+    description: >
+      If set, a specific branch for which slack status updates will be sent.
 
   include_project_field:
-    description: Whether or not to include the Project field in the message
     type: boolean
     default: true
+    description: >
+      Whether or not to include the Project field in the message
 
   include_job_number_field:
-    description: Whether or not to include the Job Number field in the message
     type: boolean
     default: true
+    description: >
+      Whether or not to include the Job Number field in the message
 
   include_visit_job_action:
-    description: Whether or not to include the Visit Job action in the message
     type: boolean
     default: true
+    description: >
+      Whether or not to include the Visit Job action in the message
 
 steps:
   - run:
