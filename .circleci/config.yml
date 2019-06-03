@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  orb-tools: circleci/orb-tools@8.5.0
+  orb-tools: circleci/orb-tools@8.14.0
   slack: circleci/slack@dev:alpha
 
 executors:
