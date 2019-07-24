@@ -12,12 +12,12 @@ parameters:
 
   success_message:
     type: string
-    default: ":tada: A $CIRCLE_JOB job has succeeded! $SLACK_MENTIONS"
+    default: ":tada: A $CIRCLE_JOB job has succeeded!"
     description: Enter custom message.
 
   failure_message:
     type: string
-    default: ":red_circle: A $CIRCLE_JOB job has failed! $SLACK_MENTIONS"
+    default: ":red_circle: A $CIRCLE_JOB job has failed!"
     description: Enter custom message.
 
   fail_only:
@@ -125,7 +125,7 @@ steps:
                             \"attachments\": [ \
                               { \
                                 \"fallback\": \"<< parameters.success_message >>\", \
-                                \"text\": \"<< parameters.success_message >>\", \
+                                \"text\": \"<< parameters.success_message >> $SLACK_MENTIONS\", \
                                 \"fields\": [ \
                                   <<# parameters.include_project_field >>
                                   { \
@@ -164,7 +164,7 @@ steps:
                   \"attachments\": [ \
                     { \
                       \"fallback\": \"<< parameters.failure_message >>\", \
-                      \"text\": \"<< parameters.failure_message >>\", \
+                      \"text\": \"<< parameters.failure_message >> $SLACK_MENTIONS\", \
                       \"fields\": [ \
                         <<# parameters.include_project_field >>
                         { \
