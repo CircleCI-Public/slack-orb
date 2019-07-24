@@ -57,6 +57,12 @@ parameters:
     description: >
       Whether or not to include the Visit Job action in the message
 
+  channel:
+    type: string
+    default: ""
+    description: >
+      If set, overriding webhook's channel setting
+
 steps:
   - run:
       name: Slack - Setting Failure Condition
@@ -122,6 +128,9 @@ steps:
               else
                 curl -X POST -H 'Content-type: application/json' \
                   --data "{ \
+                            <<# parameters.channel >>
+                            \"channel\": \"<< parameters.channel >>\", \
+                            <</ parameters.channel >>
                             \"attachments\": [ \
                               { \
                                 \"fallback\": \"<< parameters.success_message >>\", \
@@ -161,6 +170,9 @@ steps:
               #If Failed
               curl -X POST -H 'Content-type: application/json' \
                 --data "{ \
+                  <<# parameters.channel >>
+                  \"channel\": \"<< parameters.channel >>\", \
+                  <</ parameters.channel >>
                   \"attachments\": [ \
                     { \
                       \"fallback\": \"<< parameters.failure_message >>\", \
