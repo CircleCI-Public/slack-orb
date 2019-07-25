@@ -1,18 +1,12 @@
 version: 2.1
 
 orbs:
-  orb-tools: circleci/orb-tools@8.14.0
+  orb-tools: circleci/orb-tools@8.27.3
   slack: circleci/slack@dev:alpha
-
-executors:
-  ci-base:
-    resource_class: small
-    docker:
-      - image: cibuilds/base
 
 jobs:
   notifytest:
-    executor: ci-base
+    executor: orb-tools/ubuntu
     steps:
       - run: exit 0 #toggle this to force success or status for testing
       - slack/notify:
@@ -21,7 +15,7 @@ jobs:
           mentions: "${ORBS_USER_GROUP_UUID}"
 
   statustestpass-full:
-    executor: ci-base
+    executor: orb-tools/ubuntu
 
     parameters:
       only_for_branches:
@@ -35,7 +29,7 @@ jobs:
           only_for_branches: <<parameters.only_for_branches>>
 
   statustestpass-minimal:
-    executor: ci-base
+    executor: orb-tools/ubuntu
 
     parameters:
       only_for_branches:
@@ -52,19 +46,19 @@ jobs:
           include_visit_job_action: false
 
   approvaltest:
-    executor: ci-base
+    executor: orb-tools/ubuntu
     steps:
       - slack/approval:
           mentions: "${ORBS_USER_GROUP_UUID}"
 
   approvaltest-mention-here:
-    executor: ci-base
+    executor: orb-tools/ubuntu
     steps:
       - slack/approval:
           mentions: "here"
 
   approvaltest-mention-here-2:
-    executor: ci-base
+    executor: orb-tools/ubuntu
     steps:
       - slack/approval:
           mentions: "foo-here-bar"
@@ -94,8 +88,8 @@ prod-deploy_requires: &prod-deploy_requires
     approval-notification-job-master
   ]
 
-add-ssh-keys: &add-ssh-keys
-  [add_ssh_keys: {fingerprints: ["40:21:b7:d7:fe:ea:dd:80:ca:c8:34:7a:37:b4:b4:d2"]}]
+# add-ssh-keys: &add-ssh-keys
+#   [add_ssh_keys: {fingerprints: ["40:21:b7:d7:fe:ea:dd:80:ca:c8:34:7a:37:b4:b4:d2"]}]
 
 workflows:
   lint_pack-validate_publish-dev:
@@ -235,6 +229,7 @@ workflows:
           release: minor
           context: orb-publishing
           orb-name: circleci/slack
+          ssh-fingerprints: 79:ae:f5:10:17:8a:d2:9a:ed:63:5c:b0:92:66:23:49
           requires: *prod-deploy_requires
           filters:
             branches:
@@ -247,6 +242,7 @@ workflows:
           release: major
           context: orb-publishing
           orb-name: circleci/slack
+          ssh-fingerprints: 79:ae:f5:10:17:8a:d2:9a:ed:63:5c:b0:92:66:23:49
           requires: *prod-deploy_requires
           filters:
             branches:
