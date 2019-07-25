@@ -217,6 +217,8 @@ workflows:
           name: dev-promote-patch
           context: orb-publishing
           orb-name: circleci/slack
+          cleanup-tags: true
+          ssh-fingerprints: 79:ae:f5:10:17:8a:d2:9a:ed:63:5c:b0:92:66:23:49
           requires: *prod-deploy_requires
           filters:
             branches:
@@ -229,6 +231,7 @@ workflows:
           release: minor
           context: orb-publishing
           orb-name: circleci/slack
+          cleanup-tags: true
           ssh-fingerprints: 79:ae:f5:10:17:8a:d2:9a:ed:63:5c:b0:92:66:23:49
           requires: *prod-deploy_requires
           filters:
@@ -242,6 +245,7 @@ workflows:
           release: major
           context: orb-publishing
           orb-name: circleci/slack
+          cleanup-tags: true
           ssh-fingerprints: 79:ae:f5:10:17:8a:d2:9a:ed:63:5c:b0:92:66:23:49
           requires: *prod-deploy_requires
           filters:
