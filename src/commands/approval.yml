@@ -30,7 +30,7 @@ steps:
   - run:
       name: Provide error if non-bash shell
       command: |
-        if [ -z "$BASH" ]; then
+        if [ ! -x /bin/bash ]; then
           echo Bash not installed.
           exit 1
         fi
@@ -40,7 +40,7 @@ steps:
       shell: /bin/bash
       command: |
         # Provide error if non-bash shell
-        if [ -z "$BASH" ]; then
+        if [ ! -x /bin/bash ]; then
           echo Bash not installed.
           exit 1
         fi
