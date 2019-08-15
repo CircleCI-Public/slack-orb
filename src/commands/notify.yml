@@ -1,10 +1,11 @@
 description: Notify a Slack channel with a custom message
 
 parameters:
-  webhook:
-    description: Enter either your Webhook value or use the CircleCI UI to add your token under the 'SLACK_WEBHOOK' env var
+  channel:
+    description: >
+      Channel, private group, or IM channel to send message to. Can be an encoded ID,
+      or a name.
     type: string
-    default: ${SLACK_WEBHOOK}
 
   message:
     description: Enter custom message.
@@ -66,14 +67,6 @@ parameters:
     type: boolean
     default: true
 
-  channel_override:
-    description: >
-      Incoming webhooks have a default channel, but it can be overridden in your JSON
-      payload. A public channel can be specified with "channel": "#other-channel", and
-      a Direct Message with "channel": "@username".
-    type: string
-    default: ""
-
 steps:
   - run:
       name: Provide error if non-bash shell
@@ -87,10 +80,10 @@ steps:
       name: Slack Notification
       shell: /bin/bash
       command: |
-        # Provide error if no webhook is set and error. Otherwise continue
-        if [ -z "<< parameters.webhook >>" ]; then
-          echo "NO SLACK WEBHOOK SET"
-          echo "Please input your SLACK_WEBHOOK value either in the settings for this project, or as a parameter for this orb."
+        # Provide error if no token is set and error. Otherwise continue
+        if [[ -z "$SLACK_OAUTH_TOKEN" ]]; then
+          echo "NO SLACK_OAUTH_TOKEN SET"
+          echo "Please set the SLACK_OAUTH_TOKEN environment variable"
           exit 1
         else
           # Webhook properly set.
@@ -108,11 +101,16 @@ steps:
               fi
             done
           fi
-          curl -X POST -H 'Content-type: application/json' \
-            --data \
-            "{ \
-              <<# parameters.channel_override >>\"channel\": \"<< parameters.channel_override >>\",<</ parameters.channel_override >>
-              \"attachments\": [ \
+          CURL_ARGS=(
+            -X POST
+            -H 'Content-Type: application/x-www-form-urlencoded'
+            -H 'Cache-Control: no-cache'
+            -d "token=${SLACK_OAUTH_TOKEN}"
+            -d 'as_user=true'
+            <<# parameters.channel >>
+            -d "channel=<< parameters.channel >>"
+            <</ parameters.channel >>
+            -d "attachments=[ \
                 { \
                   \"fallback\": \"<< parameters.message >> - $CIRCLE_BUILD_URL\", \
                   \"text\": \"<< parameters.message >> $SLACK_MENTIONS\", \
@@ -149,6 +147,7 @@ steps:
                   ], \
                   \"color\": \"<< parameters.color >>\" \
                 } \
-              ] \
-            }" << parameters.webhook >>
+              ]"
+          )
+          curl "${CURL_ARGS[@]}" "https://slack.com/api/chat.postMessage"
         fi

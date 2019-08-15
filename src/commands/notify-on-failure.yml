@@ -3,6 +3,12 @@ description: >
   master branch
 
 parameters:
+  channel:
+    description: >
+      Channel, private group, or IM channel to send message to. Can be an encoded ID,
+      or a name.
+    type: string
+
   only_for_branches:
     type: string
     default: ""
@@ -13,4 +19,5 @@ parameters:
 steps:
   - status:
       fail_only: true
+      channel: <<parameters.channel>>
       only_for_branches: <<parameters.only_for_branches>>

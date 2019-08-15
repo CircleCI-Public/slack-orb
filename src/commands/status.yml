@@ -3,12 +3,11 @@ description: >
   Must be the last step in a job.
 
 parameters:
-  webhook:
-    type: string
-    default: ${SLACK_WEBHOOK}
+  channel:
     description: >
-      Enter either your Webhook value or use the CircleCI UI to add your
-      token under the 'SLACK_WEBHOOK' env var
+      Channel, private group, or IM channel to send message to. Can be an encoded ID,
+      or a name.
+    type: string
 
   success_message:
     type: string
@@ -57,14 +56,6 @@ parameters:
     description: >
       Whether or not to include the Visit Job action in the message
 
-  channel_override:
-    description: >
-      Incoming webhooks have a default channel, but it can be overridden in your JSON
-      payload. A public channel can be specified with "channel": "#other-channel", and
-      a Direct Message with "channel": "@username".
-    type: string
-    default: ""
-
 steps:
   - run:
       name: Slack - Setting Failure Condition
@@ -101,11 +92,22 @@ steps:
           fi
         done
 
+        CURL_ARGS=(
+          -X POST
+          -H 'Content-Type: application/x-www-form-urlencoded'
+          -H 'Cache-Control: no-cache'
+          -d "token=${SLACK_OAUTH_TOKEN}"
+          -d 'as_user=true'
+          <<# parameters.channel >>
+          -d "channel=<< parameters.channel >>"
+          <</ parameters.channel >>
+        )
+
         if [ "x" == "x<< parameters.only_for_branches>>" ] || [ "$current_branch_in_filter" = true ]; then
-          # Provide error if no webhook is set and error. Otherwise continue
-          if [ -z "<< parameters.webhook >>" ]; then
-            echo "NO SLACK WEBHOOK SET"
-            echo "Please input your SLACK_WEBHOOK value either in the settings for this project, or as a parameter for this orb."
+          # Provide error if no token is set and error. Otherwise continue
+          if [[ -z "$SLACK_OAUTH_TOKEN" ]]; then
+            echo "NO SLACK_OAUTH_TOKEN SET"
+            echo "Please set the SLACK_OAUTH_TOKEN environment variable"
             exit 1
           else
             #Create Members string
@@ -128,50 +130,47 @@ steps:
                 echo "The job completed successfully"
                 echo '"fail_only" is set to "true". No Slack notification sent.'
               else
-                curl -X POST -H 'Content-type: application/json' \
-                  --data "{ \
-                            <<# parameters.channel_override >>\"channel\": \"<< parameters.channel_override >>\",<</ parameters.channel_override >>
-                            \"attachments\": [ \
-                              { \
-                                \"fallback\": \"<< parameters.success_message >>\", \
-                                \"text\": \"<< parameters.success_message >> $SLACK_MENTIONS\", \
-                                \"fields\": [ \
-                                  <<# parameters.include_project_field >>
-                                  { \
-                                    \"title\": \"Project\", \
-                                    \"value\": \"$CIRCLE_PROJECT_REPONAME\", \
-                                    \"short\": true \
-                                  }, \
-                                  <</ parameters.include_project_field >>
-                                  <<# parameters.include_job_number_field >>
-                                  { \
-                                    \"title\": \"Job Number\", \
-                                    \"value\": \"$CIRCLE_BUILD_NUM\", \
-                                    \"short\": true \
-                                  } \
-                                  <</ parameters.include_job_number_field >>
-                                ], \
-                                \"actions\": [ \
-                                  <<# parameters.include_visit_job_action >>
-                                  { \
-                                    \"type\": \"button\", \
-                                    \"text\": \"Visit Job\", \
-                                    \"url\": \"$CIRCLE_BUILD_URL\" \
-                                  } \
-                                  <</ parameters.include_visit_job_action >>
-                                ], \
-                                \"color\": \"#1CBF43\" \
-                              } \
-                            ] \
-                          } " << parameters.webhook >>
+                CURL_ARGS+=(
+                  -d "attachments=[ \
+                        { \
+                          \"fallback\": \"<< parameters.success_message >>\", \
+                          \"text\": \"<< parameters.success_message >> $SLACK_MENTIONS\", \
+                          \"fields\": [ \
+                            <<# parameters.include_project_field >>
+                            { \
+                              \"title\": \"Project\", \
+                              \"value\": \"$CIRCLE_PROJECT_REPONAME\", \
+                              \"short\": true \
+                            }, \
+                            <</ parameters.include_project_field >>
+                            <<# parameters.include_job_number_field >>
+                            { \
+                              \"title\": \"Job Number\", \
+                              \"value\": \"$CIRCLE_BUILD_NUM\", \
+                              \"short\": true \
+                            } \
+                            <</ parameters.include_job_number_field >>
+                          ], \
+                          \"actions\": [ \
+                            <<# parameters.include_visit_job_action >>
+                            { \
+                              \"type\": \"button\", \
+                              \"text\": \"Visit Job\", \
+                              \"url\": \"$CIRCLE_BUILD_URL\" \
+                            } \
+                            <</ parameters.include_visit_job_action >>
+                          ], \
+                          \"color\": \"#1CBF43\" \
+                        } \
+                      ]"
+                )
+                curl "${CURL_ARGS[@]}" "https://slack.com/api/chat.postMessage"
                 echo "Job completed successfully. Alert sent."
               fi
             else
               #If Failed
-              curl -X POST -H 'Content-type: application/json' \
-                --data "{ \
-                  <<# parameters.channel_override >>\"channel\": \"<< parameters.channel_override >>\",<</ parameters.channel_override >>
-                  \"attachments\": [ \
+              CURL_ARGS+=(
+                  -d "attachments=[ \
                     { \
                       \"fallback\": \"<< parameters.failure_message >>\", \
                       \"text\": \"<< parameters.failure_message >> $SLACK_MENTIONS\", \
@@ -202,8 +201,9 @@ steps:
                       ], \
                       \"color\": \"#ed5c5c\" \
                     } \
-                  ] \
-                } " << parameters.webhook >>
+                  ]"
+              )
+              curl "${CURL_ARGS[@]}" 'https://slack.com/api/chat.postMessage'
               echo "Job failed. Alert sent."
             fi
           fi
