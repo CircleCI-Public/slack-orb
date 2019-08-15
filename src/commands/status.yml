@@ -57,6 +57,14 @@ parameters:
     description: >
       Whether or not to include the Visit Job action in the message
 
+  channel_override:
+    description: >
+      Incoming webhooks have a default channel, but it can be overridden in your JSON
+      payload. A public channel can be specified with "channel": "#other-channel", and
+      a Direct Message with "channel": "@username".
+    type: string
+    default: ""
+
 steps:
   - run:
       name: Slack - Setting Failure Condition
@@ -122,6 +130,7 @@ steps:
               else
                 curl -X POST -H 'Content-type: application/json' \
                   --data "{ \
+                            <<# parameters.channel_override >>\"channel\": \"<< parameters.channel_override >>\",<</ parameters.channel_override >>
                             \"attachments\": [ \
                               { \
                                 \"fallback\": \"<< parameters.success_message >>\", \
@@ -161,6 +170,7 @@ steps:
               #If Failed
               curl -X POST -H 'Content-type: application/json' \
                 --data "{ \
+                  <<# parameters.channel_override >>\"channel\": \"<< parameters.channel_override >>\",<</ parameters.channel_override >>
                   \"attachments\": [ \
                     { \
                       \"fallback\": \"<< parameters.failure_message >>\", \

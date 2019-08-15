@@ -66,6 +66,14 @@ parameters:
     type: boolean
     default: true
 
+  channel_override:
+    description: >
+      Incoming webhooks have a default channel, but it can be overridden in your JSON
+      payload. A public channel can be specified with "channel": "#other-channel", and
+      a Direct Message with "channel": "@username".
+    type: string
+    default: ""
+
 steps:
   - run:
       name: Provide error if non-bash shell
@@ -103,6 +111,7 @@ steps:
           curl -X POST -H 'Content-type: application/json' \
             --data \
             "{ \
+              <<# parameters.channel_override >>\"channel\": \"<< parameters.channel_override >>\",<</ parameters.channel_override >>
               \"attachments\": [ \
                 { \
                   \"fallback\": \"<< parameters.message >> - $CIRCLE_BUILD_URL\", \
