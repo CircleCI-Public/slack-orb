@@ -16,6 +16,7 @@ usage:
             mentions: "USERID1,USERID2," # Optional: Enter the Slack IDs of any user or group (sub_team) to be mentioned
             color: "#42e2f4" # Optional: Assign custom colors for each notification
             webhook: "webhook" # Optional: Enter a specific webhook here or the default will use $SLACK_WEBHOOK
+            channel: "CHANNELID" # Optional: Enter a channel id to override webhook's default channel
 
   workflows:
     your-workflow:
