@@ -105,7 +105,7 @@ jobs:
           mentions: "USERID1,USERID2" # Optional: Enter the Slack IDs of any user or group (sub_team) to be mentioned
           fail_only: true # Optional: if set to `true` then only failure messages will occur.
           webhook: "webhook" # Optional: Enter a specific webhook here or the default will use $SLACK_WEBHOOK
-          only_for_branch: "master" # Optional: If set, a specific branch for which status updates will be sent. In this case, only for pushes to master branch.
+          only_for_branches: "master" # Optional: If set, a specific branch for which status updates will be sent. In this case, only for pushes to master branch.
 ```
 
 ![Status Success Example](/img/statusSuccess.PNG)
