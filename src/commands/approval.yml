@@ -26,6 +26,12 @@ parameters:
     type: string
     default: https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}
 
+  channel:
+    type: string
+    default: ""
+    description: >
+      If set, overriding webhook's channel setting
+
 steps:
   - run:
       name: Provide error if non-bash shell
@@ -62,6 +68,9 @@ steps:
           curl -X POST -H 'Content-type: application/json' \
             --data \
             "{ \
+              <<# parameters.channel >>
+              \"channel\": \"<< parameters.channel >>\", \
+              <</ parameters.channel >>
               \"attachments\": [ \
                 { \
                   \"fallback\": \"<< parameters.message >> - << parameters.url >>\", \
