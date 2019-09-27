@@ -114,7 +114,11 @@ jobs:
 ## Dependencies / Requirements
 
 ### Bash Shell
-Due to the limitations of the `sh` shell, `Bash` is required. `Bash` is the default shell used on CircleCI and the Orb will be compatible with most images. Images such as `Alpine` that do not contain the `Bash` shell by default are incompatible and en error message will be logged. You may install the Bash shell through your package manager (example: `apk add bash`) in the Dockerfile for the image you are using.
+Because these scripts us bash-specific features, `Bash` is required.
+`Bash` is the default shell used on CircleCI and the Orb will be compatible with most images.
+If using an `Alpine` base image, you will need to call `apk add bash` before calling this Orb,
+or create a derivative base image that calls `RUN apk add bash`.
+If `Bash` is not available, an error message will be logged and the task will fail.
 
 ### cURL
 cURL is used to post the Webhook data and must be installed in the container to function properly.

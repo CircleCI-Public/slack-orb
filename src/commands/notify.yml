@@ -70,7 +70,7 @@ steps:
   - run:
       name: Provide error if non-bash shell
       command: |
-        if [ -z "$BASH" ]; then
+        if [ ! -x /bin/bash ]; then
           echo Bash not installed.
           exit 1
         fi

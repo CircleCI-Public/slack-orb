@@ -30,7 +30,7 @@ steps:
   - run:
       name: Provide error if non-bash shell
       command: |
-        if [ -z "$BASH" ]; then
+        if [ ! -x /bin/bash ]; then
           echo Bash not installed.
           exit 1
         fi
@@ -39,11 +39,6 @@ steps:
       name: Slack - Sending Approval Notification
       shell: /bin/bash
       command: |
-        # Provide error if non-bash shell
-        if [ -z "$BASH" ]; then
-          echo Bash not installed.
-          exit 1
-        fi
         # Provide error if no webhook is set and error. Otherwise continue
         if [ -z "<< parameters.webhook >>" ]; then
           echo "NO SLACK WEBHOOK SET"
