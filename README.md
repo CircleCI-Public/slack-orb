@@ -116,7 +116,7 @@ jobs:
 ## Dependencies / Requirements
 
 ### Bash Shell
-Because these scripts us bash-specific features, `Bash` is required.
+Because these scripts use bash-specific features, `Bash` is required.
 `Bash` is the default shell used on CircleCI and the Orb will be compatible with most images.
 If using an `Alpine` base image, you will need to call `apk add bash` before calling this Orb,
 or create a derivative base image that calls `RUN apk add bash`.
