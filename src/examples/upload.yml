@@ -1,0 +1,22 @@
+description: "Upload a file in slack"
+
+usage:
+  version: 2.1
+
+  orbs:
+    slack: circleci/slack@x.y.z
+
+  jobs:
+    build:
+      docker:
+        - image: <docker image>
+      steps:
+        # With fail_only set to true, no alert will be sent in this example. Change the exit status on the next line to produce an error.
+        - run: exit 0
+
+        - slack/status:
+            fail_only: true # Optional: if set to `true` then only failure messages will occur.
+            webhook: "webhook" # Optional: Enter a specific webhook here or the default will use $SLACK_WEBHOOK
+            command: |
+              curl https://slack.com/api/files.upload -F token="${SLACK_TOKEN}" -F channels="${SLACK_CHANNEL}" -F title="${message_title}" -F filename="${filename}" -F file=@"${path_to_file}"
+
