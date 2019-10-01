@@ -73,6 +73,15 @@ steps:
         fi
 
   - run:
+      name: Provide error if curl not installed
+      command: |
+        command -v curl
+        if [ $? -ne 0 ]; then
+          echo Curl not installed.
+          exit 1
+        fi
+
+  - run:
       name: Slack - Setting Failure Condition
       command: |
         echo 'export SLACK_BUILD_STATUS="fail"' >> $BASH_ENV
