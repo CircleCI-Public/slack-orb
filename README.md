@@ -65,7 +65,7 @@ jobs:
           mentions: "USERID1,USERID2," # Optional: Enter the Slack IDs of any user or group (sub_team) to be mentioned
           color: "#42e2f4" # Optional: Assign custom colors for each notification
           webhook: "webhook" # Optional: Enter a specific webhook here or the default will use $SLACK_WEBHOOK
-          when: "always" # Optional: Must be one of `always`, `on_success`, `on_fail`
+          when: "always" # Optional: Must be one of `always`, `on_success`, `on_fail` or the default will use `always`
 ```
 
 ![Custom Message Example](/img/notifyMessage.PNG)
