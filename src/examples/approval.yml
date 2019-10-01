@@ -11,4 +11,4 @@ usage:
       jobs:
         - slack/approval-notification:
             message: "Pending approval"
-            webhook: "webhook" # Optional: Enter a specific webhook here or the default will use $SLACK_WEBHOOK
+            webhook: ${SLACK_WEBHOOK} # Will use the value set in the CircleCI settings under the env-var SLACK_WEBHOOK

@@ -30,7 +30,7 @@ Notify a slack channel with a custom message at any point in a job with this cus
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `webhook` | `string` | ${SLACK_WEBHOOK} | Enter either your webhook value or use the CircleCI UI to add your token under the `SLACK_WEBHOOK` environment variable |
+| `webhook` | `env_var_name` | ${SLACK_WEBHOOK} | Please use the CircleCI UI to add your token under the `SLACK_WEBHOOK` environment variable |
 | `message` | `string` | Your job on CircleCI has completed. | Enter your custom message to send to your Slack channel |
 | `mentions` | `string` | `false` | Comma-separated list of Slack User or Group (SubTeam) IDs (e.g., "USER1,USER2,USER3"). _**Note:** these are Slack User IDs, not usernames. The user ID can be found on the user's profile. Look below for information on obtaining Group ID. For `here`, `channel` or `everyone` just write them._ |
 | `color` | `string` | #333333 |  Hex color value for notification attachment color |
@@ -64,7 +64,7 @@ jobs:
           message: "This is a custom message notification" # Optional: Enter your own message
           mentions: "USERID1,USERID2," # Optional: Enter the Slack IDs of any user or group (sub_team) to be mentioned
           color: "#42e2f4" # Optional: Assign custom colors for each notification
-          webhook: "webhook" # Optional: Enter a specific webhook here or the default will use $SLACK_WEBHOOK
+          webhook: ${SLACK_WEBHOOK} # Please use the CircleCI UI to set the slack webhook under the SLACK_WEBHOOK environment variable
 ```
 
 ![Custom Message Example](/img/notifyMessage.PNG)
@@ -76,7 +76,7 @@ Send a status alert at the end of a job based on success or failure. This must b
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `webhook` | `string` | ${SLACK_WEBHOOK} | Enter either your webhook value or use the CircleCI UI to add your token under the `SLACK_WEBHOOK` environment variable |
+| `webhook` | `env_var_name` | ${SLACK_WEBHOOK} | Please use the CircleCI UI to add your token under the `SLACK_WEBHOOK` environment variable |
 | `success_message` | `string` | :tada: A $CIRCLE_JOB job has succeeded! $SLACK_MENTIONS | Enter your custom message to send to your Slack channel |
 | `failure_message` | `string` | :red_circle: A $CIRCLE_JOB job has failed! $SLACK_MENTIONS | Enter your custom message to send to your Slack channel |
 | `mentions` | `string` |  | Comma-separated list of Slack User or Group (SubTeam) IDs (e.g., "USER1,USER2,USER3"). _**Note:** these are Slack User IDs, not usernames. The user ID can be found on the user's profile. Look below for information on obtaining Group ID._ |
@@ -106,7 +106,7 @@ jobs:
       - slack/status:
           mentions: "USERID1,USERID2" # Optional: Enter the Slack IDs of any user or group (sub_team) to be mentioned
           fail_only: true # Optional: if set to `true` then only failure messages will occur.
-          webhook: "webhook" # Optional: Enter a specific webhook here or the default will use $SLACK_WEBHOOK
+          webhook: ${SLACK_WEBHOOK} # Please use the CircleCI UI to set the slack webhook under the SLACK_WEBHOOK environment variable 
           only_for_branches: "master" # Optional: If set, a specific branch for which status updates will be sent. In this case, only for pushes to master branch.
 ```
 

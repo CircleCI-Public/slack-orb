@@ -2,9 +2,9 @@ description: Send a notification that a manual approval job is ready
 
 parameters:
   webhook:
-    description: Enter either your Webhook value or use the CircleCI UI to add your token under the 'SLACK_WEBHOOK' env var
-    type: string
-    default: ${SLACK_WEBHOOK}
+    description: Please use the CircleCI UI to add your token under the 'SLACK_WEBHOOK' env var
+    type: env_var_name
+    default: SLACK_WEBHOOK
 
   message:
     description: Enter custom message.
@@ -48,7 +48,7 @@ steps:
         # Provide error if no webhook is set and error. Otherwise continue
         if [ -z "<< parameters.webhook >>" ]; then
           echo "NO SLACK WEBHOOK SET"
-          echo "Please input your SLACK_WEBHOOK value either in the settings for this project, or as a parameter for this orb."
+          echo "Please input your SLACK_WEBHOOK value in the settings for this project"
           exit 1
         else
           #Create Members string
