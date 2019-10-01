@@ -1,4 +1,5 @@
-# Slack Orb ![CircleCI status](https://circleci.com/gh/CircleCI-Public/slack-orb.svg "CircleCI status") [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/circleci/slack)](https://circleci.com/orbs/registry/orb/circleci/slack)
+# Slack Orb [![CircleCI Build Status](https://circleci.com/gh/CircleCI-Public/slack-orb.svg?style=shield "CircleCI Build Status")](https://circleci.com/gh/CircleCI-Public/slack-orb) [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/circleci/slack)](https://circleci.com/orbs/registry/orb/circleci/slack) [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/CircleCI-Public/slack-orb/master/LICENSE) [![CircleCI Community](https://img.shields.io/badge/community-CircleCI%20Discuss-343434.svg)](https://discuss.circleci.com/c/ecosystem/orbs)
+
 Easily integrate custom [Slack](https://slack.com/ "Slack") notifications into your [CircleCI](https://circleci.com/ "CircleCI") projects. Create custom alert messages for any job or receive status updates.
 
 Learn more about [Orbs](https://circleci.com/docs/2.0/using-orbs/ "Using Orbs").
@@ -10,7 +11,7 @@ Example config:
 version: 2.1
 
 orbs:
-  slack: circleci/slack@1.0.0
+  slack: circleci/slack@x.y.z
 
 jobs:
   build:
@@ -31,7 +32,7 @@ Notify a slack channel with a custom message at any point in a job with this cus
 |-----------|------|---------|-------------|
 | `webhook` | `string` | ${SLACK_WEBHOOK} | Enter either your webhook value or use the CircleCI UI to add your token under the `SLACK_WEBHOOK` environment variable |
 | `message` | `string` | Your job on CircleCI has completed. | Enter your custom message to send to your Slack channel |
-| `mentions` | `string` | `false` | Comma-separated list of Slack User or Group (SubTeam) IDs (e.g., "USER1,USER2,USER3"). _**Note:** these are Slack User IDs, not usernames. The user ID can be found on the user's profile. Look below for information on obtaining Group ID._ |
+| `mentions` | `string` | `false` | Comma-separated list of Slack User or Group (SubTeam) IDs (e.g., "USER1,USER2,USER3"). _**Note:** these are Slack User IDs, not usernames. The user ID can be found on the user's profile. Look below for information on obtaining Group ID. For `here`, `channel` or `everyone` just write them._ |
 | `color` | `string` | #333333 |  Hex color value for notification attachment color |
 | `author_name` | `string` |  | Optional author name property for the [Slack message attachment] |
 | `author_link` | `string` |  | Optional author link property for the [Slack message attachment] |
@@ -51,7 +52,7 @@ Example:
 version: 2.1
 
 orbs:
-  slack: circleci/slack@1.0.0
+  slack: circleci/slack@x.y.z
 
 jobs:
   build:
@@ -75,9 +76,14 @@ Send a status alert at the end of a job based on success or failure. This must b
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `webhook` | `string` | ${SLACK_WEBHOOK} | Enter either your webhook value or use the CircleCI UI to add your token under the `SLACK_WEBHOOK` environment variable |
+| `success_message` | `string` | :tada: A $CIRCLE_JOB job has succeeded! $SLACK_MENTIONS | Enter your custom message to send to your Slack channel |
+| `failure_message` | `string` | :red_circle: A $CIRCLE_JOB job has failed! $SLACK_MENTIONS | Enter your custom message to send to your Slack channel |
 | `mentions` | `string` |  | Comma-separated list of Slack User or Group (SubTeam) IDs (e.g., "USER1,USER2,USER3"). _**Note:** these are Slack User IDs, not usernames. The user ID can be found on the user's profile. Look below for information on obtaining Group ID._ |
-| `fail_only` | `string` | false | If set to "true," successful jobs will _not_ send alerts |
-| `only_for_branch` | `string` |  | If set, a specific branch for which slack status updates will be sent |
+| `fail_only` | `boolean` | `false` | If set to `true`, successful jobs will _not_ send alerts |
+| `only_for_branches` | `string` |  | If set, a comma-separated list of branches for which to send notifications |
+| `include_project_field` | `boolean` | `true` | Whether or not to include the _Project_ field in the message |
+| `include_job_number_field` | `boolean` | `true` | Whether or not to include the _Job Number_ field in the message |
+| `include_visit_job_action` | `boolean` | `true` | Whether or not to include the _Visit Job_ action in the message |
 
 Example:
 
@@ -85,19 +91,19 @@ Example:
 version: 2.1
 
 orbs:
-  slack: circleci/slack@1.0.0
+  slack: circleci/slack@x.y.z
 
 jobs:
   build:
     docker:
       - image: <docker image>
     steps:
-      # With fail_only set to true, no alert will be sent in this example. Change the exit status on the next line to produce an error.
+      # With fail_only set to `true`, no alert will be sent in this example. Change the exit status on the next line to produce an error.
       - run: exit 0
 
       - slack/status:
           mentions: "USERID1,USERID2" # Optional: Enter the Slack IDs of any user or group (sub_team) to be mentioned
-          fail_only: "true" # Optional: if set to "true" then only failure messages will occur.
+          fail_only: true # Optional: if set to `true` then only failure messages will occur.
           webhook: "webhook" # Optional: Enter a specific webhook here or the default will use $SLACK_WEBHOOK
           only_for_branch: "master" # Optional: If set, a specific branch for which status updates will be sent. In this case, only for pushes to master branch.
 ```
@@ -137,4 +143,4 @@ You can implement the Webhook in one of two ways, as an environment variable, or
 2. You can enter the Webhook for the individual status or alert by entering is at the `webhook` parameter, as shown above.
 
 ## Contributing
-We welcome [issues](https://github.com/CircleCI-Public/slack-orb/issues) to and [pull requests](https://github.com/CircleCI-Public/slack-orb/pulls) against this repository! For further questions/comments about this or other orbs, visit [CircleCI's Orbs discussion forum](https://discuss.circleci.com/c/orbs).
+We welcome [issues](https://github.com/CircleCI-Public/slack-orb/issues) to and [pull requests](https://github.com/CircleCI-Public/slack-orb/pulls) against this repository! For further questions/comments about this or other orbs, visit [CircleCI's Orbs discussion forum](https://discuss.circleci.com/c/ecosystem/orbs).

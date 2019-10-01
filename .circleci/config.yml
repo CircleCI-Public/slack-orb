@@ -1,19 +1,12 @@
 version: 2.1
 
 orbs:
-  circle-compare-url: iynere/compare-url@0.4.8
-  orb-tools: circleci/orb-tools@8.1.0
+  orb-tools: circleci/orb-tools@8.27.3
   slack: circleci/slack@dev:alpha
-
-executors:
-  ci-base:
-    resource_class: small
-    docker:
-      - image: cibuilds/base
 
 jobs:
   notifytest:
-    executor: ci-base
+    executor: orb-tools/ubuntu
     steps:
       - run: exit 0 #toggle this to force success or status for testing
       - slack/notify:
@@ -21,25 +14,54 @@ jobs:
           color: "#f4aa42"
           mentions: "${ORBS_USER_GROUP_UUID}"
 
-  statustestpass:
-    executor: ci-base
+  statustestpass-full:
+    executor: orb-tools/ubuntu
+
+    parameters:
+      only_for_branches:
+        type: string
+        default: ""
+
     steps:
       - run: exit 0 #toggle this to force success or status for testing
       - slack/status:
           mentions: "${ORBS_USER_GROUP_UUID}"
+          only_for_branches: <<parameters.only_for_branches>>
 
-  # statustestfail:
-  #   executor: ci-base
-  #   steps:
-  #     - run: exit 1 #toggle this to force success or status for testing
-  #     - slack/status:
-  #         mentions: "${ORBS_USER_GROUP_UUID}"
+  statustestpass-minimal:
+    executor: orb-tools/ubuntu
+
+    parameters:
+      only_for_branches:
+        type: string
+        default: ""
+
+    steps:
+      - run: exit 0 #toggle this to force success or status for testing
+      - slack/status:
+          mentions: "${ORBS_USER_GROUP_UUID}"
+          only_for_branches: <<parameters.only_for_branches>>
+          include_project_field: false
+          include_job_number_field: false
+          include_visit_job_action: false
 
   approvaltest:
-    executor: ci-base
+    executor: orb-tools/ubuntu
     steps:
       - slack/approval:
           mentions: "${ORBS_USER_GROUP_UUID}"
+
+  approvaltest-mention-here:
+    executor: orb-tools/ubuntu
+    steps:
+      - slack/approval:
+          mentions: "here"
+
+  approvaltest-mention-here-2:
+    executor: orb-tools/ubuntu
+    steps:
+      - slack/approval:
+          mentions: "foo-here-bar"
 
 # yaml anchor filters
 integration-dev_filters: &integration-dev_filters
@@ -55,14 +77,19 @@ integration-master_filters: &integration-master_filters
     only: /master-.*/
 
 prod-deploy_requires: &prod-deploy_requires
-  [notifytest-master, statustestpass-master, approvaltest-master, approval-notification-job-master]
+  [
+    notifytest-master,
+    statustestpass-full-master,
+    statustestpass-minimal-master,
+    statustestpass-shouldnt-trigger-master,
+    approvaltest-master,
+    approvaltest-mention-here-master,
+    approvaltest-mention-here-2-master,
+    approval-notification-job-master
+  ]
 
-add-ssh-keys: &add-ssh-keys
-  [add_ssh_keys: {fingerprints: ["40:21:b7:d7:fe:ea:dd:80:ca:c8:34:7a:37:b4:b4:d2"]}]
-
-# not in use yet—add this functionality to git-tools-orb when it's ready
-# cleanup-git-tag: &cleanup-git-tag
-#   [run: {when: "always", name: "cleanup tag", command: "git config --global user.email $CIRCLE_USERNAME@users.noreply.github.com && git config --global user.name $CIRCLE_USERNAME && git push --delete origin $CIRCLE_TAG"}]
+# add-ssh-keys: &add-ssh-keys
+#   [add_ssh_keys: {fingerprints: ["40:21:b7:d7:fe:ea:dd:80:ca:c8:34:7a:37:b4:b4:d2"]}]
 
 workflows:
   lint_pack-validate_publish-dev:
@@ -70,22 +97,19 @@ workflows:
       - orb-tools/lint
 
       - orb-tools/pack:
-          requires:
-            - orb-tools/lint
+          requires: [orb-tools/lint]
 
       - orb-tools/publish-dev:
           context: orb-publishing
           orb-name: circleci/slack
-          requires:
-            - orb-tools/pack
+          requires: [orb-tools/pack]
 
       - orb-tools/trigger-integration-workflow:
           context: orb-publishing
           name: trigger-integration-dev
           ssh-fingerprints: 79:ae:f5:10:17:8a:d2:9a:ed:63:5c:b0:92:66:23:49
           cleanup-tags: true
-          requires:
-            - orb-tools/publish-dev
+          requires: [orb-tools/publish-dev]
           filters:
             branches:
               ignore: master
@@ -95,8 +119,7 @@ workflows:
           ssh-fingerprints: 79:ae:f5:10:17:8a:d2:9a:ed:63:5c:b0:92:66:23:49
           cleanup-tags: true
           tag: master
-          requires:
-            - orb-tools/publish-dev
+          requires: [orb-tools/publish-dev]
           filters:
             branches:
               only: master
@@ -109,13 +132,34 @@ workflows:
           context: orb-publishing
           filters: *integration-dev_filters
 
-      - statustestpass:
-          name: statustestpass-dev
+      - statustestpass-full:
+          name: statustestpass-full-dev
           context: orb-publishing
+          filters: *integration-dev_filters
+
+      - statustestpass-minimal:
+          name: statustestpass-minimal-dev
+          context: orb-publishing
+          filters: *integration-dev_filters
+
+      - statustestpass-minimal:
+          name: statustestpass-shouldnt-trigger-dev
+          context: orb-publishing
+          only_for_branches: master,staging
           filters: *integration-dev_filters
 
       - approvaltest:
           name: approvaltest-dev
+          context: orb-publishing
+          filters: *integration-dev_filters
+
+      - approvaltest-mention-here:
+          name: approvaltest-mention-here-dev
+          context: orb-publishing
+          filters: *integration-dev_filters
+
+      - approvaltest-mention-here-2:
+          name: approvaltest-mention-here-2-dev
           context: orb-publishing
           filters: *integration-dev_filters
 
@@ -131,13 +175,34 @@ workflows:
           context: orb-publishing
           filters: *integration-master_filters
 
-      - statustestpass:
-          name: statustestpass-master
+      - statustestpass-full:
+          name: statustestpass-full-master
           context: orb-publishing
+          filters: *integration-master_filters
+
+      - statustestpass-minimal:
+          name: statustestpass-minimal-master
+          context: orb-publishing
+          filters: *integration-master_filters
+
+      - statustestpass-minimal:
+          name: statustestpass-shouldnt-trigger-master
+          context: orb-publishing
+          only_for_branches: master,staging
           filters: *integration-master_filters
 
       - approvaltest:
           name: approvaltest-master
+          context: orb-publishing
+          filters: *integration-master_filters
+
+      - approvaltest-mention-here:
+          name: approvaltest-mention-here-master
+          context: orb-publishing
+          filters: *integration-master_filters
+
+      - approvaltest-mention-here-2:
+          name: approvaltest-mention-here-2-master
           context: orb-publishing
           filters: *integration-master_filters
 
@@ -152,6 +217,8 @@ workflows:
           name: dev-promote-patch
           context: orb-publishing
           orb-name: circleci/slack
+          cleanup-tags: true
+          ssh-fingerprints: 79:ae:f5:10:17:8a:d2:9a:ed:63:5c:b0:92:66:23:49
           requires: *prod-deploy_requires
           filters:
             branches:
@@ -164,6 +231,8 @@ workflows:
           release: minor
           context: orb-publishing
           orb-name: circleci/slack
+          cleanup-tags: true
+          ssh-fingerprints: 79:ae:f5:10:17:8a:d2:9a:ed:63:5c:b0:92:66:23:49
           requires: *prod-deploy_requires
           filters:
             branches:
@@ -176,6 +245,8 @@ workflows:
           release: major
           context: orb-publishing
           orb-name: circleci/slack
+          cleanup-tags: true
+          ssh-fingerprints: 79:ae:f5:10:17:8a:d2:9a:ed:63:5c:b0:92:66:23:49
           requires: *prod-deploy_requires
           filters:
             branches:
