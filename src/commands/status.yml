@@ -65,6 +65,14 @@ parameters:
 
 steps:
   - run:
+      name: Provide error if non-bash shell
+      command: |
+        if [ ! -x /bin/bash ]; then
+          echo Bash not installed.
+          exit 1
+        fi
+
+  - run:
       name: Slack - Setting Failure Condition
       command: |
         echo 'export SLACK_BUILD_STATUS="fail"' >> $BASH_ENV
@@ -75,14 +83,6 @@ steps:
       command: |
         echo 'export SLACK_BUILD_STATUS="success"' >> $BASH_ENV
       when: on_success
-
-  - run:
-      name: Provide error if non-bash shell
-      command: |
-        if [ ! -x /bin/bash ]; then
-          echo Bash not installed.
-          exit 1
-        fi
 
   - run:
       name: Slack - Sending Status Alert
