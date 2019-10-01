@@ -40,14 +40,17 @@ steps:
           echo Bash not installed.
           exit 1
         fi
+ 
+  - run:
+      name: Provide error if cURL is not installed.
+      command: |
+        which curl > curl_exists; echo $? | grep -q '1' && echo curl not installed && rm curl_exists && exit 1
+        rm curl_exists
 
   - run:
       name: Slack - Sending Approval Notification
       shell: /bin/bash
       command: |
-        # Provide error if curl is not installed
-        which curl > curl_exists; echo $? | grep -q '1' && echo curl not installed && rm out && exit 1
-        rm curl_exists
         # Provide error if no webhook is set and error. Otherwise continue
         if [ -z "<< parameters.webhook >>" ]; then
           echo "NO SLACK WEBHOOK SET"
