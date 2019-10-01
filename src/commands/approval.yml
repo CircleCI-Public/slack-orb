@@ -40,7 +40,7 @@ steps:
           echo Bash not installed.
           exit 1
         fi
- 
+
   - run:
       name: Provide error if cURL is not installed.
       command: |
