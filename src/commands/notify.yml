@@ -14,42 +14,42 @@ parameters:
   color:
     description: Hex color value for notification attachment color.
     type: string
-    default: '#333333'
+    default: "#333333"
 
   mentions:
     description: A comma separated list of user IDs. No spaces.
     type: string
-    default: ''
+    default: ""
 
   author_name:
     description: Optional author name
     type: string
-    default: ''
+    default: ""
 
   author_link:
     description: Optional author link
     type: string
-    default: ''
+    default: ""
 
   title:
     description: Optional title
     type: string
-    default: ''
+    default: ""
 
   title_link:
     description: Optional title link
     type: string
-    default: ''
+    default: ""
 
   footer:
     description: Optional footer
     type: string
-    default: ''
+    default: ""
 
   ts:
     description: Optional timestamp
     type: string
-    default: ''
+    default: ""
 
   include_project_field:
     description: Whether or not to include the Project field in the message
@@ -67,9 +67,10 @@ parameters:
     default: true
 
   when:
-    description: When to send the notification, can be `on_success` or `on_fail`.
-    type: string
-    default: ''
+    description: When to send the notification, must be one of: `always`, `on_success` or `on_fail`.
+    type: enum
+    default: "always"
+    enum: ["always", "on_fail", "on_success"]
 
 steps:
   - run:

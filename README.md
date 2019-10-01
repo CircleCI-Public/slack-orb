@@ -43,7 +43,7 @@ Notify a slack channel with a custom message at any point in a job with this cus
 | `include_project_field` | `boolean` | `true` | Whether or not to include the _Project_ field in the message |
 | `include_job_number_field` | `boolean` | `true` | Whether or not to include the _Job Number_ field in the message |
 | `include_visit_job_action` | `boolean` | `true` | Whether or not to include the _Visit Job_ action in the message |
-| `when` | `string` |  | When to send the notification, can be `on_success` or `on_fail`. |
+| `when` | `enum` |  | When to send the notification, must be one of: `always`, `on_success`, `on_fail`, defaults to `always`.  |
 
 [Slack message attachment]: https://api.slack.com/docs/message-attachments
 
@@ -65,7 +65,7 @@ jobs:
           mentions: "USERID1,USERID2," # Optional: Enter the Slack IDs of any user or group (sub_team) to be mentioned
           color: "#42e2f4" # Optional: Assign custom colors for each notification
           webhook: "webhook" # Optional: Enter a specific webhook here or the default will use $SLACK_WEBHOOK
-          when: "on_success" # Optional: Can be `on_success` or `on_fail`
+          when: "always" # Optional: Must be one of `always`, `on_success`, `on_fail`
 ```
 
 ![Custom Message Example](/img/notifyMessage.PNG)
