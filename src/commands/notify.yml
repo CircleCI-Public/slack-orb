@@ -103,7 +103,7 @@ steps:
           echo "Please input your SLACK_WEBHOOK value either in the settings for this project, or as a parameter for this orb."
           exit 1
         else
-          if [ -n "<< parameters.when >>" ]; then
+          if [[ -n "<< parameters.when >>" && << parameters.when >> != "always" ]]; then
             if [ << parameters.when >> != $CIRCLE_BUILD_STATUS ]; then
               exit 0
             fi
