@@ -116,7 +116,7 @@ jobs:
 ## Dependencies / Requirements
 
 ### Bash Shell
-Because these scripts us bash-specific features, `Bash` is required.
+Because these scripts use bash-specific features, `Bash` is required.
 `Bash` is the default shell used on CircleCI and the Orb will be compatible with most images.
 If using an `Alpine` base image, you will need to call `apk add bash` before calling this Orb,
 or create a derivative base image that calls `RUN apk add bash`.
@@ -132,7 +132,7 @@ Full instructions can be found at Slack: https://api.slack.com/incoming-webhooks
 
 1. [Create Slack App](https://api.slack.com/docs/slack-button#register_your_slack_app). This will also be the name of the "user" that posts alerts to Slack. You'll be asked for which Workspace this app belongs to.
 2. In the settings for the app, enable `Incoming Webhooks`
-3. In the left hand panel of your Slack app settings, under `Features` click `Incoming Webhooks`
+3. On the left hand panel of your Slack app settings, under `Features` click `Incoming Webhooks`
 4. Click `Add New Webhook to Workspace`. You will be asked to pick a channel for the webhook here.
 5. Done! A webhook URL will be created.
 
@@ -145,7 +145,7 @@ Full instructions can be found at Slack: https://api.slack.com/incoming-webhooks
 ### What to do with Slack Webhook
 You can implement the Webhook in one of two ways, as an environment variable, or as a parameter.
 
-1. In the settings page for your project on CircleCI, click `Environment Variables`. From that page you can click the `Add Variable` button. Finally, enter your webhook as the value, and `SLACK_WEBHOOK` as the name.
+1. In the settings page for your project on CircleCI, click `Environment Variables`. From that page you can click on the `Add Variable` button. Finally, enter your webhook as the value, and `SLACK_WEBHOOK` as the name.
 2. You can enter the Webhook for the individual status or alert by entering is at the `webhook` parameter, as shown above.
 
 ## Contributing
