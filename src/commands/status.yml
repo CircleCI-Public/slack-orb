@@ -7,7 +7,7 @@ parameters:
     type: env_var_name
     default: SLACK_WEBHOOK
     description: >
-      Please use the CircleCI UI to add your token under the 
+      Please use the CircleCI UI to add your token under the
       'SLACK_WEBHOOK' env var
 
   success_message:
