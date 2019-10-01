@@ -57,6 +57,12 @@ parameters:
     description: >
       Whether or not to include the Visit Job action in the message
 
+  channel:
+    type: string
+    default: ""
+    description: >
+      If set, overriding webhook's channel setting
+
 steps:
   - run:
       name: Provide error if curl is not installed.
@@ -79,7 +85,7 @@ steps:
   - run:
       name: Provide error if non-bash shell
       command: |
-        if [ -z "$BASH" ]; then
+        if [ ! -x /bin/bash ]; then
           echo Bash not installed.
           exit 1
         fi
@@ -128,6 +134,9 @@ steps:
               else
                 curl -X POST -H 'Content-type: application/json' \
                   --data "{ \
+                            <<# parameters.channel >>
+                            \"channel\": \"<< parameters.channel >>\", \
+                            <</ parameters.channel >>
                             \"attachments\": [ \
                               { \
                                 \"fallback\": \"<< parameters.success_message >>\", \
@@ -167,6 +176,9 @@ steps:
               #If Failed
               curl -X POST -H 'Content-type: application/json' \
                 --data "{ \
+                  <<# parameters.channel >>
+                  \"channel\": \"<< parameters.channel >>\", \
+                  <</ parameters.channel >>
                   \"attachments\": [ \
                     { \
                       \"fallback\": \"<< parameters.failure_message >>\", \

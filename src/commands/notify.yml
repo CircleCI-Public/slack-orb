@@ -66,11 +66,17 @@ parameters:
     type: boolean
     default: true
 
+  channel:
+    type: string
+    default: ""
+    description: >
+      If set, overriding webhook's channel setting
+
 steps:
   - run:
       name: Provide error if non-bash shell
       command: |
-        if [ -z "$BASH" ]; then
+        if [ ! -x /bin/bash ]; then
           echo Bash not installed.
           exit 1
         fi
@@ -106,6 +112,9 @@ steps:
           curl -X POST -H 'Content-type: application/json' \
             --data \
             "{ \
+              <<# parameters.channel >>
+              \"channel\": \"<< parameters.channel >>\", \
+              <</ parameters.channel >>
               \"attachments\": [ \
                 { \
                   \"fallback\": \"<< parameters.message >> - $CIRCLE_BUILD_URL\", \

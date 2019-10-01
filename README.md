@@ -43,6 +43,7 @@ Notify a slack channel with a custom message at any point in a job with this cus
 | `include_project_field` | `boolean` | `true` | Whether or not to include the _Project_ field in the message |
 | `include_job_number_field` | `boolean` | `true` | Whether or not to include the _Job Number_ field in the message |
 | `include_visit_job_action` | `boolean` | `true` | Whether or not to include the _Visit Job_ action in the message |
+| `channel` | `string` | | If set, overriding webhook's channel setting |
 
 [Slack message attachment]: https://api.slack.com/docs/message-attachments
 
@@ -84,6 +85,7 @@ Send a status alert at the end of a job based on success or failure. This must b
 | `include_project_field` | `boolean` | `true` | Whether or not to include the _Project_ field in the message |
 | `include_job_number_field` | `boolean` | `true` | Whether or not to include the _Job Number_ field in the message |
 | `include_visit_job_action` | `boolean` | `true` | Whether or not to include the _Visit Job_ action in the message |
+| `channel` | `string` | | If set, overriding webhook's channel setting |
 
 Example:
 
@@ -105,7 +107,7 @@ jobs:
           mentions: "USERID1,USERID2" # Optional: Enter the Slack IDs of any user or group (sub_team) to be mentioned
           fail_only: true # Optional: if set to `true` then only failure messages will occur.
           webhook: "webhook" # Optional: Enter a specific webhook here or the default will use $SLACK_WEBHOOK
-          only_for_branch: "master" # Optional: If set, a specific branch for which status updates will be sent. In this case, only for pushes to master branch.
+          only_for_branches: "master" # Optional: If set, a specific branch for which status updates will be sent. In this case, only for pushes to master branch.
 ```
 
 ![Status Success Example](/img/statusSuccess.PNG)
@@ -114,7 +116,11 @@ jobs:
 ## Dependencies / Requirements
 
 ### Bash Shell
-Due to the limitations of the `sh` shell, `Bash` is required. `Bash` is the default shell used on CircleCI and the Orb will be compatible with most images. Images such as `Alpine` that do not contain the `Bash` shell by default are incompatible and en error message will be logged. You may install the Bash shell through your package manager (example: `apk add bash`) in the Dockerfile for the image you are using.
+Because these scripts us bash-specific features, `Bash` is required.
+`Bash` is the default shell used on CircleCI and the Orb will be compatible with most images.
+If using an `Alpine` base image, you will need to call `apk add bash` before calling this Orb,
+or create a derivative base image that calls `RUN apk add bash`.
+If `Bash` is not available, an error message will be logged and the task will fail.
 
 ### cURL
 cURL is used to post the Webhook data and must be installed in the container to function properly.
