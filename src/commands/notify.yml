@@ -67,7 +67,7 @@ parameters:
     default: true
 
   when:
-    description: When to send the notification, must be one of: `always`, `on_success` or `on_fail`.
+    description: When to send the notification, must be one of `always`, `on_success` or `on_fail`.
     type: enum
     default: "always"
     enum: ["always", "on_fail", "on_success"]
