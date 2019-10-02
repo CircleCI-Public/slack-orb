@@ -1,0 +1,42 @@
+description: Upload a file to slack
+
+parameters:
+  filepath:
+    description: Enter the path to the file.
+    type: string
+    default: ""
+
+  filetype:
+    description: Enter the file type identifier.
+    type: string
+    default: ""
+
+  title:
+    description: Enter the title of file.
+    type: string
+    default: ""
+
+  comment:
+    description: Enter additional comment for the file.
+    type: string
+    default: ""
+
+  channels:
+    description: Comma-separated list of channel names or IDs where the file will be shared.
+    type: string
+    default: ""
+
+steps:
+  - run:
+      name: Provide error if non-bash shell
+      command: |
+        if [ ! -x /bin/bash ]; then
+          echo Bash not installed.
+          exit 1
+        fi
+
+  - run:
+    name: Slack file upload
+    shell: /bin/bash
+    command: |
+      # [Work-In-Progress] Bash Script for slack file upload.
