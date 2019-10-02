@@ -143,7 +143,7 @@ Full instructions can be found at Slack: https://api.slack.com/incoming-webhooks
 4. Find your group below and copy the value for "ID"
 
 ### What to do with Slack Webhook
-You can implement the Webhook in one of two ways, as an environment variable, or as a parameter.
+You can implement the Webhook in one of two ways, either as an environment variable, or as a parameter.
 
 1. In the settings page for your project on CircleCI, click `Environment Variables`. From that page you can click the `Add Variable` button. Finally, enter your webhook as the value, and `SLACK_WEBHOOK` as the name.
 2. You can enter the Webhook for the individual status or alert by entering is at the `webhook` parameter, as shown above.
