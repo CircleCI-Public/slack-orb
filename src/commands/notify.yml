@@ -11,6 +11,11 @@ parameters:
     type: string
     default: Your job on CircleCI has completed.
 
+  image_url:
+    description: Enter a valid Image URL
+    type: string
+    default: ""
+
   color:
     description: Hex color value for notification attachment color.
     type: string
@@ -129,6 +134,7 @@ steps:
                     } \
                     <</ parameters.include_job_number_field >>
                   ], \
+                  \"image_url\": \"<< parameters.image_url >>\", \
                   \"actions\": [ \
                     <<# parameters.include_visit_job_action >>
                     { \
