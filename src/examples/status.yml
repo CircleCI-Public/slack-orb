@@ -13,15 +13,6 @@ usage:
       steps:
         # With fail_only set to true, no alert will be sent in this example. Change the exit status on the next line to produce an error.
         - run: exit 0
-        - run:
-          name: Provide error if non-bash shell
-      command: |
-        if [ ! -x /bin/bash ]; then
-          echo Bash not installed.
-          exit 1
-        fi
-
-
         - slack/status:
             mentions: "USERID1,USERID2" # Optional: Enter the Slack IDs of any user or group (sub_team) to be mentioned
             fail_only: true # Optional: if set to `true` then only failure messages will occur.
