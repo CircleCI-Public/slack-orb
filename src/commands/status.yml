@@ -77,11 +77,22 @@ steps:
       when: on_success
 
   - run:
-      name: Provide error if non-bash shell
+      name: Preliminary Checks
       command: |
         if [ ! -x /bin/bash ]; then
-          echo Bash not installed.
+          echo bash not installed.
           exit 1
+        fi
+
+        if ! which curl >/dev/null; then
+          echo curl not installed.
+          exit 1
+        fi
+
+        if [ -z "<< parameters.webhook >>" ]; then
+            echo "NO SLACK WEBHOOK SET"
+            echo "Please input your SLACK_WEBHOOK value either in the settings for this project, or as a parameter for this orb."
+            exit 1
         fi
 
   - run:
