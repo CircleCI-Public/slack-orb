@@ -17,7 +17,10 @@ parameters:
     default: "#3AA3E3"
 
   mentions:
-    description: A comma separated list of user IDs. No spaces.
+    description: >
+      A comma separated list of user IDs. No spaces.
+
+      Use "CIRCLE_USERNAME" to mention the triggering user. Requires `GITHUB_TO_SLACK_<GITHUB_USERNAME>=<SLACK_UID>` environment variables defined for each member of the team.
     type: string
     default: ""
 
@@ -55,7 +58,10 @@ steps:
           if [ -n "<< parameters.mentions >>" ]; then
             IFS="," read -ra SLACK_MEMBERS \<<< "<< parameters.mentions >>"
             for i in "${SLACK_MEMBERS[@]}"; do
-              if [ $(echo ${i} | head -c 1) == "S" ]; then
+              if [ "${i}" == "CIRCLE_USERNAME" ]; then
+                SLACK_UID="GITHUB_TO_SLACK_${!i}"
+                SLACK_MENTIONS="${SLACK_MENTIONS<@{!SLACK_UID}>}"
+              elif [ $(echo ${i} | head -c 1) == "S" ]; then
                 SLACK_MENTIONS="${SLACK_MENTIONS}<!subteam^${i}> "
               elif echo ${i} | grep -E "^(here|channel|everyone)$" > /dev/null; then
                 SLACK_MENTIONS="${SLACK_MENTIONS}<!${i}> "
