@@ -40,7 +40,7 @@ Notify a slack channel with a custom message at any point in a job with this cus
 | `title_link` | `string` |  | Optional title link property for the [Slack message attachment] |
 | `footer` | `string` |  | Optional footer property for the [Slack message attachment] |
 | `ts` | `string` |  | Optional timestamp property for the [Slack message attachment] |
-| `include_project_field` | `boolean` | `true` | Whether or not to include the _Project_ field in the message |
+| `include_project_field` | `boolean` | `true` | Condition to check if it is necessary to include the _Project_ field in the message |
 | `include_job_number_field` | `boolean` | `true` | Whether or not to include the _Job Number_ field in the message |
 | `include_visit_job_action` | `boolean` | `true` | Whether or not to include the _Visit Job_ action in the message |
 | `channel` | `string` | | If set, overriding webhook's channel setting |
@@ -69,7 +69,7 @@ jobs:
 
 ![Custom Message Example](/img/notifyMessage.PNG)
 
-See Slack's [Basic message formatting](https://api.slack.com/docs/message-formatting) documentation for guidance on formatting notification messages.
+Refer to Slack's [Basic message formatting](https://api.slack.com/docs/message-formatting) documentation for guidance on formatting notification messages.
 
 ### Status
 Send a status alert at the end of a job based on success or failure. This must be the last step in a job.
@@ -116,7 +116,7 @@ jobs:
 ## Dependencies / Requirements
 
 ### Bash Shell
-Because these scripts us bash-specific features, `Bash` is required.
+Because these scripts use bash-specific features, `Bash` is required.
 `Bash` is the default shell used on CircleCI and the Orb will be compatible with most images.
 If using an `Alpine` base image, you will need to call `apk add bash` before calling this Orb,
 or create a derivative base image that calls `RUN apk add bash`.
@@ -143,7 +143,7 @@ Full instructions can be found at Slack: https://api.slack.com/incoming-webhooks
 4. Find your group below and copy the value for "ID"
 
 ### What to do with Slack Webhook
-You can implement the Webhook in one of two ways, as an environment variable, or as a parameter.
+You can implement the Webhook in one of two ways, either as an environment variable, or as a parameter.
 
 1. In the settings page for your project on CircleCI, click `Environment Variables`. From that page you can click the `Add Variable` button. Finally, enter your webhook as the value, and `SLACK_WEBHOOK` as the name.
 2. You can enter the Webhook for the individual status or alert by entering is at the `webhook` parameter, as shown above.
