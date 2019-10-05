@@ -13,7 +13,7 @@ usage:
       steps:
         - slack/notify:
             message: "This is a custom message notification" # Optional: Enter your own message
-            mentions: "USERID1,USERID2," # Optional: Enter the Slack IDs of any user or group (sub_team) to be mentioned
+            mentions: "USERID1,USERID2,CIRCLE_USERNAME" # Optional: Enter the Slack IDs of any user or group (sub_team) to be mentioned
             color: "#42e2f4" # Optional: Assign custom colors for each notification
             webhook: "webhook" # Optional: Enter a specific webhook here or the default will use $SLACK_WEBHOOK
             channel: "CHANNELID" # Optional: Enter a channel id to override webhook's default channel
