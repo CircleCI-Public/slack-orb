@@ -44,6 +44,9 @@ Notify a slack channel with a custom message at any point in a job with this cus
 | `include_job_number_field` | `boolean` | `true` | Whether or not to include the _Job Number_ field in the message |
 | `include_visit_job_action` | `boolean` | `true` | Whether or not to include the _Visit Job_ action in the message |
 | `channel` | `string` | | If set, overriding webhook's channel setting |
+| `username` | `string` | | If set, overriding webhook's username setting |
+| `icon_emoji` | `string` | | If set, overriding webhook's icon_emoji setting |
+| `icon_url` | `string` | | If set, overriding webhook's icon_url setting |
 
 [Slack message attachment]: https://api.slack.com/docs/message-attachments
 
@@ -86,6 +89,9 @@ Send a status alert at the end of a job based on success or failure. This must b
 | `include_job_number_field` | `boolean` | `true` | Whether or not to include the _Job Number_ field in the message |
 | `include_visit_job_action` | `boolean` | `true` | Whether or not to include the _Visit Job_ action in the message |
 | `channel` | `string` | | If set, overriding webhook's channel setting |
+| `username` | `string` | | If set, overriding webhook's username setting |
+| `icon_emoji` | `string` | | If set, overriding webhook's icon_emoji setting |
+| `icon_url` | `string` | | If set, overriding webhook's icon_url setting |
 
 Example:
 

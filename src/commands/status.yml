@@ -63,6 +63,24 @@ parameters:
     description: >
       If set, overriding webhook's channel setting
 
+  username:
+    type: string
+    default: ""
+    description: >
+      If set, overriding webhook's username setting
+
+  icon_emoji:
+    type: string
+    default: ""
+    description: >
+      If set, overriding webhook's icon_emoji setting
+
+  icon_url:
+    type: string
+    default: ""
+    description: >
+      If set, overriding webhook's icon_url setting
+
 steps:
   - run:
       name: Slack - Setting Failure Condition
@@ -131,6 +149,15 @@ steps:
                             <<# parameters.channel >>
                             \"channel\": \"<< parameters.channel >>\", \
                             <</ parameters.channel >>
+                            <<# parameters.username >>
+                            \"username\": \"<< parameters.username >>\", \
+                            <</ parameters.username >>
+                            <<# parameters.icon_emoji >>
+                            \"icon_emoji\": \"<< parameters.icon_emoji >>\", \
+                            <</ parameters.icon_emoji >>
+                            <<# parameters.icon_url >>
+                            \"icon_url\": \"<< parameters.icon_url >>\", \
+                            <</ parameters.icon_url >>
                             \"attachments\": [ \
                               { \
                                 \"fallback\": \"<< parameters.success_message >>\", \
@@ -173,6 +200,15 @@ steps:
                   <<# parameters.channel >>
                   \"channel\": \"<< parameters.channel >>\", \
                   <</ parameters.channel >>
+                  <<# parameters.username >>
+                  \"username\": \"<< parameters.username >>\", \
+                  <</ parameters.username >>
+                  <<# parameters.icon_emoji >>
+                  \"icon_emoji\": \"<< parameters.icon_emoji >>\", \
+                  <</ parameters.icon_emoji >>
+                  <<# parameters.icon_url >>
+                  \"icon_url\": \"<< parameters.icon_url >>\", \
+                  <</ parameters.icon_url >>
                   \"attachments\": [ \
                     { \
                       \"fallback\": \"<< parameters.failure_message >>\", \

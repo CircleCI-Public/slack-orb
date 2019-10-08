@@ -19,3 +19,7 @@ usage:
             fail_only: true # Optional: if set to `true` then only failure messages will occur.
             webhook: "webhook" # Optional: Enter a specific webhook here or the default will use $SLACK_WEBHOOK
             only_for_branches: "only_for_branches" # Optional: If set, a comma-separated list of branches (or a single branch) for which status updates will be sent.
+            channel: "CHANNELID" # Optional: Enter a channel id to override webhook's default channel
+            username: "username" # Optional: Enter an username to override webhook's default name
+            icon_emoji: ":smile:" # Optional: Enter an emoji code to override webhook's default icon
+            icon_url: "icon_url" # Optional: Enter an icon image URL to override webhook's default icon
