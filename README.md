@@ -160,6 +160,7 @@ jobs:
   - slack/approval-notification:
       color: "#aa7fcd" # Optional: Enter your own message
       message: "Deployment pending approval" # Optional: Custom approval message
+      channel: "CHANNELID" # Optional: If set, overrides webhook's default channel setting
 ```
 
 ## Dependencies / Requirements
