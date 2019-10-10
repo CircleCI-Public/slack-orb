@@ -43,7 +43,7 @@ Notify a slack channel with a custom message at any point in a job with this cus
 | `include_project_field` | `boolean` | `true` | Condition to check if it is necessary to include the _Project_ field in the message |
 | `include_job_number_field` | `boolean` | `true` | Whether or not to include the _Job Number_ field in the message |
 | `include_visit_job_action` | `boolean` | `true` | Whether or not to include the _Visit Job_ action in the message |
-| `channel` | `string` | | If set, overriding webhook's channel setting |
+| `channel` | `string` | | Name of concerned channel if set, overriding webhook's channel setting |
 
 [Slack message attachment]: https://api.slack.com/docs/message-attachments
 
@@ -85,7 +85,7 @@ Send a status alert at the end of a job based on success or failure. This must b
 | `include_project_field` | `boolean` | `true` | Whether or not to include the _Project_ field in the message |
 | `include_job_number_field` | `boolean` | `true` | Whether or not to include the _Job Number_ field in the message |
 | `include_visit_job_action` | `boolean` | `true` | Whether or not to include the _Visit Job_ action in the message |
-| `channel` | `string` | | If set, overriding webhook's channel setting |
+| `channel` | `string` | | Name of concerned channel if set, overriding webhook's channel setting |
 
 Example:
 
