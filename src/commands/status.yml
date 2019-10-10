@@ -61,7 +61,7 @@ parameters:
     type: string
     default: ""
     description: >
-      Name of concerned channel if set, overriding webhook's channel setting
+      ID of concerned channel if set, overriding webhook's channel setting
 
 steps:
   - run:
