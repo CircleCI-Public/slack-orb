@@ -25,6 +25,36 @@ jobs:
 
 ## Commands
 
+### Approval
+Send a notification that a manual approval job is ready
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `color` | `string` | '#3AA3E3' | Hex color value for notification attachment color. |
+| `mentions` | `string` | '' | A comma separated list of user IDs. No spaces. |
+| `message` | `string` | A workflow in CircleCI is awaiting your approval. | Enter custom message. |
+| `url` | `string` | 'https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}' | The URL to link back to. |
+| `webhook` | `string` | '${SLACK_WEBHOOK}' | Enter either your Webhook value or use the CircleCI UI to add your token under the 'SLACK_WEBHOOK' env var |
+
+Example:
+
+```yaml
+version: 2.1
+
+orbs:
+  slack: circleci/slack@x.y.z
+
+jobs:
+    docker:
+      - image: <docker image>
+    steps:
+      - slack/approval:
+          message: "This is a custom approval message" # Optional: Enter your own message
+          mentions: "USERID1,USERID2," # Optional: Enter the Slack IDs of any user or group (sub_team) to be mentioned
+          color: "#42e2f4" # Optional: Assign custom colors for each approval message
+          webhook: "webhook" # Optional: Enter a specific webhook here or the default will use $SLACK_WEBHOOK
+```
+
 ### Notify
 Notify a slack channel with a custom message at any point in a job with this custom step.
 
@@ -112,6 +142,25 @@ jobs:
 
 ![Status Success Example](/img/statusSuccess.PNG)
 ![Status Fail Example](/img/statusFail.PNG)
+
+## Jobs
+
+### approval-notification
+Send an approval notification message
+
+Example:
+
+```yaml
+version: 2.1
+
+orbs:
+  slack: circleci/slack@x.y.z
+
+jobs:
+  - slack/approval-notification:
+      color: "#aa7fcd" # Optional: Enter your own message
+      message: "Deployment pending approval" # Optional: Custom approval message
+```
 
 ## Dependencies / Requirements
 
