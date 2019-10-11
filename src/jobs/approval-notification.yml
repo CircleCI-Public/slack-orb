@@ -1,6 +1,11 @@
 description: Notify Slack about an awaiting approval job
 
 parameters:
+    image_url:
+    description: Enter Image URL
+    type: string
+    default: ""
+    
   webhook:
     description: Enter either your Webhook value or use the CircleCI UI to add your token under the 'SLACK_WEBHOOK' env var
     type: string
