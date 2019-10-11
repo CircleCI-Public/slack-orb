@@ -111,6 +111,7 @@ Send a status alert at the end of a job based on success or failure. This must b
 | `failure_message` | `string` | :red_circle: A $CIRCLE_JOB job has failed! $SLACK_MENTIONS | Enter your custom message to send to your Slack channel |
 | `mentions` | `string` |  | Comma-separated list of Slack User or Group (SubTeam) IDs (e.g., "USER1,USER2,USER3"). _**Note:** these are Slack User IDs, not usernames. The user ID can be found on the user's profile. Look below for information on obtaining Group ID._ |
 | `fail_only` | `boolean` | `false` | If set to `true`, successful jobs will _not_ send alerts |
+| `change_only` | `boolean` | `false` | If set to `true`, consecutive successes or failures will _not_ send alerts |
 | `only_for_branches` | `string` |  | If set, a comma-separated list of branches, for which to send notifications |
 | `include_project_field` | `boolean` | `true` | Whether or not to include the _Project_ field in the message |
 | `include_job_number_field` | `boolean` | `true` | Whether or not to include the _Job Number_ field in the message |
@@ -136,6 +137,7 @@ jobs:
       - slack/status:
           mentions: "USERID1,USERID2" # Optional: Enter the Slack IDs of any user or group (sub_team) to be mentioned
           fail_only: true # Optional: if set to `true` then only failure messages will occur.
+          change_only: true # Optional: if set to `true` then only "change" in status messages will occur.
           webhook: "webhook" # Optional: Enter a specific webhook here or the default will use $SLACK_WEBHOOK
           only_for_branches: "master" # Optional: If set, a specific branch for which status updates will be sent. In this case, only for pushes to master branch.
 ```
