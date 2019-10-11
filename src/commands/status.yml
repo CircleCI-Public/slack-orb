@@ -26,6 +26,12 @@ parameters:
     description: >
       If `true`, notifications successful jobs will not be sent
 
+  change_only:
+    type: boolean
+    default: false
+    description: >
+      If `true`, notifications that are not "broke" or "fixed" will not be sent.
+
   mentions:
     type: string
     default: ""
@@ -125,6 +131,9 @@ steps:
               if [ << parameters.fail_only >> = true ]; then
                 echo "The job completed successfully"
                 echo '"fail_only" is set to "true". No Slack notification sent.'
+              elif [ << parameters.change_only >> = true ] && [ "fixed" != "$CIRCLE_JOB_STATUS_CHANGE" ]; then
+                echo "Job completed successfully."
+                echo '"change_only" is set to "true", and not "fixed". No Slack notification sent.'
               else
                 curl -X POST -H 'Content-type: application/json' \
                   --data "{ \
@@ -167,46 +176,51 @@ steps:
                 echo "Job completed successfully. Alert sent."
               fi
             else
-              #If Failed
-              curl -X POST -H 'Content-type: application/json' \
-                --data "{ \
-                  <<# parameters.channel >>
-                  \"channel\": \"<< parameters.channel >>\", \
-                  <</ parameters.channel >>
-                  \"attachments\": [ \
-                    { \
-                      \"fallback\": \"<< parameters.failure_message >>\", \
-                      \"text\": \"<< parameters.failure_message >> $SLACK_MENTIONS\", \
-                      \"fields\": [ \
-                        <<# parameters.include_project_field >>
-                        { \
-                          \"title\": \"Project\", \
-                          \"value\": \"$CIRCLE_PROJECT_REPONAME\", \
-                          \"short\": true \
-                        }, \
-                        <</ parameters.include_project_field >>
-                        <<# parameters.include_job_number_field >>
-                        { \
-                          \"title\": \"Job Number\", \
-                          \"value\": \"$CIRCLE_BUILD_NUM\", \
-                          \"short\": true \
-                        } \
-                        <</ parameters.include_job_number_field >>
-                      ], \
-                      \"actions\": [ \
-                        <<# parameters.include_visit_job_action >>
-                        { \
-                          \"type\": \"button\", \
-                          \"text\": \"Visit Job\", \
-                          \"url\": \"$CIRCLE_BUILD_URL\" \
-                        } \
-                        <</ parameters.include_visit_job_action >>
-                      ], \
-                      \"color\": \"#ed5c5c\" \
-                    } \
-                  ] \
-                } " << parameters.webhook >>
-              echo "Job failed. Alert sent."
+              if [ << parameters.change_only >> = true ] && [ "broke" != "$CIRCLE_JOB_STATUS_CHANGE" ]; then
+                echo "Job failed."
+                echo '"change_only" is set to "true", and not "broke". No Slack notification sent.'
+              else
+                #If Failed
+                curl -X POST -H 'Content-type: application/json' \
+                  --data "{ \
+                    <<# parameters.channel >>
+                    \"channel\": \"<< parameters.channel >>\", \
+                    <</ parameters.channel >>
+                    \"attachments\": [ \
+                      { \
+                        \"fallback\": \"<< parameters.failure_message >>\", \
+                        \"text\": \"<< parameters.failure_message >> $SLACK_MENTIONS\", \
+                        \"fields\": [ \
+                          <<# parameters.include_project_field >>
+                          { \
+                            \"title\": \"Project\", \
+                            \"value\": \"$CIRCLE_PROJECT_REPONAME\", \
+                            \"short\": true \
+                          }, \
+                          <</ parameters.include_project_field >>
+                          <<# parameters.include_job_number_field >>
+                          { \
+                            \"title\": \"Job Number\", \
+                            \"value\": \"$CIRCLE_BUILD_NUM\", \
+                            \"short\": true \
+                          } \
+                          <</ parameters.include_job_number_field >>
+                        ], \
+                        \"actions\": [ \
+                          <<# parameters.include_visit_job_action >>
+                          { \
+                            \"type\": \"button\", \
+                            \"text\": \"Visit Job\", \
+                            \"url\": \"$CIRCLE_BUILD_URL\" \
+                          } \
+                          <</ parameters.include_visit_job_action >>
+                        ], \
+                        \"color\": \"#ed5c5c\" \
+                      } \
+                    ] \
+                  } " << parameters.webhook >>
+                echo "Job failed. Alert sent."
+              fi
             fi
           fi
         else
