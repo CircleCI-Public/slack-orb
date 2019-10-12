@@ -199,3 +199,6 @@ You can implement the Webhook in one of two ways, either as an environment varia
 
 ## Contributing
 We welcome [issues](https://github.com/CircleCI-Public/slack-orb/issues) to and [pull requests](https://github.com/CircleCI-Public/slack-orb/pulls) against this repository! For further questions/comments about this or other orbs, visit [CircleCI's Orbs discussion forum](https://discuss.circleci.com/c/ecosystem/orbs).
+
+## License
+This project is licensed under the MIT License - read [LICENSE](LICENSE) file for details.
