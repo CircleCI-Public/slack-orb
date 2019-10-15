@@ -11,7 +11,7 @@ Example config:
 version: 2.1
 
 orbs:
-  slack: circleci/slack@x.y.z
+  slack: circleci/slack@x.y.z/*
 
 jobs:
   build:
@@ -42,7 +42,7 @@ Example:
 version: 2.1
 
 orbs:
-  slack: circleci/slack@x.y.z
+  slack: circleci/slack@x.y.z/*
 
 jobs:
     docker:
@@ -83,7 +83,7 @@ Example:
 version: 2.1
 
 orbs:
-  slack: circleci/slack@x.y.z
+  slack: circleci/slack@x.y.z/*
 
 jobs:
   build:
@@ -123,7 +123,7 @@ Example:
 version: 2.1
 
 orbs:
-  slack: circleci/slack@x.y.z
+  slack: circleci/slack@x.y.z/*
 
 jobs:
   build:
@@ -154,7 +154,7 @@ Example:
 version: 2.1
 
 orbs:
-  slack: circleci/slack@x.y.z
+  slack: circleci/slack@x.y.z/*
 
 jobs:
   - slack/approval-notification:
