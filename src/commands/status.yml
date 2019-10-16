@@ -20,9 +20,13 @@ parameters:
     default: ":red_circle: A $CIRCLE_JOB job has failed!"
     description: Enter custom message.
 
-  success_only:
-    type: boolean
-    default: false
+  when:
+    type: enum
+    enum:
+      - always
+      - on_fail
+      - on_success
+    default: always
     description: >
       If `true`, notifications of failed jobs will not be sent
 
@@ -105,6 +109,12 @@ steps:
           fi
         done
 
+        SLACK_NOTIFY_WHEN="<< parameters.when >>"
+
+        if [ << parameters.fail_only >> = true ]; then
+          SLACK_NOTIFY_WHEN="on_fail"
+        fi
+
         if [ "x" == "x<< parameters.only_for_branches>>" ] || [ "$current_branch_in_filter" = true ]; then
           # Provide error if no webhook is set and error. Otherwise continue
           if [ -z "<< parameters.webhook >>" ]; then
@@ -128,9 +138,9 @@ steps:
             #If successful
             if [ "$SLACK_BUILD_STATUS" = "success" ]; then
               #Skip if fail_only
-              if [ << parameters.fail_only >> = true ]; then
+              if [ "$SLACK_NOTIFY_WHEN" == "on_fail" ]; then
                 echo "The job completed successfully"
-                echo '"fail_only" is set to "true". No Slack notification sent.'
+                echo '`when` is set to "on_fail". No Slack notification sent.'
               else
                 curl -X POST -H 'Content-type: application/json' \
                   --data "{ \
@@ -175,9 +185,9 @@ steps:
             else
               #If Failed
               #Skip if fail_only
-              if [ << parameters.success_only >> = true ]; then
+              if [ "$SLACK_NOTIFY_WHEN" == "on_success" ]; then
                 echo "Job failed."
-                echo '"success_only" is set to "true". No Slack notification sent.'
+                echo '`when` is set to "on_success". No Slack notification sent.'
               else
                 curl -X POST -H 'Content-type: application/json' \
                   --data "{ \
