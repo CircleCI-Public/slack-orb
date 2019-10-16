@@ -35,7 +35,7 @@ parameters:
     default: false
     description: >
       If `true`, notifications successful jobs will not be sent
-      *Deprecated*: use the `when` parameters
+      *Deprecated*: use the `when: on_fail` parameter.
 
   mentions:
     type: string

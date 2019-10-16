@@ -110,8 +110,8 @@ Send a status alert at the end of a job based on success or failure. This must b
 | `success_message` | `string` | :tada: A $CIRCLE_JOB job has succeeded! $SLACK_MENTIONS | Enter your custom message to send to your Slack channel |
 | `failure_message` | `string` | :red_circle: A $CIRCLE_JOB job has failed! $SLACK_MENTIONS | Enter your custom message to send to your Slack channel |
 | `mentions` | `string` |  | Comma-separated list of Slack User or Group (SubTeam) IDs (e.g., "USER1,USER2,USER3"). _**Note:** these are Slack User IDs, not usernames. The user ID can be found on the user's profile. Look below for information on obtaining Group ID._ |
-| `success_only` | `boolean` | `false` | If set to `true`, failed jobs will _not_ send alerts |
-| `fail_only` | `boolean` | `false` | If set to `true`, successful jobs will _not_ send alerts |
+| `when` | `enum` | `always` | When to send alerts - `always` to always send an alert, `on_success` to only send for successful jobs, and `on_failure` to only send on failed jobs. |
+| `fail_only` | `boolean` | `false` | If set to `true`, successful jobs will _not_ send alerts. *Deprecated*: use the `when: on_fail` parameter.  |
 | `only_for_branches` | `string` |  | If set, a comma-separated list of branches, for which to send notifications |
 | `include_project_field` | `boolean` | `true` | Whether or not to include the _Project_ field in the message |
 | `include_job_number_field` | `boolean` | `true` | Whether or not to include the _Job Number_ field in the message |
