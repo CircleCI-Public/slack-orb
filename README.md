@@ -3,6 +3,8 @@
 Easily integrate custom [Slack](https://slack.com/ "Slack") notifications into your [CircleCI](https://circleci.com/ "CircleCI") projects. Create custom alert messages for any job or receive status updates.
 
 Learn more about [Orbs](https://circleci.com/docs/2.0/using-orbs/ "Using Orbs").
++  user id: ""
++  name: ""
 
 ## Usage
 Example config:
