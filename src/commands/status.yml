@@ -69,6 +69,12 @@ parameters:
     description: >
       ID of channel if set, overrides webhook's default channel setting
 
+  circle_token_name:
+    default: CIRCLE_TOKEN
+    description: The name of environment variable containing CircleCI API Token.
+      Only required for private projects.
+    type: string
+
 steps:
   - run:
       name: Slack - Setting Failure Condition
@@ -89,6 +95,31 @@ steps:
           echo Bash not installed.
           exit 1
         fi
+
+  - run:
+      name: Slack - Setting previous build status if needed
+      shell: /bin/bash
+      when: always
+      command: |
+        <<# parameters.change_only >>
+        set -e
+
+        # Support both https://github.com/user/project and git@github.com:user/project.git
+        if [[ $(echo $CIRCLE_REPOSITORY_URL | sed -e 's|^[^/]*//||' -e 's|/.*$||' -e 's|^[^@]*@||' -e 's|:.*$||' | grep github.com) ]]; then
+          VCS_TYPE=github
+        else
+          VCS_TYPE=bitbucket
+        fi
+
+        LAST_BUILD_STATUS=$(\
+            curl -Lfs <<# parameters.circle_token_name >> --user "${<<parameters.circle_token_name>>}:" <</parameters.circle_token_name>> \
+            https://circleci.com/api/v1.1/project/${VCS_TYPE}/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/${CIRCLE_PREVIOUS_BUILD_NUM} \
+            | jq -r .outcome \
+        )
+
+        echo "export SLACK_LAST_BUILD_STATUS=$LAST_BUILD_STATUS" >> $BASH_ENV
+        <</ parameters.change_only >>
+        exit 0
 
   - run:
       name: Slack - Sending Status Alert
@@ -131,7 +162,7 @@ steps:
               if [ << parameters.fail_only >> = true ]; then
                 echo "The job completed successfully"
                 echo '"fail_only" is set to "true". No Slack notification sent.'
-              elif [ << parameters.change_only >> = true ] && [ "fixed" != "$CIRCLE_JOB_STATUS_CHANGE" ]; then
+              elif [ << parameters.change_only >> = true ] && [ "success" = "$SLACK_LAST_BUILD_STATUS" ]; then
                 echo "Job completed successfully."
                 echo '"change_only" is set to "true", and not "fixed". No Slack notification sent.'
               else
@@ -176,7 +207,7 @@ steps:
                 echo "Job completed successfully. Alert sent."
               fi
             else
-              if [ << parameters.change_only >> = true ] && [ "broke" != "$CIRCLE_JOB_STATUS_CHANGE" ]; then
+              if [ << parameters.change_only >> = true ] && [ "success" != "$SLACK_LAST_BUILD_STATUS" ]; then
                 echo "Job failed."
                 echo '"change_only" is set to "true", and not "broke". No Slack notification sent.'
               else
