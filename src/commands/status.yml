@@ -72,7 +72,7 @@ parameters:
   circle_token_name:
     default: CIRCLE_TOKEN
     description: The name of environment variable containing CircleCI API Token.
-      Only required for private projects.
+      Only required for private projects when `change_only` is set to true.
     type: string
 
 steps:
