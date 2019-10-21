@@ -115,7 +115,7 @@ Send a status alert at the end of a job based on success or failure. This must b
 | `include_project_field` | `boolean` | `true` | Whether or not to include the _Project_ field in the message |
 | `include_job_number_field` | `boolean` | `true` | Whether or not to include the _Job Number_ field in the message |
 | `include_visit_job_action` | `boolean` | `true` | Whether or not to include the _Visit Job_ action in the message |
-| `channel` | `string` | | ID of channel if set, overrides webhook's default channel setting |
+| `channel` | `string` | | ID of the channel if set, overrides webhook's default channel setting |
 
 Example:
 
@@ -182,7 +182,7 @@ Full instructions can be found at Slack: https://api.slack.com/incoming-webhooks
 
 1. [Create Slack App](https://api.slack.com/docs/slack-button#register_your_slack_app). This will also be the name of the "user" that posts alerts to Slack. You'll be asked for which Workspace this app belongs to.
 2. In the settings for the app, enable `Incoming Webhooks`.
-3. In the left hand panel of your Slack app settings, under `Features` click `Incoming Webhooks`.
+3. In the left-hand panel of your Slack app settings, under `Features` click `Incoming Webhooks`.
 4. Click `Add New Webhook to Workspace`. You will be asked to pick a channel for the webhook here.
 5. Done! A webhook URL will be created.
 
@@ -193,9 +193,9 @@ Full instructions can be found at Slack: https://api.slack.com/incoming-webhooks
 4. Find your group below and copy the value for "ID".
 
 ### What to do with Slack Webhook
-You can implement the Webhook in one of two ways, either as an environment variable, or as a parameter.
+You can implement the Webhook in one of two ways, either as an environment variable or as a parameter.
 
-1. In the settings page for your project on CircleCI, click `Environment Variables`. From that page you can click the `Add Variable` button. Finally, enter your webhook as the value, and `SLACK_WEBHOOK` as the name.
+1. In the settings page for your project on CircleCI, click `Environment Variables`. From that page, you can click the `Add Variable` button. Finally, enter your webhook as the value, and `SLACK_WEBHOOK` as the name.
 2. You can enter the Webhook for the individual status or alert by entering it at the `webhook` parameter, as shown above.
 
 ## Contributing
