@@ -26,7 +26,7 @@ jobs:
 ## Commands
 
 ### Approval
-Send a notification that a manual approval job is ready
+Send a notification that a manual approval job is ready.
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
