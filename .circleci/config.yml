@@ -63,12 +63,6 @@ jobs:
       - slack/approval:
           mentions: "foo-here-bar"
 
-  approvaltest-triggering-user-mention:
-    executor: orb-tools/ubuntu
-    steps:
-      - slack/approval:
-          mentions: "CIRCLE_USERNAME"
-
 # yaml anchor filters
 integration-dev_filters: &integration-dev_filters
   branches:
@@ -91,7 +85,6 @@ prod-deploy_requires: &prod-deploy_requires
     approvaltest-master,
     approvaltest-mention-here-master,
     approvaltest-mention-here-2-master,
-    approvaltest-triggering-user-mention-master,
     approval-notification-job-master
   ]
 
@@ -170,11 +163,6 @@ workflows:
           context: orb-publishing
           filters: *integration-dev_filters
 
-      - approvaltest-triggering-user-mention:
-          name: approvaltest-triggering-user-mention
-          context: orb-publishing
-          filters: *integration-dev_filters
-
       - slack/approval-notification:
           name: approval-notification-job-dev
           context: orb-publishing
@@ -215,11 +203,6 @@ workflows:
 
       - approvaltest-mention-here-2:
           name: approvaltest-mention-here-2-master
-          context: orb-publishing
-          filters: *integration-master_filters
-
-      - approvaltest-triggering-user-mention:
-          name: approvaltest-triggering-user-mention-master
           context: orb-publishing
           filters: *integration-master_filters
 

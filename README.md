@@ -62,7 +62,7 @@ Notify a slack channel with a custom message at any point in a job with this cus
 |-----------|------|---------|-------------|
 | `webhook` | `string` | ${SLACK_WEBHOOK} | Either enter your webhook value or use the CircleCI UI to add your token under the `SLACK_WEBHOOK` environment variable |
 | `message` | `string` | Your job on CircleCI has completed. | Enter a custom message to send to your Slack channel |
-| `mentions` | `string` | `false` | Comma-separated list of Triggering User ("CIRCLE_USERNAME"), Slack User, or Group (SubTeam) IDs (e.g., "USER1,USER2,USER3"). _**Note:** these are Slack User IDs, not usernames. The user ID can be found on the user's profile. Look below for information on obtaining Group ID. For `here`, `channel` or `everyone` just write them._ |
+| `mentions` | `string` | `false` | Comma-separated list of Slack User or Group (SubTeam) IDs (e.g., "USER1,USER2,USER3"). _**Note:** these are Slack User IDs, not usernames. The user ID can be found on the user's profile. Look below for information on obtaining Group ID. For `here`, `channel` or `everyone` just write them._ |
 | `color` | `string` | #333333 |  Hex color value for notification attachment color |
 | `author_name` | `string` |  | Optional author name property for the [Slack message attachment] |
 | `author_link` | `string` |  | Optional author link property for the [Slack message attachment] |
@@ -109,7 +109,7 @@ Send a status alert at the end of a job based on success or failure. This must b
 | `webhook` | `string` | ${SLACK_WEBHOOK} | Either enter your webhook value or use the CircleCI UI to add your token under the `SLACK_WEBHOOK` environment variable |
 | `success_message` | `string` | :tada: A $CIRCLE_JOB job has succeeded! $SLACK_MENTIONS | Enter your custom message to send to your Slack channel |
 | `failure_message` | `string` | :red_circle: A $CIRCLE_JOB job has failed! $SLACK_MENTIONS | Enter your custom message to send to your Slack channel |
-| `mentions` | `string` |  | Comma-separated list of Triggering User ("CIRCLE_USERNAME"), Slack User, or Group (SubTeam) IDs (e.g., "USER1,USER2,USER3"). _**Note:** these are Slack User IDs, not usernames. The user ID can be found on the user's profile. Look below for information on obtaining Group ID._ |
+| `mentions` | `string` |  | Comma-separated list of Slack User or Group (SubTeam) IDs (e.g., "USER1,USER2,USER3"). _**Note:** these are Slack User IDs, not usernames. The user ID can be found on the user's profile. Look below for information on obtaining Group ID._ |
 | `fail_only` | `boolean` | `false` | If set to `true`, successful jobs will _not_ send alerts |
 | `only_for_branches` | `string` |  | If set, a comma-separated list of branches, for which to send notifications |
 | `include_project_field` | `boolean` | `true` | Whether or not to include the _Project_ field in the message |
