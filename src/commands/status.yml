@@ -39,6 +39,13 @@ parameters:
       If set, a comma-separated list of branches for which to send
       notifications. No spaces.
 
+  use_on_tags:
+    type: string
+    default: "match-nothing" # hopefully no one will use this as a tag (:
+    description: >
+      Set to the same pattern as the workflow tag filter to notify on tags.
+      Set to empty string to match all tags.
+
   include_project_field:
     type: boolean
     default: true
@@ -104,6 +111,11 @@ steps:
             current_branch_in_filter=true
           fi
         done
+
+        tag_regex="<< parameters.use_on_tags >>"
+        if [ -n "$CIRCLE_TAG" ] && echo $CIRCLE_TAG | grep -E "${tag_regex//\/}" 1>/dev/null; then
+          current_branch_in_filter=true
+        fi
 
         if [ "x" == "x<< parameters.only_for_branches>>" ] || [ "$current_branch_in_filter" = true ]; then
           # Provide error if no webhook is set and error. Otherwise continue

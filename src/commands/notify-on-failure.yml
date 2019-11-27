@@ -10,7 +10,15 @@ parameters:
       If set, a comma-separated list of branches for which to send
       notifications. No spaces.
 
+  use_on_tags:
+    type: string
+    default: "match-nothing" # hopefully no one will use this as a tag (:
+    description: >
+      Set to the same pattern as the workflow tag filter to notify on tags.
+      Set to empty string to match all tags.
+
 steps:
   - status:
       fail_only: true
       only_for_branches: <<parameters.only_for_branches>>
+      use_on_tags: <<parameters.use_on_tags>>

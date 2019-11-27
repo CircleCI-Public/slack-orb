@@ -112,6 +112,7 @@ Send a status alert at the end of a job based on success or failure. This must b
 | `mentions` | `string` |  | Comma-separated list of Slack User or Group (SubTeam) IDs (e.g., "USER1,USER2,USER3"). _**Note:** these are Slack User IDs, not usernames. The user ID can be found on the user's profile. Look below for information on obtaining Group ID._ |
 | `fail_only` | `boolean` | `false` | If set to `true`, successful jobs will _not_ send alerts |
 | `only_for_branches` | `string` |  | If set, a comma-separated list of branches, for which to send notifications |
+| `use_on_tags` | `string` |  | Set to the same pattern as the workflow tag filter to notify on tags. Set to empty string to match all tags. |
 | `include_project_field` | `boolean` | `true` | Whether or not to include the _Project_ field in the message |
 | `include_job_number_field` | `boolean` | `true` | Whether or not to include the _Job Number_ field in the message |
 | `include_visit_job_action` | `boolean` | `true` | Whether or not to include the _Visit Job_ action in the message |
@@ -138,6 +139,7 @@ jobs:
           fail_only: true # Optional: if set to `true` then only failure messages will occur.
           webhook: "webhook" # Optional: Enter a specific webhook here or the default will use $SLACK_WEBHOOK
           only_for_branches: "master" # Optional: If set, a specific branch for which status updates will be sent. In this case, only for pushes to master branch.
+          use_on_tags: "/^v.*/" # Optional: Set to the same regex as the workflow tag filter, or empty string to match all tags. In this case, all tags starting with "v"
 ```
 
 ![Status Success Example](/img/statusSuccess.PNG)
