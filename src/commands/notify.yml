@@ -147,7 +147,7 @@ steps:
                       \"title\": \"Job Number\", \
                       \"value\": \"$CIRCLE_BUILD_NUM\", \
                       \"short\": true \
-                    } \
+                    }, \
                     <</ parameters.include_job_number_field >>
                     <<# parameters.include_job_branch_field >>
                     { \
