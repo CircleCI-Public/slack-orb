@@ -61,6 +61,12 @@ parameters:
     type: boolean
     default: true
 
+  include_job_branch_field:
+    type: boolean
+    default: true
+    description: >
+      Whether or not to include the Job branch field in the message        
+
   include_visit_job_action:
     description: Whether or not to include the Visit Job action in the message
     type: boolean
@@ -143,6 +149,13 @@ steps:
                       \"short\": true \
                     } \
                     <</ parameters.include_job_number_field >>
+                    <<# parameters.include_job_branch_field >>
+                    { \
+                      \"title\": \"Job Branch\", \
+                      \"value\": \"$CIRCLE_BRANCH\", \
+                      \"short\": true \
+                    } \
+                    <</ parameters.include_job_branch_field >>                     
                   ], \
                   \"actions\": [ \
                     <<# parameters.include_visit_job_action >>

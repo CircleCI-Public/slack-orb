@@ -54,5 +54,6 @@ steps:
       mentions: << parameters.mentions >>
       include_project_field: << parameters.include_project_field >>
       include_job_number_field: << parameters.include_job_number_field >>
+      include_job_branch_field: << parameters.include_job_branch_field >>
       url: << parameters.url >>
       channel: << parameters.channel >>
