@@ -33,6 +33,12 @@ parameters:
     description: >
       Whether or not to include the Job Number field in the message
 
+  include_job_branch_field:
+    type: boolean
+    default: true
+    description: >
+      Whether or not to include the Job branch field in the message   
+
   url:
     description: The URL to link back to.
     type: string
