@@ -60,8 +60,9 @@ Notify a slack channel with a custom message at any point in a job with this cus
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `webhook` | `string` | ${SLACK_WEBHOOK} | Either enter your webhook value or use the CircleCI UI to add your token under the `SLACK_WEBHOOK` environment variable |
+| `webhook` | `string` | ${SLACK_WEBHOOK} | Enter either your webhook value or use the CircleCI UI to add your token under the `SLACK_WEBHOOK` environment variable |
 | `message` | `string` | Your job on CircleCI has completed. | Enter a custom message to send to your Slack channel |
+| `image_url` | `string` |  | Enter a valid URL to an image |
 | `mentions` | `string` | `false` | Comma-separated list of Slack User or Group (SubTeam) IDs (e.g., "USER1,USER2,USER3"). _**Note:** these are Slack User IDs, not usernames. The user ID can be found on the user's profile. Look below for information on obtaining Group ID. For `here`, `channel` or `everyone` just write them._ |
 | `color` | `string` | #333333 |  Hex color value for notification attachment color |
 | `author_name` | `string` |  | Optional author name property for the [Slack message attachment] |
