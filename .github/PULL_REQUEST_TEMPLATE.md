@@ -2,7 +2,7 @@
 
 <!--
 	thank you for contributing to CircleCI Orbs!
-	before submitting your a request, please go through the following
+	before submitting your request, please go through the following
 	items and place an x in the [ ] if they have been completed
 -->
 

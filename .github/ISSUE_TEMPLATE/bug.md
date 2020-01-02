@@ -1,3 +1,12 @@
+---
+name: Bug
+about: Use this template when reporting an issue with this orb
+title: ''
+labels: ''
+assignees: ''
+
+---
+
 ### Orb version
 
 <!---

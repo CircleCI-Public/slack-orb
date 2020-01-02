@@ -21,16 +21,34 @@ parameters:
     type: string
     default: ""
 
+  include_project_field:
+    type: boolean
+    default: true
+    description: >
+      Whether or not to include the Project field in the message
+
+  include_job_number_field:
+    type: boolean
+    default: true
+    description: >
+      Whether or not to include the Job Number field in the message
+
   url:
     description: The URL to link back to.
     type: string
     default: https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}
 
+  channel:
+    type: string
+    default: ""
+    description: >
+      ID of channel if set, overrides webhook's default channel setting
+
 steps:
   - run:
       name: Provide error if non-bash shell
       command: |
-        if [ -z "$BASH" ]; then
+        if [ ! -x /bin/bash ]; then
           echo Bash not installed.
           exit 1
         fi
@@ -39,11 +57,6 @@ steps:
       name: Slack - Sending Approval Notification
       shell: /bin/bash
       command: |
-        # Provide error if non-bash shell
-        if [ -z "$BASH" ]; then
-          echo Bash not installed.
-          exit 1
-        fi
         # Provide error if no webhook is set and error. Otherwise continue
         if [ -z "<< parameters.webhook >>" ]; then
           echo "NO SLACK WEBHOOK SET"
@@ -67,21 +80,28 @@ steps:
           curl -X POST -H 'Content-type: application/json' \
             --data \
             "{ \
+              <<# parameters.channel >>
+              \"channel\": \"<< parameters.channel >>\", \
+              <</ parameters.channel >>
               \"attachments\": [ \
                 { \
                   \"fallback\": \"<< parameters.message >> - << parameters.url >>\", \
                   \"text\": \"<< parameters.message >> $SLACK_MENTIONS\", \
                   \"fields\": [ \
+                    <<# parameters.include_project_field >>
                     { \
                       \"title\": \"Project\", \
                       \"value\": \"$CIRCLE_PROJECT_REPONAME\", \
                       \"short\": true \
                     }, \
+                    <</ parameters.include_project_field >>
+                    <<# parameters.include_job_number_field >>
                     { \
                       \"title\": \"Job Number\", \
                       \"value\": \"$CIRCLE_BUILD_NUM\", \
                       \"short\": true \
                     } \
+                    <</ parameters.include_job_number_field >>
                   ], \
                   \"actions\": [ \
                     { \
