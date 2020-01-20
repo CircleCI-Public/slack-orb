@@ -31,6 +31,11 @@ parameters:
     type: string
     default: ""
 
+  author_icon:
+    description: Optional author icon
+    type: string
+    default: ""
+
   title:
     description: Optional title
     type: string
@@ -124,6 +129,7 @@ steps:
                   \"text\": \"<< parameters.message >> $SLACK_MENTIONS\", \
                   \"author_name\": \"<< parameters.author_name >>\", \
                   \"author_link\": \"<< parameters.author_link >>\", \
+                  \"author_icon\": \"<< parameters.author_icon >>\", \
                   \"title\": \"<< parameters.title >>\", \
                   \"title_link\": \"<< parameters.title_link >>\", \
                   \"footer\": \"<< parameters.footer >>\", \

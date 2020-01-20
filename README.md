@@ -66,6 +66,7 @@ Notify a slack channel with a custom message at any point in a job with this cus
 | `color` | `string` | #333333 |  Hex color value for notification attachment color |
 | `author_name` | `string` |  | Optional author name property for the [Slack message attachment] |
 | `author_link` | `string` |  | Optional author link property for the [Slack message attachment] |
+| `author_icon` | `string` |  | Optional author icon property for the [Slack message attachment] |
 | `title` | `string` |  | Optional title property for the [Slack message attachment] |
 | `title_link` | `string` |  | Optional title link property for the [Slack message attachment] |
 | `footer` | `string` |  | Optional footer property for the [Slack message attachment] |
