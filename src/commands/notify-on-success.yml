@@ -1,0 +1,16 @@
+description: >
+  A handy command to notify a Slack channel on success in the default
+  master branch
+
+parameters:
+  only_for_branches:
+    type: string
+    default: ""
+    description: >
+      If set, a comma-separated list of branches for which to send
+      notifications. No spaces.
+
+steps:
+  - status:
+      success_only: true
+      only_for_branches: <<parameters.only_for_branches>>
