@@ -43,6 +43,7 @@ Notify a slack channel with a custom message at any point in a job with this cus
 | `include_project_field` | `boolean` | `true` | Whether or not to include the _Project_ field in the message |
 | `include_job_number_field` | `boolean` | `true` | Whether or not to include the _Job Number_ field in the message |
 | `include_visit_job_action` | `boolean` | `true` | Whether or not to include the _Visit Job_ action in the message |
+| `dashboard_link` | `string` |  | Optional dashboard link property for the [Slack message attachment] |
 
 [Slack message attachment]: https://api.slack.com/docs/message-attachments
 

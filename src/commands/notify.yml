@@ -67,6 +67,11 @@ parameters:
     type: boolean
     default: true
 
+  dashboard_link:
+    description: The URL to the dashboard
+    type: string
+    default: ""
+
 steps:
   - run:
       name: Provide error if non-bash shell
@@ -142,8 +147,15 @@ steps:
                       \"type\": \"button\", \
                       \"text\": \"Visit Job\", \
                       \"url\": \"$CIRCLE_BUILD_URL\" \
-                    } \
+                    }, \
                     <</ parameters.include_visit_job_action >>
+                    <<# parameters.dashboard_link >>
+                    { \
+                      \"type\": \"button\", \
+                      \"text\": \"Dashboard\", \
+                      \"url\": \"<< parameters.dashboard_link >>\" \
+                    } \
+                    <</ parameters.dashboard_link >>
                   ], \
                   \"color\": \"<< parameters.color >>\" \
                 } \
