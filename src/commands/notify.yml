@@ -67,11 +67,6 @@ parameters:
     type: boolean
     default: true
 
-  include_dashboard:
-    description: Include a dashboard link button
-    type: boolean
-    default: false
-
   dashboard_link:
     description: The URL to the dashboard
     type: string
@@ -154,13 +149,13 @@ steps:
                       \"url\": \"$CIRCLE_BUILD_URL\" \
                     }, \
                     <</ parameters.include_visit_job_action >>
-                    <<# parameters.include_dashboard >>
+                    <<# parameters.dashboard_link >>
                     { \
                       \"type\": \"button\", \
                       \"text\": \"Dashboard\", \
                       \"url\": \"<< parameters.dashboard_link >>\" \
                     } \
-                    <</ parameters.include_dashboard >>
+                    <</ parameters.dashboard_link >>
                   ], \
                   \"color\": \"<< parameters.color >>\" \
                 } \
