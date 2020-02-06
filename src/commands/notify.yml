@@ -72,6 +72,17 @@ parameters:
     type: string
     default: ""
 
+  lighthouse_bookings_results_link:
+    description: The URL to the dashboard
+    type: string
+    default: ""
+
+  lighthouse_ph_results_link:
+    description: The URL to the dashboard
+    type: string
+    default: ""
+
+
 steps:
   - run:
       name: Provide error if non-bash shell
@@ -156,6 +167,22 @@ steps:
                       \"url\": \"<< parameters.dashboard_link >>\" \
                     } \
                     <</ parameters.dashboard_link >>
+                  ], \
+                    <<# parameters.lighthouse_bookings_results_link >>
+                    { \
+                      \"type\": \"button\", \
+                      \"text\": \"Lighthouse Bookings\", \
+                      \"url\": \"<< parameters.lighthouse_bookings_results_link >>\" \
+                    } \
+                    <</ parameters.lighthouse_bookings_results_link >>
+                  ], \
+                    <<# parameters.lighthouse_ph_results_link >>
+                    { \
+                      \"type\": \"button\", \
+                      \"text\": \"Lighthouse PH\", \
+                      \"url\": \"<< parameters.lighthouse_ph_results_link >>\" \
+                    } \
+                    <</ parameters.lighthouse_ph_results_link >>
                   ], \
                   \"color\": \"<< parameters.color >>\" \
                 } \
