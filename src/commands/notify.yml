@@ -67,17 +67,7 @@ parameters:
     type: boolean
     default: true
 
-  dashboard_link:
-    description: The URL to the dashboard
-    type: string
-    default: ""
-
-  lighthouse_bookings_results_link:
-    description: The URL to the dashboard
-    type: string
-    default: ""
-
-  lighthouse_ph_results_link:
+  lighthouse_button_links:
     description: The URL to the dashboard
     type: string
     default: ""
@@ -96,6 +86,75 @@ steps:
       name: Slack Notification
       shell: /bin/bash
       command: |
+        # set up potential lighthouse test results
+        curl_arg_1="            -X POST
+                    -H 'Content-Type: application/x-www-form-urlencoded'
+                    -H 'Cache-Control: no-cache'
+                    -d \"token=\${SLACK_OAUTH_TOKEN}\"
+                    -d 'as_user=true'
+                    <<# parameters.channel >>
+                    -d \"channel=<< parameters.channel >>\"
+                    <</ parameters.channel >>
+                    -d \"attachments=[ \\
+                        { \\
+                          \\\"fallback\\\": \\\"<< parameters.message >> - \$CIRCLE_BUILD_URL\\\", \\
+                          \\\"text\\\": \\\"<< parameters.message >> \$SLACK_MENTIONS\\\", \\
+                          \\\"author_name\\\": \\\"<< parameters.author_name >>\\\", \\
+                          \\\"author_link\\\": \\\"<< parameters.author_link >>\\\", \\
+                          \\\"title\\\": \\\"<< parameters.title >>\\\", \\
+                          \\\"title_link\\\": \\\"<< parameters.title_link >>\\\", \\
+                          \\\"footer\\\": \\\"<< parameters.footer >>\\\", \\
+                          \\\"ts\\\": \\\"<< parameters.ts >>\\\", \\
+                          \\\"fields\\\": [ \\
+                            <<# parameters.include_project_field >>
+                            { \\
+                              \\\"title\\\": \\\"Project\\\", \\
+                              \\\"value\\\": \\\"\$CIRCLE_PROJECT_REPONAME\\\", \\
+                              \\\"short\\\": true \\
+                            }, \\
+                            <</ parameters.include_project_field >>
+                            <<# parameters.include_job_number_field >>
+                            { \\
+                              \\\"title\\\": \\\"Job Number\\\", \\
+                              \\\"value\\\": \\\"\$CIRCLE_BUILD_NUM\\\", \\
+                              \\\"short\\\": true \\
+                            } \\
+                            <</ parameters.include_job_number_field >>
+                          ], \\
+                          \\\"actions\\\": [ \\
+                            <<# parameters.include_visit_job_action >>
+                            { \\
+                              \\\"type\\\": \\\"button\\\", \\
+                              \\\"text\\\": \\\"Visit Job\\\", \\
+                              \\\"url\\\": \\\"\$CIRCLE_BUILD_URL\\\" \\
+                            }, \\
+                            <</ parameters.include_visit_job_action >>
+                            <</ parameters.dashboard_link >>
+                            { \\
+                              \\\"type\\\": \\\"button\\\", \\
+                              \\\"text\\\": \\\"Dashboard\\\", \\
+                              \\\"url\\\": \\\"<< parameters.dashboard_link >>\\\" \\
+                            }, \\
+                            <</ parameters.dashboard_link >>
+                            <<# parameters.lighthouse_button_links >>
+                            "
+        for row in $(echo "${sample}" | jq -c '.[]'); do
+            _jq() {
+             echo ${row} | jq -r ${1}
+            }
+        	curl_arg_2="$curlArg2{ \\
+                             \\\"type\\\": \\\"button\\\", \\
+                             \\\"text\\\": \\\"$(_jq '.name')\\\", \\
+                             \\\"url\\\": \\\"$(_jq '.url')\\\" \\
+                            }, \\
+                            "
+        done
+        curl_arg_3="<</ parameters.lighthouse_button_links >>
+                          ], \\
+                          \\\"color\\\": \\\"<< parameters.color >>\\\" \\
+                        } \\
+                      ]\""
+        curl_args=$curl_arg_1$curl_arg_2$curl_arg_3
         # Provide error if no token is set and error. Otherwise continue
         if [[ -z "$SLACK_OAUTH_TOKEN" ]]; then
           echo "NO SLACK_OAUTH_TOKEN SET"
@@ -117,74 +176,6 @@ steps:
               fi
             done
           fi
-          CURL_ARGS=(
-            -X POST
-            -H 'Content-Type: application/x-www-form-urlencoded'
-            -H 'Cache-Control: no-cache'
-            -d "token=${SLACK_OAUTH_TOKEN}"
-            -d 'as_user=true'
-            <<# parameters.channel >>
-            -d "channel=<< parameters.channel >>"
-            <</ parameters.channel >>
-            -d "attachments=[ \
-                { \
-                  \"fallback\": \"<< parameters.message >> - $CIRCLE_BUILD_URL\", \
-                  \"text\": \"<< parameters.message >> $SLACK_MENTIONS\", \
-                  \"author_name\": \"<< parameters.author_name >>\", \
-                  \"author_link\": \"<< parameters.author_link >>\", \
-                  \"title\": \"<< parameters.title >>\", \
-                  \"title_link\": \"<< parameters.title_link >>\", \
-                  \"footer\": \"<< parameters.footer >>\", \
-                  \"ts\": \"<< parameters.ts >>\", \
-                  \"fields\": [ \
-                    <<# parameters.include_project_field >>
-                    { \
-                      \"title\": \"Project\", \
-                      \"value\": \"$CIRCLE_PROJECT_REPONAME\", \
-                      \"short\": true \
-                    }, \
-                    <</ parameters.include_project_field >>
-                    <<# parameters.include_job_number_field >>
-                    { \
-                      \"title\": \"Job Number\", \
-                      \"value\": \"$CIRCLE_BUILD_NUM\", \
-                      \"short\": true \
-                    } \
-                    <</ parameters.include_job_number_field >>
-                  ], \
-                  \"actions\": [ \
-                    <<# parameters.include_visit_job_action >>
-                    { \
-                      \"type\": \"button\", \
-                      \"text\": \"Visit Job\", \
-                      \"url\": \"$CIRCLE_BUILD_URL\" \
-                    }, \
-                    <</ parameters.include_visit_job_action >>
-                    <<# parameters.dashboard_link >>
-                    { \
-                      \"type\": \"button\", \
-                      \"text\": \"Dashboard\", \
-                      \"url\": \"<< parameters.dashboard_link >>\" \
-                    }, \
-                    <</ parameters.dashboard_link >>
-                    <<# parameters.lighthouse_bookings_results_link >>
-                    { \
-                      \"type\": \"button\", \
-                      \"text\": \"Lighthouse Bookings\", \
-                      \"url\": \"<< parameters.lighthouse_bookings_results_link >>\" \
-                    }, \
-                    <</ parameters.lighthouse_bookings_results_link >>
-                    <<# parameters.lighthouse_ph_results_link >>
-                    { \
-                      \"type\": \"button\", \
-                      \"text\": \"Lighthouse PH\", \
-                      \"url\": \"<< parameters.lighthouse_ph_results_link >>\" \
-                    } \
-                    <</ parameters.lighthouse_ph_results_link >>
-                  ], \
-                  \"color\": \"<< parameters.color >>\" \
-                } \
-              ]"
-          )
+          CURL_ARGS=("$curl_args")
           curl "${CURL_ARGS[@]}" "https://slack.com/api/chat.postMessage"
         fi
