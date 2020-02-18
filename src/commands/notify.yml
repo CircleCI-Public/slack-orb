@@ -68,7 +68,7 @@ parameters:
     default: true
 
   lighthouse_button_links:
-    description: The URL to the dashboard
+    description: A string (json formatted) with the test names and results links
     type: string
     default: ""
 
@@ -138,7 +138,7 @@ steps:
                             <</ parameters.dashboard_link >>
                             <<# parameters.lighthouse_button_links >>
                             "
-        for row in $(echo "${sample}" | jq -c '.[]'); do
+        for row in $(echo "<< parameters.lighthouse_button_links >>" | jq -c '.[]'); do
             _jq() {
              echo ${row} | jq -r ${1}
             }
