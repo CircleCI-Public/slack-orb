@@ -5,7 +5,7 @@ description: >
 parameters:
   only_for_branches:
     type: string
-    default: ""
+    default: "master"
     description: >
       If set, a comma-separated list of branches for which to send
       notifications. No spaces.
