@@ -34,7 +34,7 @@ Send a notification that a manual approval job is ready
 | `mentions` | `string` | '' | A comma separated list of user IDs. No spaces. |
 | `message` | `string` | A workflow in CircleCI is awaiting your approval. | Enter custom message. |
 | `url` | `string` | 'https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}' | The URL to link back to. |
-| `webhook` | `string` | '${SLACK_WEBHOOK}' | Enter either your Webhook value or use the CircleCI UI to add your token under the 'SLACK_WEBHOOK' env var |
+| `webhook` | `string` | '${SLACK_WEBHOOK}' | Enter either your Webhook value or use the CircleCI UI to add the webhook under the 'SLACK_WEBHOOK' env var |
 
 Example:
 
@@ -60,7 +60,7 @@ Notify a slack channel with a custom message at any point in a job with this cus
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `webhook` | `string` | ${SLACK_WEBHOOK} | Either enter your webhook value or use the CircleCI UI to add your token under the `SLACK_WEBHOOK` environment variable |
+| `webhook` | `string` | ${SLACK_WEBHOOK} | Either enter your webhook value or use the CircleCI UI to add the webhook under the `SLACK_WEBHOOK` environment variable |
 | `message` | `string` | Your job on CircleCI has completed. | Enter a custom message to send to your Slack channel |
 | `mentions` | `string` | `false` | Comma-separated list of Slack User or Group (SubTeam) IDs (e.g., "USER1,USER2,USER3"). _**Note:** these are Slack User IDs, not usernames. The user ID can be found on the user's profile. Look below for information on obtaining Group ID. For `here`, `channel` or `everyone` just write them._ |
 | `color` | `string` | #333333 |  Hex color value for notification attachment color |
@@ -107,7 +107,7 @@ Send a status alert at the end of a job based on success or failure. This must b
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `webhook` | `string` | ${SLACK_WEBHOOK} | Either enter your webhook value or use the CircleCI UI to add your token under the `SLACK_WEBHOOK` environment variable |
+| `webhook` | `string` | ${SLACK_WEBHOOK} | Either enter your webhook value or use the CircleCI UI to add the webhook under the `SLACK_WEBHOOK` environment variable |
 | `success_message` | `string` | :tada: A $CIRCLE_JOB job has succeeded! $SLACK_MENTIONS | Enter your custom message to send to your Slack channel |
 | `failure_message` | `string` | :red_circle: A $CIRCLE_JOB job has failed! $SLACK_MENTIONS | Enter your custom message to send to your Slack channel |
 | `mentions` | `string` |  | Comma-separated list of Slack User or Group (SubTeam) IDs (e.g., "USER1,USER2,USER3"). _**Note:** these are Slack User IDs, not usernames. The user ID can be found on the user's profile. Look below for information on obtaining Group ID._ |
