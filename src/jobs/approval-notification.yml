@@ -33,6 +33,12 @@ parameters:
     description: >
       Whether or not to include the Job Number field in the message
 
+  include_job_branch_field:
+    type: boolean
+    default: true
+    description: >
+      Whether or not to include the Job branch field in the message
+
   url:
     description: The URL to link back to.
     type: string
@@ -54,5 +60,6 @@ steps:
       mentions: << parameters.mentions >>
       include_project_field: << parameters.include_project_field >>
       include_job_number_field: << parameters.include_job_number_field >>
+      include_job_branch_field: << parameters.include_job_branch_field >>
       url: << parameters.url >>
       channel: << parameters.channel >>
