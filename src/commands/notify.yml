@@ -94,7 +94,7 @@ steps:
 
   - run:
       name: Slack Notification
-      shell: /bin/bash
+      shell: bash
       command: |
         # Provide error if no webhook is set and error. Otherwise continue
         if [ -z "<< parameters.webhook >>" ]; then

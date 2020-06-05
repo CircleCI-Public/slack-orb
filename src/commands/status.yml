@@ -98,7 +98,7 @@ steps:
 
   - run:
       name: Slack - Sending Status Alert
-      shell: /bin/bash
+      shell: bash
       when: always
       command: |
         current_branch_in_filter=false
