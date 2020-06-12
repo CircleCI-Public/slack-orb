@@ -1,0 +1,24 @@
+  
+description: |
+  Send a slack notification when a job fails. This example uses a pre-included template. Custom templates can also be used.
+usage:
+  version: 2.1
+  orbs:
+    slack: circleci/slack@x.y
+    node: circleci/node:x.y
+  jobs:
+    deploy:
+      executor:
+        name: node/default
+      steps:
+        - checkout
+        - node/install-packages
+        - run:
+            command: npm run deploy
+        - slack/notify:
+            event: fail
+            template: basic_fail_1
+  workflows:
+    deploy_and_notify:
+      jobs:
+        - deploy

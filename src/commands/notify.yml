@@ -5,162 +5,44 @@ parameters:
     description: Enter either your Webhook value or use the CircleCI UI to add your token under the 'SLACK_WEBHOOK' env var
     type: string
     default: ${SLACK_WEBHOOK}
-
-  message:
-    description: Enter custom message.
+  template:
+    description: "Use one of the built-in templates. Select the template name. Preview each template on the gitHub Readme: "
     type: string
-    default: Your job on CircleCI has completed.
+    default: ""
+  custom:
+    description: |
+      Enter a custom message template.
 
-  color:
-    description: Hex color value for notification attachment color.
-    type: string
-    default: "#333333"
-
+      1. Create your message template using the Block Kit Builder: https://app.slack.com/block-kit-builder/.
+      2. Insert any desired environment variables.
+      3. Paste value here.
+  event:
+    description: |
+      In what event should this message send? Options: ["fail", "pass", "always"]
+    type: enum
+    enum: ["fail", "pass", "always"]
+    default: "always"
   mentions:
     description: A comma separated list of user IDs. No spaces.
     type: string
     default: ""
 
-  author_name:
-    description: Optional author name
-    type: string
-    default: ""
-
-  author_link:
-    description: Optional author link
-    type: string
-    default: ""
-
-  author_icon:
-    description: Optional author icon
-    type: string
-    default: ""
-
-  title:
-    description: Optional title
-    type: string
-    default: ""
-
-  title_link:
-    description: Optional title link
-    type: string
-    default: ""
-
-  footer:
-    description: Optional footer
-    type: string
-    default: ""
-
-  ts:
-    description: Optional timestamp
-    type: string
-    default: ""
-
-  include_project_field:
-    description: Whether or not to include the Project field in the message
-    type: boolean
-    default: true
-
-  include_job_number_field:
-    description: Whether or not to include the Job Number field in the message
-    type: boolean
-    default: true
-
-  include_visit_job_action:
-    description: Whether or not to include the Visit Job action in the message
-    type: boolean
-    default: true
-
-  channel:
-    type: string
-    default: ""
-    description: >
-      ID of channel if set, overrides webhook's default channel setting
+# import pre-built templates using the orb-pack local script include.
+environment:
+  slack-template-1: <<include(../message_templates/basic_fail_1.json)>>
 
 steps:
   - run:
-      name: Provide error if non-bash shell
+      when: on_fail
+      name: Slack - Detecting Job Status (FAIL)
       command: |
-        if [ ! -x /bin/bash ]; then
-          echo Bash not installed.
-          exit 1
-        fi
-
+        echo `export CCI_STATUS="fail"` >> $BASH_ENV
   - run:
-      name: Provide error if cURL is not installed.
+      when: on_success
+      name: Slack - Detecting Job Status (PASS)
       command: |
-        which curl > curl_exists; echo $? | grep -q '1' && echo curl not installed && rm curl_exists && exit 1
-        rm curl_exists
-
+        CCI_STATUS="pass" >> $BASH_ENV
   - run:
-      name: Slack Notification
-      shell: /bin/bash
-      command: |
-        # Provide error if no webhook is set and error. Otherwise continue
-        if [ -z "<< parameters.webhook >>" ]; then
-          echo "NO SLACK WEBHOOK SET"
-          echo "Please input your SLACK_WEBHOOK value either in the settings for this project, or as a parameter for this orb."
-          exit 1
-        else
-          # Webhook properly set.
-          echo Notifying Slack Channel
-          #Create Members string
-          if [ -n "<< parameters.mentions >>" ]; then
-            IFS="," read -ra SLACK_MEMBERS \<<< "<< parameters.mentions >>"
-            for i in "${SLACK_MEMBERS[@]}"; do
-              if [ $(echo ${i} | head -c 1) == "S" ]; then
-                SLACK_MENTIONS="${SLACK_MENTIONS}<!subteam^${i}> "
-              elif echo ${i} | grep -E "^(here|channel|everyone)$" > /dev/null; then
-                SLACK_MENTIONS="${SLACK_MENTIONS}<!${i}> "
-              else
-                SLACK_MENTIONS="${SLACK_MENTIONS}<@${i}> "
-              fi
-            done
-          fi
-          curl -X POST -H 'Content-type: application/json' \
-            --data \
-            "{ \
-              <<# parameters.channel >>
-              \"channel\": \"<< parameters.channel >>\", \
-              <</ parameters.channel >>
-              \"attachments\": [ \
-                { \
-                  \"fallback\": \"<< parameters.message >> - $CIRCLE_BUILD_URL\", \
-                  \"text\": \"<< parameters.message >> $SLACK_MENTIONS\", \
-                  \"author_name\": \"<< parameters.author_name >>\", \
-                  \"author_link\": \"<< parameters.author_link >>\", \
-                  \"author_icon\": \"<< parameters.author_icon >>\", \
-                  \"title\": \"<< parameters.title >>\", \
-                  \"title_link\": \"<< parameters.title_link >>\", \
-                  \"footer\": \"<< parameters.footer >>\", \
-                  \"ts\": \"<< parameters.ts >>\", \
-                  \"fields\": [ \
-                    <<# parameters.include_project_field >>
-                    { \
-                      \"title\": \"Project\", \
-                      \"value\": \"$CIRCLE_PROJECT_REPONAME\", \
-                      \"short\": true \
-                    }, \
-                    <</ parameters.include_project_field >>
-                    <<# parameters.include_job_number_field >>
-                    { \
-                      \"title\": \"Job Number\", \
-                      \"value\": \"$CIRCLE_BUILD_NUM\", \
-                      \"short\": true \
-                    } \
-                    <</ parameters.include_job_number_field >>
-                  ], \
-                  \"actions\": [ \
-                    <<# parameters.include_visit_job_action >>
-                    { \
-                      \"type\": \"button\", \
-                      \"text\": \"Visit Job\", \
-                      \"url\": \"$CIRCLE_BUILD_URL\" \
-                    } \
-                    <</ parameters.include_visit_job_action >>
-                  ], \
-                  \"color\": \"<< parameters.color >>\" \
-                } \
-              ] \
-            }" << parameters.webhook >>
-        fi
+      when: always
+      name: Slack - Sending Notification
+      command: <<include(../scripts/notify.sh)>>

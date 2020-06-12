@@ -1,5 +1,7 @@
+description: A small and fast docker environment perfect for sending Slack notfications
+
 docker:
-  - image: cimg/base:2019.11
+  - image: cimg/base:stable
     environment:
       TERM: dumb
 resource_class: small

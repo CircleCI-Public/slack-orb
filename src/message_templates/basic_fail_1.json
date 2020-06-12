@@ -1,0 +1,43 @@
+{
+	"blocks": [
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Your job *${CIRCLE_JOB}* has failed ⚠️ "
+			},
+			"fields": [
+				{
+					"type": "mrkdwn",
+					"text": "*Commiter:*\n${CIRCLE_USER}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*SHA:*\n${CIRCLE_SHA1}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Mentions:*\n"
+				}
+			],
+			"accessory": {
+				"type": "image",
+				"image_url": "https://assets.brandfolder.com/otz5mn-bw4j2w-6jzqo8/original/circle-logo-badge-black.png",
+				"alt_text": "CircleCI logo"
+			}
+		},
+		{
+			"type": "actions",
+			"elements": [
+				{
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "View Job"
+					},
+					"url": "${CIRCLE_BUILD_URL}"
+				}
+			]
+		}
+	]
+}
