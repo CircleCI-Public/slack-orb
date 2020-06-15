@@ -16,6 +16,8 @@ parameters:
       1. Create your message template using the Block Kit Builder: https://app.slack.com/block-kit-builder/.
       2. Insert any desired environment variables.
       3. Paste value here.
+    type: string
+    default: ""
   event:
     description: |
       In what event should this message send? Options: ["fail", "pass", "always"]
@@ -26,10 +28,6 @@ parameters:
     description: A comma separated list of user IDs. No spaces.
     type: string
     default: ""
-
-# import pre-built templates using the orb-pack local script include.
-environment:
-  slack-template-1: <<include(../message_templates/basic_fail_1.json)>>
 
 steps:
   - run:
@@ -45,4 +43,7 @@ steps:
   - run:
       when: always
       name: Slack - Sending Notification
-      command: <<include(../scripts/notify.sh)>>
+      environment:
+        # import pre-built templates using the orb-pack local script include.
+        basic-fail-1: <<include(message_templates/basic_fail_1.json)>>
+      command: <<include(scripts/notify.sh)>>
