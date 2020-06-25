@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  node: circleci/slack@<<pipeline.parameters.dev-orb-version>>
+  slack: circleci/slack@<<pipeline.parameters.dev-orb-version>>
   orb-tools: circleci/orb-tools@9.1
 
 # Pipeline parameters
