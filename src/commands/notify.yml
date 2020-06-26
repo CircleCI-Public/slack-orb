@@ -45,5 +45,7 @@ steps:
       name: Slack - Sending Notification
       environment:
         # import pre-built templates using the orb-pack local script include.
-        basic-fail-1: <<include(message_templates/basic_fail_1.json)>>
-      command: <<include(scripts/notify.sh)>>
+        basic-fail-1: << include(message_templates/basic_fail_1.json) >>
+        SLACK_PARAM_TEMPLATE: <<parameters.template>>
+        SLACK_PARAM_CUSTOM: <<parameters.custom>>
+      command: << include(scripts/notify.sh) >>

@@ -3,13 +3,7 @@ echo "Sending Notification"
 if [[ "$CCI_STATUS" == "<<parameters.event>>" || "<<parameters.event>>" == "always" ]]; then
     # send message
     # If sending message, default to custom template, if none is supplied, check for a pre-selected template value. If none, error.
-    read -r -d '' SLACK_PARAM_TEMPLATE <<'EOF'
-    <<parameters.template>>
-EOF
-    read -r -d '' SLACK_PARAM_CUSTOM <<'EOF'
-    <<parameters.custom>>
-EOF
-    SLACK_PARAM_TEMPLATE='<<parameters.template>>'
+
     if [ -n "$SLACK_PARAM_CUSTOM" ]; then
         SLACK_MSG_BODY="$SLACK_PARAM_CUSTOM"
     elif [ -n "$SLACK_PARAM_TEMPLATE" ]; then
