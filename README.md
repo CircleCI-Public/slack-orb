@@ -2,6 +2,8 @@
 
 Send Slack notifications from your CircleCI pipelines even easier with Slack Orb 4.0
 
+[What are Orbs?](https://circleci.com/orbs/)
+
 ## Usage
 
 For full usage guidelines, see the [orb registry listing](http://circleci.com/orbs/registry/orb/circleci/slack).
@@ -41,6 +43,22 @@ The Slack Orb comes with a number of included templates to get your started with
           ]
         }
   ```
+  
+## FAQ
+
+**Q:**
+  How can I stop duplicate messages in parallel jobs?
+  
+**A:**
+  It is not possible to limit the output to a singular ouput. The notifiy command acts as a convenient and parameterizable way to send a `curl` request to the provided Slack Webhook. When a job is ran in parallel, each instance runs independantly and sends its own notification. 
+
+
+**Q:**
+  Is it possible to receive only the final status of the Workflow?
+
+**A:**
+  Each job within a workflow operates independantly, as the orb code executes within each job, they are not able to report on the outcome of the workflow after all jobs have completed. Each job can independantly report its individual status.
+
 
 ## Contributing
 
