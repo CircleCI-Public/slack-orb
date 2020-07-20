@@ -12,9 +12,9 @@ For full usage guidelines, see the [orb registry listing](http://circleci.com/or
 
 The Slack Orb comes with a number of included templates to get your started with minimal setup. Feel free to use an included template or create your own.
 
-| Template Preview  | Template  |
-| ------------- | ------------- |
-| ![basic_fail_1](./img/basic_fail_1.png)  | <b>Template:</b> basic_fail_1<br><br> Should be used with the "fail" event.  |
+| Template Preview  | Template  | Description |
+| ------------- | ------------- | ------------- |
+| ![basic_fail_1](./img/basic_fail_1.png)  | basic_fail_1   | Should be used with the "fail" event. |
 
 
 ## Custom Message Template
@@ -52,13 +52,23 @@ The Slack Orb comes with a number of included templates to get your started with
 **A:**
   It is not possible to limit the output to a singular ouput. The notifiy command acts as a convenient and parameterizable way to send a `curl` request to the provided Slack Webhook. When a job is ran in parallel, each instance runs independantly and sends its own notification. 
 
+---
 
 **Q:**
   Is it possible to receive only the final status of the Workflow?
 
 **A:**
   Each job within a workflow operates independantly, as the orb code executes within each job, they are not able to report on the outcome of the workflow after all jobs have completed. Each job can independantly report its individual status.
+  
+ ---
+ 
+**Q:**
+  How do I use custom environment variables?
 
+**A:**
+  Each step executes as a separate shell. To export environment variables for use in over steps, they must be added to `BASH_ENV`. View [Using Environment Variables](https://circleci.com/docs/2.0/env-vars/#using-parameters-and-bash-environment) and the included usage examples.
+
+---
 
 ## Contributing
 
