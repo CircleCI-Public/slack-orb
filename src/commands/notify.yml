@@ -2,9 +2,9 @@ description: Notify a Slack channel with a custom message
 
 parameters:
   webhook:
-    description: Enter either your Webhook value or use the CircleCI UI to add your token under the 'SLACK_WEBHOOK' env var
-    type: string
-    default: ${SLACK_WEBHOOK}
+    description: Enter the name of the envionment variable containing your Slack Webhook URL.
+    type: env_var_name
+    default: SLACK_WEBHOOK
   template:
     description: "Use one of the built-in templates. Select the template name. Preview each template on the gitHub Readme: "
     type: string
@@ -44,8 +44,11 @@ steps:
       when: always
       name: Slack - Sending Notification
       environment:
+        SLACK_PARAM_EVENT: "<<parameters.event>>"
+        SLACK_PARAM_WEBHOOK: "$<<parameters.webhook>>"
+        SLACK_PARAM_TEMPLATE: "<<parameters.template>>"
+        SLACK_PARAM_CUSTOM: "<<parameters.custom>>"
+        SLACK_PARAM_MENTIONS: "<<parameters.mentions>>"
         # import pre-built templates using the orb-pack local script include.
-        basic-fail-1: << include(message_templates/basic_fail_1.json) >>
-        SLACK_PARAM_TEMPLATE: <<parameters.template>>
-        SLACK_PARAM_CUSTOM: <<parameters.custom>>
-      command: << include(scripts/notify.sh) >>
+        basic-fail-1: "<<include(message_templates/basic_fail_1.json)>>"
+      command: <<include(scripts/notify.sh)>>

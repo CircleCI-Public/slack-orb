@@ -17,10 +17,20 @@ parameters:
 
 integration-tests: &integration-tests
   [
-
+    - test-notify-custom-text
   ]
 
 jobs:
+  test-notify-custom-text:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - slack/notify:
+            event: always
+            custom: |
+              {
+                text: "Hello world"
+              }
 
 workflows:
   # This `lint-pack_validate_publish-dev` workflow will run on any commit.
@@ -32,12 +42,6 @@ workflows:
       # validate the orb.yml file to ensure it is well-formed
       - orb-tools/pack
 
-      - approve_for_testing:
-          type: approval
-          requires:
-            - orb-tools/pack
-            - orb-tools/lint
-
       # release dev version of orb, for testing & possible publishing.
       # orb will be published as dev:alpha and dev:${CIRCLE_SHA1:0:7}.
       # requires a CircleCI API token to be stored as CIRCLE_TOKEN (default)
@@ -48,7 +52,8 @@ workflows:
           orb-name: circleci/slack
           context: orb-publishing
           requires:
-            - approve_for_testing
+            - orb-tools/pack
+            - orb-tools/lint
 
       # trigger an integration workflow to test the
       # dev:${CIRCLE_SHA1:0:7} version of your orb
@@ -68,6 +73,7 @@ workflows:
       # your integration test jobs go here: essentially, run all your orb's
       # jobs and commands to ensure they behave as expected. or, run other
       # integration tests of your choosing
+      - test-notify-custom-text
 
       - orb-tools/dev-promote-prod-from-commit-subject:
           orb-name: circleci/slack
