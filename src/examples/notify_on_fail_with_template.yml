@@ -1,4 +1,3 @@
-  
 description: |
   Send a slack notification when a job fails. This example uses a pre-included template. Custom templates can also be used.
 usage:
