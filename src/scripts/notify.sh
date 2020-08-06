@@ -51,9 +51,32 @@ ModifyCustomTemplate() {
     fi
 }
 
+InstallJq() {
+    if echo $OSTYPE | grep darwin > /dev/null 2>&1; then
+        brew install jq
+        return $?
+    fi
+
+    if cat /etc/issue | grep Alpine > /dev/null 2>&1; then
+        apk add jq
+        return $?
+    fi
+
+    if cat /etc/issue | grep Debian > /dev/null 2>&1 || cat /etc/issue | grep Ubuntu > /dev/null 2>&1; then
+        if [[ $EUID == 0 ]]; then export SUDO=""; else # Check if we're root
+            export SUDO="sudo";
+        fi
+        $SUDO apt update
+        $SUDO apt install -y jq
+        return $?
+    fi
+
+}
+
 # Will not run if sourced from another script.
 # This is done so this script may be tested.
 if [[ "$_" == "$0" ]]; then
+    InstallJq
     SetEnvVars
     BuildMessageBody
     Notify
