@@ -17,7 +17,7 @@ parameters:
 
 integration-tests: &integration-tests
   [
-    - test-notify-custom-text
+    test-notify-custom-text
   ]
 
 jobs:
