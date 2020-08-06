@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   slack: circleci/slack@<<pipeline.parameters.dev-orb-version>>
-  orb-tools: circleci/orb-tools@9.1
+  orb-tools: circleci/orb-tools@9.3
 
 # Pipeline parameters
 parameters:
@@ -40,7 +40,8 @@ workflows:
       - orb-tools/lint
       # pack your orb YAML files to a single orb.yml
       # validate the orb.yml file to ensure it is well-formed
-      - orb-tools/pack
+      - orb-tools/pack:
+          use-orb-pack: true
 
       # release dev version of orb, for testing & possible publishing.
       # orb will be published as dev:alpha and dev:${CIRCLE_SHA1:0:7}.
