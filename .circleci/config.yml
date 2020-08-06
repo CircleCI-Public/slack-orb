@@ -29,7 +29,7 @@ jobs:
             event: always
             custom: |
               {
-                text: "Hello world"
+                "text": "Hello world"
               }
 
 workflows:
