@@ -31,6 +31,9 @@ jobs:
               {
                 "text": "Hello world"
               }
+      - slack/notify:
+          template: basic-fail-1
+          event: always
 
 workflows:
   # This `lint-pack_validate_publish-dev` workflow will run on any commit.
