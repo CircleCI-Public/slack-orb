@@ -10,11 +10,11 @@ BuildMessageBody() {
     #   If none, error.
     if [ -n "$SLACK_PARAM_CUSTOM" ]; then
         ModifyCustomTemplate
-        T2=$(eval echo $CUSTOM_BODY_MODIFIED | jq '.' | sed 's/"/\\"/g')
+        T2=$(eval echo $CUSTOM_BODY_MODIFIED | sed 's/"/\\"/g')
         SLACK_MSG_BODY=$(eval echo $T2 | sed 's/\\\"/\"/g')
     elif [ -n "$SLACK_PARAM_TEMPLATE" ]; then
         TEMPLATE="$(echo \$$SLACK_PARAM_TEMPLATE)"
-        T2=$(eval echo $TEMPLATE | jq '.' | sed 's/"/\\"/g')
+        T2=$(eval echo $TEMPLATE | sed 's/"/\\"/g')
         SLACK_MSG_BODY=$(eval echo $T2 | sed 's/\\\"/\"/g')
     else
         echo "Error: No message template selected."
@@ -51,7 +51,7 @@ ModifyCustomTemplate() {
         CUSTOM_BODY_MODIFIED=$(echo "$SLACK_PARAM_CUSTOM" | jq '. + {"text": ""}')
     else
         # In case the text field was set manually.
-        CUSTOM_BODY_MODIFIED=$SLACK_PARAM_CUSTOM
+        CUSTOM_BODY_MODIFIED=$($SLACK_PARAM_CUSTOM | jq '.')
     fi
 }
 
