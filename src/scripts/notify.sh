@@ -9,9 +9,8 @@ BuildMessageBody() {
     #   if none is supplied, check for a pre-selected template value.
     #   If none, error.
     if [ -n "$SLACK_PARAM_CUSTOM" ]; then
-        SLACK_PARAM_CUSTOM=$(echo $SLACK_PARAM_CUSTOM | sed 's/"/\\"/g' | sed 's/\\n/\\\\n/g')
-        echo $(eval echo "DEBUG ${SLACK_PARAM_CUSTOM}")
         ModifyCustomTemplate
+        CUSTOM_BODY_MODIFIED=$(echo $CUSTOM_BODY_MODIFIED | sed 's/"/\\"/g' | sed 's/\\n/\\\\n/g')
         T2=$(eval echo $CUSTOM_BODY_MODIFIED)
     elif [ -n "$SLACK_PARAM_TEMPLATE" ]; then
         TEMPLATE="$(echo \$$SLACK_PARAM_TEMPLATE)"
