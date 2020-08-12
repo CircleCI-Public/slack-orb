@@ -9,18 +9,18 @@ BuildMessageBody() {
     #   if none is supplied, check for a pre-selected template value.
     #   If none, error.
     if [ -n "$SLACK_PARAM_CUSTOM" ]; then
+        SLACK_PARAM_CUSTOM=$(echo SLACK_PARAM_CUSTOM | sed 's/"/\\"/g' | sed 's/\\n/\\\\n/g')
         ModifyCustomTemplate
-        T2=$(eval echo $CUSTOM_BODY_MODIFIED | sed 's/"/\\"/g')
-        SLACK_MSG_BODY=$(eval echo $T2 | sed 's/\\\"/\"/g')
+        T2=$(eval echo $CUSTOM_BODY_MODIFIED)
     elif [ -n "$SLACK_PARAM_TEMPLATE" ]; then
         TEMPLATE="$(echo \$$SLACK_PARAM_TEMPLATE)"
-        T2=$(eval echo $TEMPLATE | sed 's/"/\\"/g')
-        SLACK_MSG_BODY=$(eval echo $T2 | sed 's/\\\"/\"/g')
+        T2=$(eval echo $TEMPLATE | sed 's/"/\\"/g' | sed 's/\\n/\\\\n/g')
     else
         echo "Error: No message template selected."
         echo "Select either a custom template or one of the pre-included ones via the 'custom' or 'template' parameters."
         exit 1
     fi
+    SLACK_MSG_BODY=$T2
 }
 
 PostToSlack() {
