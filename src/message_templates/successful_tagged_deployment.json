@@ -22,7 +22,7 @@
 				},
 				{
 					"type": "mrkdwn",
-					"text": "*Tag*: \n$CIRCLE_TAG)"
+					"text": "*Tag*: \n$CIRCLE_TAG"
 				}
 			]
 		},
