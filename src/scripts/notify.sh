@@ -12,8 +12,8 @@ BuildMessageBody() {
         ModifyCustomTemplate
         SLACK_MSG_BODY="$CUSTOM_BODY_MODIFIED"
     elif [ -n "$SLACK_PARAM_TEMPLATE" ]; then
-        TEMPLATE=$(eval echo \$$SLACK_PARAM_TEMPLATE)
-        SLACK_MSG_BODY=$(printf '%s\n' "$TEMPLATE")
+        TEMPLATE="$(echo \"$SLACK_PARAM_TEMPLATE\")"
+        SLACK_MSG_BODY=$(eval echo \"$TEMPLATE\")
     else
         echo "Error: No message template selected."
         echo "Select either a custom template or one of the pre-included ones via the 'custom' or 'template' parameters."
@@ -22,7 +22,7 @@ BuildMessageBody() {
 }
 
 PostToSlack() {
-    echo $SLACK_MSG_BODY
+    echo "$SLACK_MSG_BODY"
     curl -X POST -H 'Content-type: application/json' \
         --data \
         "$SLACK_MSG_BODY" "$INTRNL_SLACK_WEBHOOK"
