@@ -51,7 +51,7 @@ ModifyCustomTemplate() {
         CUSTOM_BODY_MODIFIED=$(echo "$SLACK_PARAM_CUSTOM" | jq '. + {"text": ""}')
     else
         # In case the text field was set manually.
-        CUSTOM_BODY_MODIFIED=$($SLACK_PARAM_CUSTOM | jq '.')
+        CUSTOM_BODY_MODIFIED=$(echo $SLACK_PARAM_CUSTOM | jq '.')
     fi
 }
 
