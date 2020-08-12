@@ -50,5 +50,5 @@ steps:
         SLACK_PARAM_CUSTOM: "<<parameters.custom>>"
         SLACK_PARAM_MENTIONS: "<<parameters.mentions>>"
         # import pre-built templates using the orb-pack local script include.
-        basic-fail-1: "<<include(message_templates/basic_fail_1.json)>>"
+        basic_fail_1: "<<include(message_templates/basic_fail_1.json)>>"
       command: <<include(scripts/notify.sh)>>
