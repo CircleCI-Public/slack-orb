@@ -21,6 +21,7 @@ BuildMessageBody() {
 }
 
 PostToSlack() {
+    echo "Debug: $SLACK_MSG_BODY"
     curl -X POST -H 'Content-type: application/json' \
         --data \
         "$SLACK_MSG_BODY" "$INTRNL_SLACK_WEBHOOK"
