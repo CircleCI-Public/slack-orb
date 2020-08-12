@@ -12,7 +12,7 @@ BuildMessageBody() {
         ModifyCustomTemplate
         SLACK_MSG_BODY="$CUSTOM_BODY_MODIFIED"
     elif [ -n "$SLACK_PARAM_TEMPLATE" ]; then
-        SLACK_MSG_BODY=$(eval echo "$(eval echo \$$SLACK_PARAM_TEMPLATE)")
+        SLACK_MSG_BODY=$(eval echo $(eval echo \$$SLACK_PARAM_TEMPLATE))
     else
         echo "Error: No message template selected."
         echo "Select either a custom template or one of the pre-included ones via the 'custom' or 'template' parameters."
