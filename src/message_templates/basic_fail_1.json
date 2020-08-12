@@ -10,15 +10,15 @@
 			"fields": [
 				{
 					"type": "mrkdwn",
-					"text": "*Commiter*:\n${CIRCLE_USERNAME}"
+					"text": "*Commiter*: \n${CIRCLE_USERNAME}"
 				},
 				{
 					"type": "mrkdwn",
-					"text": "*SHA*:\n${CIRCLE_SHA1}"
+					"text": "*SHA*: \n${CIRCLE_SHA1}"
 				},
 				{
 					"type": "mrkdwn",
-					"text": "*Mentions*:\n"
+					"text": "*Mentions*: \n"
 				}
 			],
 			"accessory": {
