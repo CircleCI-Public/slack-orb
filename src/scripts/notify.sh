@@ -10,7 +10,7 @@ BuildMessageBody() {
     #   If none, error.
     if [ -n "$SLACK_PARAM_CUSTOM" ]; then
         SLACK_PARAM_CUSTOM=$(echo $SLACK_PARAM_CUSTOM | sed 's/"/\\"/g' | sed 's/\\n/\\\\n/g')
-        echo "DEBUG ${SLACK_PARAM_CUSTOM}"
+        echo $(eval echo "DEBUG ${SLACK_PARAM_CUSTOM}")
         ModifyCustomTemplate
         T2=$(eval echo $CUSTOM_BODY_MODIFIED)
     elif [ -n "$SLACK_PARAM_TEMPLATE" ]; then
