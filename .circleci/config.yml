@@ -29,7 +29,22 @@ jobs:
             event: always
             custom: |
               {
-                "text": "Hello world"
+                "blocks": [
+                  {
+                    "type": "section",
+                    "text": {
+                      "type": "mrkdwn",
+                      "text": "This is a *markdown* enabled field."
+                    }
+                  },
+                  {
+                    "type": "section",
+                    "text": {
+                      "type": "mrkdwn",
+                      "text": "@guru, @gabriel, <@gabriel>, @KyleTryon, @Kyle.Tryon, @U8C9ETTUG, <@KyleTryon>"
+                    }
+                  }
+                ]
               }
       - slack/notify:
           template: basic_fail_1
