@@ -39,7 +39,7 @@
 						"type": "plain_text",
 						"text": "View Workflow"
 					},
-					"url": "$(VCS=$(echo 'https://circleci.com/gh/CircleCI-Public/slack-orb/1662' | cut -c 22-23); echo \"https://app.circleci.com/pipelines/${VCS}/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/<<pipeline.number>>/workflows/${CIRCLE_WORKFLOW_ID}\")"
+					"url": "https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}"
 				}
 			]
 		}
