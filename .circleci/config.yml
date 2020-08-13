@@ -3,6 +3,7 @@ version: 2.1
 orbs:
   slack: circleci/slack@<<pipeline.parameters.dev-orb-version>>
   orb-tools: circleci/orb-tools@9.3
+  bats: circleci/bats@1.0
 
 # Pipeline parameters
 parameters:
@@ -57,11 +58,13 @@ jobs:
           event: always
 
 workflows:
-  # This `lint-pack_validate_publish-dev` workflow will run on any commit.
-  lint_pack-validate_publish-dev:
+
+  test-pack:
     unless: << pipeline.parameters.run-integration-tests >>
     jobs:
       - orb-tools/lint
+      - bats/run:
+          path: ./src/tests
       # pack your orb YAML files to a single orb.yml
       # validate the orb.yml file to ensure it is well-formed
       - orb-tools/pack:
@@ -79,6 +82,7 @@ workflows:
           requires:
             - orb-tools/pack
             - orb-tools/lint
+            - bats/run
 
       # trigger an integration workflow to test the
       # dev:${CIRCLE_SHA1:0:7} version of your orb
@@ -88,11 +92,7 @@ workflows:
           requires:
             - orb-tools/publish-dev
 
-  # This `integration-tests_prod-release` workflow will only run
-  # when the run-integration-tests pipeline parameter is set to true.
-  # It is meant to be triggered by the "trigger-integration-tests-workflow"
-  # job, and run tests on <your orb>@dev:${CIRCLE_SHA1:0:7}.
-  integration-tests_prod-release:
+  integration-test_deploy:
     when: << pipeline.parameters.run-integration-tests >>
     jobs:
       # your integration test jobs go here: essentially, run all your orb's
