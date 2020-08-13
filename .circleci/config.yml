@@ -42,7 +42,7 @@ jobs:
                     "type": "section",
                     "text": {
                       "type": "mrkdwn",
-                      "text": "NO MENTIONS"
+                      "text": "@gabriel, @U8C9ETTUG "
                     }
                   }
                 ]
