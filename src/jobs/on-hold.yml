@@ -6,6 +6,6 @@ docker:
 resource_class: small
 
 steps:
-  - slack/notify:
-      when: always
+  - notify:
+      event: always
       template: basic_on_hold_1
