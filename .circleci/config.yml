@@ -52,6 +52,9 @@ jobs:
       - slack/notify:
           template: success_tagged_deploy_1
           event: always
+      - slack/notify:
+          template: basic_on_hold_1
+          event: always
 
 workflows:
   # This `lint-pack_validate_publish-dev` workflow will run on any commit.
