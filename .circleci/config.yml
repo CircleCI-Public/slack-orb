@@ -35,7 +35,7 @@ jobs:
           template: basic_fail_1
           event: always
       - slack/notify:
-          template: basic_tagged_deploy
+          template: success_tagged_deploy_1
           event: always
 
 workflows:
