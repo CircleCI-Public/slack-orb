@@ -1,11 +1,10 @@
 {
-	"text": "",
 	"blocks": [
 		{
 			"type": "header",
 			"text": {
 				"type": "plain_text",
-				"text": "Deployment Successful! :tada:",
+				"text": "ON HOLD - Awaiting Approval :raised_hand:",
 				"emoji": true
 			}
 		},
@@ -18,11 +17,11 @@
 				},
 				{
 					"type": "mrkdwn",
-					"text": "*When*:\\n$(date +'%m/%d/%Y %T')"
+					"text": "*Branch*:\\n$CIRCLE_BRANCH"
 				},
 				{
 					"type": "mrkdwn",
-					"text": "*Tag*:\\n$CIRCLE_TAG"
+					"text": "*Author*:\\n$CIRCLE_USERNAME"
 				}
 			],
 			"accessory": {
@@ -38,9 +37,9 @@
 					"type": "button",
 					"text": {
 						"type": "plain_text",
-						"text": "View Job"
+						"text": "View Workflow"
 					},
-					"url": "${CIRCLE_BUILD_URL}"
+					"url": "https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}"
 				}
 			]
 		}

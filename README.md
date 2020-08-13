@@ -15,7 +15,8 @@ The Slack Orb comes with a number of included templates to get your started with
 | Template Preview  | Template  | Description |
 | ------------- | ------------- | ------------- |
 | ![basic_fail_1](./.github/img/basic_fail_1.png)  | basic_fail_1   | Should be used with the "fail" event. |
-| ![basic_fail_1](./.github/img/success_tagged_deploy_1.png)  | success_tagged_deploy_1   | To be used in the event of a successful deployment job. _see orb usage examples_ |
+| ![success_tagged_deploy_1](./.github/img/success_tagged_deploy_1.png)  | success_tagged_deploy_1   | To be used in the event of a successful deployment job. _see orb usage examples_ |
+| ![basic_on_hold_1](./.github/img/basic_on_hold_1.png)  | basic_on_hold_1   | To be used in the on-hold job. _see orb usage examples_  |
 
 
 ## Custom Message Template
