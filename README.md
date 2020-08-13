@@ -15,7 +15,7 @@ The Slack Orb comes with a number of included templates to get your started with
 | Template Preview  | Template  | Description |
 | ------------- | ------------- | ------------- |
 | ![basic_fail_1](./.github/img/basic_fail_1.png)  | basic_fail_1   | Should be used with the "fail" event. |
-| ![basic_fail_1](./.github/img/success_tagged_deploy.png)  | successful_tagged_deployment   | To be used in the event of a successful deployment job. _see orb usage examples_ |
+| ![basic_fail_1](./.github/img/success_tagged_deploy_1.png)  | success_tagged_deploy_1   | To be used in the event of a successful deployment job. _see orb usage examples_ |
 
 
 ## Custom Message Template
@@ -51,7 +51,7 @@ The Slack Orb comes with a number of included templates to get your started with
   How can I stop duplicate messages in parallel jobs?
 
 **A:**
-  It is not possible to limit the output to a singular ouput. The notifiy command acts as a convenient and parameterizable way to send a `curl` request to the provided Slack Webhook. When a job is ran in parallel, each instance runs independantly and sends its own notification.
+  It is not possible to limit the output to a singular output. The notify command acts as a convenient and parametrizable way to send a `curl` request to the provided Slack WebHook. When a job is ran in parallel, each instance runs independently and sends its own notification.
 
 ---
 
@@ -59,7 +59,7 @@ The Slack Orb comes with a number of included templates to get your started with
   Is it possible to receive only the final status of the Workflow?
 
 **A:**
-  Each job within a workflow operates independantly, as the orb code executes within each job, they are not able to report on the outcome of the workflow after all jobs have completed. Each job can independantly report its individual status.
+  Each job within a workflow operates independently, as the orb code executes within each job, they are not able to report on the outcome of the workflow after all jobs have completed. Each job can independently report its individual status.
 
  ---
 

@@ -1,5 +1,5 @@
 description: |
-  Send a slack notification when a job fails. This example uses a pre-included template. Custom templates can also be used.
+  Use one of our pre-included templates for sending a success notification when a tagged deployment passes.
   Ensure the "slack/notify" command is the last command in a job to accurately capture the status.
 usage:
   version: 2.1
@@ -16,7 +16,7 @@ usage:
         - run:
             command: npm run deploy
         - slack/notify:
-            event: fail
+            event: success
             template: basic_fail_1
   workflows:
     deploy_and_notify:
