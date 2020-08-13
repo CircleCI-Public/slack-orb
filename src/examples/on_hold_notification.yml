@@ -10,7 +10,8 @@ usage:
         - my_test_job
         # Send a slack notfication alerting the workflow will now be placed on-hold.
         - slack/on-hold:
-            requires: my_test_job
+            requires:
+              - my_test_job
         # Jobs with the type of "approval" act as place holders to pause the workflow
         # Wait for both the first job, and the notification to send before pausing.
         - pause_workflow:
@@ -20,6 +21,7 @@ usage:
               - slack/on-hold
         # This job will continue once the workflow has been manually approved.
         - my_deploy_job:
-            requires: pause_workflow
+            requires:
+              - pause_workflow
 
 
