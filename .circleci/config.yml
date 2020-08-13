@@ -17,11 +17,11 @@ parameters:
 
 integration-tests: &integration-tests
   [
-    test-notify-custom-text
+    integration-test-templates
   ]
 
 jobs:
-  test-notify-custom-text:
+  integration-test-templates:
     docker:
       - image: cimg/base:stable
     steps:
@@ -98,7 +98,7 @@ workflows:
       # your integration test jobs go here: essentially, run all your orb's
       # jobs and commands to ensure they behave as expected. or, run other
       # integration tests of your choosing
-      - test-notify-custom-text
+      - integration-test-templates
 
       - orb-tools/dev-promote-prod-from-commit-subject:
           orb-name: circleci/slack

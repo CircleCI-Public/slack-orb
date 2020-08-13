@@ -1,0 +1,10 @@
+description: |
+  Insert this job in-line with your standard CircleCI on-hold notification jobs to simulataniously send a Slack notification containing a link to the paused Workflow.
+
+docker:
+  - image: cimg/base:stable
+
+steps:
+  - slack/notify:
+      when: always
+      template: basic_on_hold_1

@@ -4,8 +4,8 @@ description: |
 usage:
   version: 2.1
   orbs:
-    slack: circleci/slack@x.y
-    node: circleci/node:x.y
+    slack: circleci/slack@4.0
+    node: circleci/node:4.0
   jobs:
     deploy:
       executor:

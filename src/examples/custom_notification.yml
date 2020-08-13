@@ -6,7 +6,7 @@ description: |
 usage:
   version: 2.1
   orbs:
-    slack: circleci/slack@x.y
+    slack: circleci/slack@4.0
   jobs:
     notify:
       docker:
