@@ -51,5 +51,5 @@ steps:
         SLACK_PARAM_MENTIONS: "<<parameters.mentions>>"
         # import pre-built templates using the orb-pack local script include.
         basic_fail_1: "<<include(message_templates/basic_fail_1.json)>>"
-        success_tagged_deploy_1: "<<include(message_templates/successful_tagged_deployment.json)>>"
+        success_tagged_deploy_1: "<<include(message_templates/success_tagged_deploy_1.json)>>"
       command: <<include(scripts/notify.sh)>>
