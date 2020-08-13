@@ -41,7 +41,7 @@ jobs:
                     "type": "section",
                     "text": {
                       "type": "mrkdwn",
-                      "text": "@guru, @gabriel, <@gabriel>, @KyleTryon, @Kyle.Tryon, @U8C9ETTUG, <@KyleTryon>"
+                      "text": "\@guru, \@gabriel, <\@gabriel>, \@KyleTryon, \@Kyle.Tryon, \@U8C9ETTUG, <\@KyleTryon>"
                     }
                   }
                 ]
