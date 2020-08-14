@@ -42,13 +42,14 @@ jobs:
                     "type": "section",
                     "text": {
                       "type": "mrkdwn",
-                      "text": "<@U8C9ETTUG>"
+                      "text": "This test will @ a normal user, a user ID, and normal group name: <@U8C9ETTUG>, @orbs, @gabriel"
                     }
                   }
                 ]
               }
       - slack/notify:
           template: basic_fail_1
+          mentions: "@orbs"
           event: always
       - slack/notify:
           template: success_tagged_deploy_1
