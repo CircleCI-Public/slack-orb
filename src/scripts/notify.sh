@@ -10,8 +10,9 @@ BuildMessageBody() {
     #   If none, error.
     if [ -n "$SLACK_PARAM_CUSTOM" ]; then
         ModifyCustomTemplate
-        CUSTOM_BODY_MODIFIED=$(echo $CUSTOM_BODY_MODIFIED | sed 's/"/\\"/g' | sed 's/\\n/\\\\n/g')
+        CUSTOM_BODY_MODIFIED=$(echo $CUSTOM_BODY_MODIFIED | sed 's/"/\\"/g' | sed 's/\\n/\\\\n/g' | sed 's/</\\</g' | sed 's/>/\\>/g')
         T2=$(eval echo $CUSTOM_BODY_MODIFIED)
+        echo $T2
     elif [ -n "$SLACK_PARAM_TEMPLATE" ]; then
         TEMPLATE="$(echo \$$SLACK_PARAM_TEMPLATE)"
         T1=$(eval echo $TEMPLATE | sed 's/"/\\"/g' | sed 's/\\n/\\\\n/g')
@@ -25,7 +26,6 @@ BuildMessageBody() {
 }
 
 PostToSlack() {
-    echo "$SLACK_MSG_BODY"
     curl -f -X POST -H 'Content-type: application/json' \
         --data \
         "$SLACK_MSG_BODY" "$INTRNL_SLACK_WEBHOOK"
@@ -54,6 +54,7 @@ ModifyCustomTemplate() {
         # In case the text field was set manually.
         CUSTOM_BODY_MODIFIED=$(echo $SLACK_PARAM_CUSTOM | jq '.')
     fi
+    echo "$CUSTOM_BODY_MODIFIED"
 }
 
 InstallJq() {
