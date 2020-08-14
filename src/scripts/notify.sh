@@ -12,6 +12,7 @@ BuildMessageBody() {
         ModifyCustomTemplate
         CUSTOM_BODY_MODIFIED=$(echo $CUSTOM_BODY_MODIFIED | sed 's/"/\\"/g' | sed 's/\\n/\\\\n/g' | sed 's/</\\<\n/g' | sed 's/>/\\>\n/g')
         T2=$(eval echo $CUSTOM_BODY_MODIFIED)
+        echo $T2
     elif [ -n "$SLACK_PARAM_TEMPLATE" ]; then
         TEMPLATE="$(echo \$$SLACK_PARAM_TEMPLATE)"
         T1=$(eval echo $TEMPLATE | sed 's/"/\\"/g' | sed 's/\\n/\\\\n/g')
