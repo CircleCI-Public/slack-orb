@@ -49,6 +49,7 @@ ModifyCustomTemplate() {
     # Inserts the required "text" field to the custom json template from block kit builder.
     # Block Kit Builder will not work with webhooks without this.
     if [ "$(echo "$SLACK_PARAM_CUSTOM" | jq '.text')" == "null" ]; then
+        echo "$SLACK_PARAM_CUSTOM"
         CUSTOM_BODY_MODIFIED=$(echo "$SLACK_PARAM_CUSTOM" | jq '. + {"text": ""}')
     else
         # In case the text field was set manually.
