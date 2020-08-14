@@ -42,7 +42,7 @@ jobs:
                     "type": "section",
                     "text": {
                       "type": "mrkdwn",
-                      "text": "\<@U8C9ETTUG\>"
+                      "text": "<\@U8C9ETTUG>"
                     }
                   }
                 ]
