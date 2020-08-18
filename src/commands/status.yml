@@ -63,6 +63,12 @@ parameters:
     description: >
       Whether or not to include the Visit Job action in the message
 
+  include_branch_field:
+    type: boolean
+    default: true
+    description: >
+      Whether or not to include the Branch field in the message
+
   channel:
     type: string
     default: ""
@@ -160,8 +166,15 @@ steps:
                                     \"title\": \"Job Number\", \
                                     \"value\": \"$CIRCLE_BUILD_NUM\", \
                                     \"short\": true \
-                                  } \
+                                  }, \
                                   <</ parameters.include_job_number_field >>
+                                  <<# parameters.include_branch_field >>
+                                  { \
+                                    \"title\": \"Branch\", \
+                                    \"value\": \"$CIRCLE_BRANCH\", \
+                                    \"short\": true \
+                                  } \
+                                  <</ parameters.include_branch_field >>
                                 ], \
                                 \"actions\": [ \
                                   <<# parameters.include_visit_job_action >>
@@ -208,8 +221,15 @@ steps:
                             \"title\": \"Job Number\", \
                             \"value\": \"$CIRCLE_BUILD_NUM\", \
                             \"short\": true \
-                          } \
+                          }, \
                           <</ parameters.include_job_number_field >>
+                          <<# parameters.include_branch_field >>
+                          { \
+                            \"title\": \"Branch\", \
+                            \"value\": \"$CIRCLE_BRANCH\", \
+                            \"short\": true \
+                          } \
+                          <</ parameters.include_branch_field >>
                         ], \
                         \"actions\": [ \
                           <<# parameters.include_visit_job_action >>
