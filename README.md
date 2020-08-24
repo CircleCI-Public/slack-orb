@@ -30,7 +30,10 @@ Send a notification that a manual approval job is ready
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
+| `channel` | `string` | | ID of channel if set, overrides webhook's default channel setting |
 | `color` | `string` | '#3AA3E3' | Hex color value for notification attachment color. |
+| `include_job_number_field` | `boolean` | `true` | Whether or not to include the _Job Number_ field in the message |
+| `include_project_field` | `boolean` | `true` | Condition to check if it is necessary to include the _Project_ field in the message |
 | `mentions` | `string` | '' | A comma separated list of user IDs. No spaces. |
 | `message` | `string` | A workflow in CircleCI is awaiting your approval. | Enter custom message. |
 | `url` | `string` | 'https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}' | The URL to link back to. |
