@@ -30,3 +30,11 @@ setup() {
     TEXTKEY=$(echo $CUSTOM_BODY_MODIFIED | jq '.text')
     [ "$TEXTKEY" == '"User-Added text key"' ]
 }
+
+@test "4: Test links -  #164" {
+    # Ensure a custom template has the text key automatically affixed.
+    SLACK_PARAM_CUSTOM=$(cat $BATS_TEST_DIRNAME/sampleCustomTemplateWithLink.json)
+    run BuildMessageBody
+    echo $output
+    [ "$status" -eq 1 ]
+}
