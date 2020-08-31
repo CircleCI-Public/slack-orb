@@ -57,6 +57,10 @@ jobs:
       - slack/notify:
           template: basic_on_hold_1
           event: always
+      - slack/notify:
+          event: pass
+          custom: >
+            {"blocks":[{"type":"header","text":{"type":"plain_text","text":"Xanadu deployed :yay:","emoji":true}},{"type":"section","text":{"type":"mrkdwn","text":"Access your build <${PREVIEW_LINK}|here> *Test: Ignore*"}}]}
 
 workflows:
 
