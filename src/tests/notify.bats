@@ -36,5 +36,5 @@ setup() {
     SLACK_PARAM_CUSTOM=$(cat $BATS_TEST_DIRNAME/sampleCustomTemplateWithLink.json)
     run BuildMessageBody
     echo $output
-    [ "$status" -eq 1 ]
+    [ "$status" -eq 0 ]
 }
