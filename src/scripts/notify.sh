@@ -45,7 +45,7 @@ Notify() {
         echo "NO SLACK ALERT"
         echo
         echo "This command is set to send an alert on: $SLACK_PARAM_EVENT"
-        echo "Current status: $CCI_STATUS"
+        echo "Current status: ${CCI_STATUS}"
         exit 0
     fi
 }
