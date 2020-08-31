@@ -42,7 +42,7 @@ steps:
       when: on_success
       name: Slack - Detecting Job Status (PASS)
       command: |
-        CCI_STATUS="pass" >> $BASH_ENV
+        echo `export CCI_STATUS="pass"` >> $BASH_ENV
   - run:
       when: always
       name: Slack - Sending Notification
