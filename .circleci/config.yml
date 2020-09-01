@@ -60,7 +60,17 @@ jobs:
       - slack/notify:
           event: pass
           custom: >
-            {"blocks":[{"type":"header","text":{"type":"plain_text","text":"Xanadu deployed :yay:","emoji":true}},{"type":"section","text":{"type":"mrkdwn","text":"Access your build <${CIRCLE_BUILD_URL}|here> *Test: Ignore*"}}]}
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Sample link using environment variable in markdown <${CIRCLE_BUILD_URL}|LINK >"
+                  }
+                }
+              ]
+            }
 
 workflows:
 
