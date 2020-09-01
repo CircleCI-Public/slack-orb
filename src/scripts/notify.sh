@@ -87,6 +87,7 @@ InstallJq() {
 # Will not run if sourced from another script.
 # This is done so this script may be tested.
 if [[ "$_" == "$0" ]]; then
+    source "/tmp/SLACK_JOB_STATUS"
     InstallJq
     SetEnvVars
     BuildMessageBody
