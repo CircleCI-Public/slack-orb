@@ -33,8 +33,8 @@ setup() {
 
 @test "4: Test links -  #164" {
     # Ensure a custom template has the text key automatically affixed.
+    TESTLINKURL="http://circleci.com"
     SLACK_PARAM_CUSTOM=$(cat $BATS_TEST_DIRNAME/sampleCustomTemplateWithLink.json)
-    run BuildMessageBody
-    echo $output
-    [ "$status" -eq 0 ]
+    BuildMessageBody
+    [ "$SLACK_MSG_BODY" == '{ "blocks": [ { "type": "section", "text": { "type": "mrkdwn", "text": "Sample link using environment variable in markdown <http://circleci.com|LINK >" } } ], "text": "" }' ]
 }
