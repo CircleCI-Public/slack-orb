@@ -30,3 +30,11 @@ setup() {
     TEXTKEY=$(echo $CUSTOM_BODY_MODIFIED | jq '.text')
     [ "$TEXTKEY" == '"User-Added text key"' ]
 }
+
+@test "4: Test links -  #164" {
+    # Ensure a custom template has the text key automatically affixed.
+    TESTLINKURL="http://circleci.com"
+    SLACK_PARAM_CUSTOM=$(cat $BATS_TEST_DIRNAME/sampleCustomTemplateWithLink.json)
+    BuildMessageBody
+    [ "$SLACK_MSG_BODY" == '{ "blocks": [ { "type": "section", "text": { "type": "mrkdwn", "text": "Sample link using environment variable in markdown <http://circleci.com|LINK >" } } ], "text": "" }' ]
+}

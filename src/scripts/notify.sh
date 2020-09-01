@@ -10,9 +10,9 @@ BuildMessageBody() {
     #   If none, error.
     if [ -n "$SLACK_PARAM_CUSTOM" ]; then
         ModifyCustomTemplate
-        CUSTOM_BODY_MODIFIED=$(echo $CUSTOM_BODY_MODIFIED | sed 's/"/\\"/g' | sed 's/\\n/\\\\n/g' | sed 's/</\\</g' | sed 's/>/\\>/g')
-        T2=$(eval echo $CUSTOM_BODY_MODIFIED)
-        echo $T2
+        echo
+        CUSTOM_BODY_MODIFIED=$(echo $CUSTOM_BODY_MODIFIED | sed 's/"/\\"/g' | sed 's/\\n/\\\\n/g' | sed 's/|/\\|/g' | sed 's/</\\</g' | sed 's/>/\\>/g')
+        T2=$(eval echo "$CUSTOM_BODY_MODIFIED")
     elif [ -n "$SLACK_PARAM_TEMPLATE" ]; then
         TEMPLATE="$(echo \$$SLACK_PARAM_TEMPLATE)"
         T1=$(eval echo $TEMPLATE | sed 's/"/\\"/g' | sed 's/\\n/\\\\n/g')
@@ -40,7 +40,7 @@ Notify() {
         echo "NO SLACK ALERT"
         echo
         echo "This command is set to send an alert on: $SLACK_PARAM_EVENT"
-        echo "Current status: $CCI_STATUS"
+        echo "Current status: ${CCI_STATUS}"
         exit 0
     fi
 }
@@ -82,6 +82,7 @@ InstallJq() {
 # Will not run if sourced from another script.
 # This is done so this script may be tested.
 if [[ "$_" == "$0" ]]; then
+    source "/tmp/SLACK_JOB_STATUS"
     InstallJq
     SetEnvVars
     BuildMessageBody
