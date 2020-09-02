@@ -24,6 +24,11 @@ parameters:
     type: enum
     enum: ["fail", "pass", "always"]
     default: "always"
+  branch_list:
+    description: |
+      A comma separated list of regex matchable branch names. Notifications will only be sent if sent from a job from these branches. By default ".*" will be used to match all branches. Pattern must match the full string, no partial matches.
+    type: string
+    default: ".*"
   mentions:
     description: |
       Exports to the "$SLACK_PARAM_MENTIONS" environment variable for use in templates.
@@ -52,6 +57,7 @@ steps:
         SLACK_PARAM_TEMPLATE: "<<parameters.template>>"
         SLACK_PARAM_CUSTOM: "<<parameters.custom>>"
         SLACK_PARAM_MENTIONS: "<<parameters.mentions>>"
+        SLACK_PARAM_BRANCHFILTER: "<<parameters.branch_list>>"
         # import pre-built templates using the orb-pack local script include.
         basic_fail_1: "<<include(message_templates/basic_fail_1.json)>>"
         success_tagged_deploy_1: "<<include(message_templates/success_tagged_deploy_1.json)>>"

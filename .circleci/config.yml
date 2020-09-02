@@ -21,10 +21,14 @@ integration-tests: &integration-tests
     integration-test-templates
   ]
 
-jobs:
-  integration-test-templates:
+executors:
+  cimg:
     docker:
       - image: cimg/base:stable
+
+jobs:
+  integration-test-templates:
+    executor: cimg
     steps:
       - slack/notify:
             event: always

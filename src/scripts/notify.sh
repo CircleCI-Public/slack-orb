@@ -79,6 +79,25 @@ InstallJq() {
 
 }
 
+BranchFilter() {
+    FLAG_MATCHES_FILTER="false"
+    for i in $(echo "$SLACK_PARAM_BRANCHFILTER" | sed "s/,/ /g")
+    do
+     if [[ "$CIRCLE_BRANCH" =~ ^${i}$ ]]; then
+        FLAG_MATCHES_FILTER="true"
+        break
+     fi
+    done
+    if [ "$FLAG_MATCHES_FILTER" = "false" ]; then
+        # dont send message.
+        echo "NO SLACK ALERT"
+        echo
+        echo 'Current branch does not match any item from the "branch_list" parameter'
+        echo "Current branch: ${CIRCLE_BRANCH}"
+        exit 0
+    fi
+}
+
 # Will not run if sourced from another script.
 # This is done so this script may be tested.
 if [[ "$_" == "$0" ]]; then
