@@ -25,7 +25,7 @@ usage:
       jobs:
         - build
         # This deploy job uses the native CircleCI workflow filters to specify that the entire job will not execute unless on the specified filtered branch.
-        # This Workflow level filter is independant from the Slack orb.
+        # This Workflow level filter is independent from the Slack orb.
         - deploy:
             requires:
               - build
