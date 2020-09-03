@@ -7,14 +7,10 @@ usage:
   orbs:
     slack: circleci/slack@4.0
   jobs:
-    deploy:
-      executor:
-        name: node/default
+    build:
+      machine: true
       steps:
-        - checkout
-        - node/install-packages
-        - run:
-            command: npm run deploy
+        - run: some build command
         - slack/notify:
             branch_list: main # a comma separated list of branches for which this notification will execute. By default, all branches will trigger.
             event: fail
