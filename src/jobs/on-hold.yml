@@ -2,7 +2,7 @@ description: |
   Insert this job in-line with your standard CircleCI on-hold notification jobs to simulataniously send a Slack notification containing a link to the paused Workflow.
 
 parameters:
-  branch_list:
+  branch_pattern:
     description: |
       A comma separated list of regex matchable branch names. Notifications will only be sent if sent from a job from these branches. By default ".+" will be used to match all branches. Pattern must match the full string, no partial matches.
     type: string
@@ -40,7 +40,7 @@ steps:
   - notify:
       event: always
       template: <<parameters.template>>
-      branch_list: <<parameters.branch_list>>
+      branch_pattern: <<parameters.branch_pattern>>
       webhook: <<parameters.webhook>>
       custom: <<parameters.custom>>
       mentions: <<parameters.mentions>>

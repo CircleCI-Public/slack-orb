@@ -33,6 +33,7 @@ PostToSlack() {
 
 Notify() {
     if [[ "$CCI_STATUS" == "$SLACK_PARAM_EVENT" || "$SLACK_PARAM_EVENT" == "always" ]]; then
+    BranchFilter # In the event the Slack notification would be sent, first ensure it is allowed to trigger on this branch.
     PostToSlack
     echo "Sending Notification"
     else
@@ -80,8 +81,9 @@ InstallJq() {
 }
 
 BranchFilter() {
+    # If any pattern supplied matches the current branch, proceed; otherwise, exit with message.
     FLAG_MATCHES_FILTER="false"
-    for i in $(echo "$SLACK_PARAM_BRANCHFILTER" | sed "s/,/ /g")
+    for i in $(echo "$SLACK_PARAM_BRANCHPATTERN" | sed "s/,/ /g")
     do
      if [[ "$CIRCLE_BRANCH" =~ ^${i}$ ]]; then
         FLAG_MATCHES_FILTER="true"
