@@ -41,7 +41,7 @@ setup() {
 }
 
 @test "5: Branch Filter - case 1 | match-all default" {
-    SLACK_PARAM_BRANCHFILTER=".*"
+    SLACK_PARAM_BRANCHFILTER=".+"
     CIRCLE_BRANCH="xyz-123"
     run BranchFilter
     echo "Error SLACK_PARAM_BRANCHFILTER debug: $SLACK_PARAM_BRANCHFILTER"

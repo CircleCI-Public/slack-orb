@@ -1,0 +1,40 @@
+description: >
+  Use the "branch_list" parameter to limit notifications to specified branches.
+  Useful when a job is executed on multiple branches but you only wish to be notified on a subset of branches.
+  For example: If your "build" job runs on every branch, but you wish to only be notified when a failure occurs on the "staging" branch, your config may look like this.
+usage:
+  version: 2.1
+  orbs:
+    slack: circleci/slack@4.0
+  jobs:
+    deploy:
+      executor:
+        name: node/default
+      steps:
+        - checkout
+        - node/install-packages
+        - run:
+            command: npm run deploy
+        - slack/notify:
+            branch_list: main # a comma separated list of branches for which this notification will execute. By default, all branches will trigger.
+            event: fail
+            template: basic_fail_1
+        - slack/notify:
+            branch_list: production # A second alert to ping certain folks to failures on this branch.
+            event: fail
+            template: basic_fail_1
+            mentions: "<@U8XXXXXXX>, @UserName"
+  workflows:
+    deploy_and_notify:
+      jobs:
+        - build
+        # This deploy job uses the native CircleCI workflow filters to specify that the entire job will not execute unless on the specified filtered branch.
+        # This Workflow level filter is independant from the Slack orb.
+        - deploy:
+            requires:
+              - build
+            filters:
+              branches:
+                only:
+                  - production
+
