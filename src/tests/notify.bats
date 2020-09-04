@@ -1,7 +1,7 @@
 setup() {
     source ./src/scripts/notify.sh
     export INTRNL_SLACK_WEBHOOK="x"
-    export SLACK_PARAM_BRANCHFILTER=$(cat $BATS_TEST_DIRNAME/sampleBranchFilters.txt)
+    export SLACK_PARAM_BRANCHPATTERN=$(cat $BATS_TEST_DIRNAME/sampleBranchFilters.txt)
 }
 
 @test "1: Skip message on no event" {
@@ -41,10 +41,10 @@ setup() {
 }
 
 @test "5: Branch Filter - case 1 | match-all default" {
-    SLACK_PARAM_BRANCHFILTER=".+"
+    SLACK_PARAM_BRANCHPATTERN=".+"
     CIRCLE_BRANCH="xyz-123"
     run BranchFilter
-    echo "Error SLACK_PARAM_BRANCHFILTER debug: $SLACK_PARAM_BRANCHFILTER"
+    echo "Error SLACK_PARAM_BRANCHPATTERN debug: $SLACK_PARAM_BRANCHPATTERN"
     echo "Error output debug: $output"
     [ "$output" == "" ] # Should match any branch: No output error
     [ "$status" -eq 0 ] # In any case, this should return a 0 exit as to not block a build/deployment.
