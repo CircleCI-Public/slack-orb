@@ -33,6 +33,7 @@ PostToSlack() {
 
 Notify() {
     if [[ "$CCI_STATUS" == "$SLACK_PARAM_EVENT" || "$SLACK_PARAM_EVENT" == "always" ]]; then
+    BranchFilter # In the event the Slack notification would be sent, first ensure it is allowed to trigger on this branch.
     PostToSlack
     echo "Sending Notification"
     else
@@ -77,6 +78,26 @@ InstallJq() {
         return $?
     fi
 
+}
+
+BranchFilter() {
+    # If any pattern supplied matches the current branch, proceed; otherwise, exit with message.
+    FLAG_MATCHES_FILTER="false"
+    for i in $(echo "$SLACK_PARAM_BRANCHPATTERN" | sed "s/,/ /g")
+    do
+     if [[ "$CIRCLE_BRANCH" =~ ^${i}$ ]]; then
+        FLAG_MATCHES_FILTER="true"
+        break
+     fi
+    done
+    if [ "$FLAG_MATCHES_FILTER" = "false" ]; then
+        # dont send message.
+        echo "NO SLACK ALERT"
+        echo
+        echo 'Current branch does not match any item from the "branch_list" parameter'
+        echo "Current branch: ${CIRCLE_BRANCH}"
+        exit 0
+    fi
 }
 
 # Will not run if sourced from another script.

@@ -16,15 +16,14 @@ parameters:
     type: string
     default: "dev:alpha"
 
-integration-tests: &integration-tests
-  [
-    integration-test-templates
-  ]
+executors:
+  cimg:
+    docker:
+      - image: cimg/base:stable
 
 jobs:
   integration-test-templates:
-    docker:
-      - image: cimg/base:stable
+    executor: cimg
     steps:
       - slack/notify:
             event: always
@@ -124,7 +123,8 @@ workflows:
           fail-if-semver-not-indicated: true
           publish-version-tag: true
           ssh-fingerprints: xxx
-          requires: *integration-tests
+          requires:
+            - integration-test-templates
           filters:
             branches:
               only: master
