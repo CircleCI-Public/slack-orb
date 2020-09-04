@@ -49,7 +49,7 @@ The Slack Orb comes with a number of included templates to get your started with
 
 ## Branch Filtering
 
-Limit Slack notifications to particular branches with the "branch_list" parameter.
+Limit Slack notifications to particular branches with the "branch_pattern" parameter.
 `A comma separated list of regex matchable branch names. Notifications will only be sent if sent from a job from these branches. By default ".+" will be used to match all branches. Pattern must match the full string, no partial matches.`
 
 
