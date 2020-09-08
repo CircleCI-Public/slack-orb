@@ -30,7 +30,7 @@ jobs:
       runner:
         type: executor
         default: cimg
-    executor: cimg
+    executor: <<parameters.runner>>
     steps:
       - slack/notify:
             event: always
