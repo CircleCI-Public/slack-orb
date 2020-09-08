@@ -60,11 +60,13 @@ ModifyCustomTemplate() {
 
 InstallJq() {
     if echo $OSTYPE | grep darwin > /dev/null 2>&1; then
+        echo "Installing JQ for Mac."
         brew install jq
         return $?
     fi
 
     if cat /etc/issue | grep Alpine > /dev/null 2>&1; then
+        echo "Installing JQ for Alpine."
         apk add jq
         return $?
     fi
@@ -73,6 +75,7 @@ InstallJq() {
         if [[ $EUID == 0 ]]; then export SUDO=""; else # Check if we're root
             export SUDO="sudo";
         fi
+        echo "Installing JQ for Debian."
         $SUDO apt update
         $SUDO apt install -y jq
         return $?
@@ -104,8 +107,12 @@ BranchFilter() {
 # This is done so this script may be tested.
 if [[ "$_" == "$0" ]]; then
     source "/tmp/SLACK_JOB_STATUS"
+    echo "DEBUG: Installing JQ"
     InstallJq
+    echo "DEBUG: Setting Env Vars"
     SetEnvVars
+    echo "DEBUG: Building Body"
     BuildMessageBody
+    echo "DEBUG: Send Notification"
     Notify
 fi
