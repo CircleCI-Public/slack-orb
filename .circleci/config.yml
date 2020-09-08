@@ -20,9 +20,16 @@ executors:
   cimg:
     docker:
       - image: cimg/base:stable
+  mac:
+    macos:
+      xcode: 11.7.0
 
 jobs:
   integration-test-templates:
+    parameters:
+      runner:
+        type: executor
+        default: cimg
     executor: cimg
     steps:
       - slack/notify:
@@ -112,7 +119,10 @@ workflows:
       # your integration test jobs go here: essentially, run all your orb's
       # jobs and commands to ensure they behave as expected. or, run other
       # integration tests of your choosing
-      - integration-test-templates
+      - integration-test-templates:
+          matrix:
+            parameters:
+              runner: [cimg, mac]
 
       - orb-tools/dev-promote-prod-from-commit-subject:
           orb-name: circleci/slack
@@ -122,7 +132,7 @@ workflows:
           bot-user: cpe-bot
           fail-if-semver-not-indicated: true
           publish-version-tag: true
-          ssh-fingerprints: xxx
+          ssh-fingerprints: 79:ae:f5:10:17:8a:d2:9a:ed:63:5c:b0:92:66:23:49
           requires:
             - integration-test-templates
           filters:
