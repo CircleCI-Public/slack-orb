@@ -41,7 +41,7 @@ jobs:
                     "type": "section",
                     "text": {
                       "type": "mrkdwn",
-                      "text": "This is a *markdown* enabled field."
+                      "text": "Current Job: $CIRCLE_JOB"
                     }
                   },
                   {
