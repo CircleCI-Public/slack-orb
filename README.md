@@ -50,9 +50,12 @@ The Slack Orb comes with a number of included templates to get your started with
 ## Branch Filtering
 
 Limit Slack notifications to particular branches with the "branch_pattern" parameter.
-`A comma separated list of regex matchable branch names. Notifications will only be sent if sent from a job from these branches. By default ".+" will be used to match all branches. Pattern must match the full string, no partial matches.`
 
+```
+A comma separated list of regex matchable branch names. Notifications will only be sent if sent from a job from these branches. By default ".+" will be used to match all branches. Pattern must match the full string, no partial matches.
+```
 
+See usage examples.
 
 ## FAQ
 
@@ -77,6 +80,14 @@ Limit Slack notifications to particular branches with the "branch_pattern" param
 
 **A:**
   Each step executes as a separate shell. To export environment variables for use in over steps, they must be added to `BASH_ENV`. View [Using Environment Variables](https://circleci.com/docs/2.0/env-vars/#using-parameters-and-bash-environment) and the included usage examples.
+
+---
+
+**Q:**
+  Can other orbs use this Slack Orb?
+
+**A:**
+  If you would like to integrate with this orb from your own orb or service, we recommend hacking your orb generate a `template.json` file containing the payload of your desired message and saving the destination to an environment variable. Make sure to export the environment variable to `$BASH_ENV`. The user can the select the environment variable created as the template for the Slack Orb notification.
 
 ---
 
