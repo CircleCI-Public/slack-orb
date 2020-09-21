@@ -27,8 +27,9 @@ BuildMessageBody() {
 
 PostToSlack() {
     curl -f -X POST -H 'Content-type: application/json' \
+        -H "Authorization: Bearer $SLACK_ACCESS_TOKEN" \
         --data \
-        "$SLACK_MSG_BODY" "$INTRNL_SLACK_WEBHOOK"
+        "$SLACK_MSG_BODY"
 }
 
 Notify() {
@@ -53,8 +54,10 @@ ModifyCustomTemplate() {
         CUSTOM_BODY_MODIFIED=$(echo "$SLACK_PARAM_CUSTOM" | jq '. + {"text": ""}')
     else
         # In case the text field was set manually.
-        CUSTOM_BODY_MODIFIED=$(echo $SLACK_PARAM_CUSTOM | jq '.')
+        CUSTOM_BODY_MODIFIED=$(echo "$SLACK_PARAM_CUSTOM" | jq '.')
     fi
+    # Insert the default channel. THIS IS TEMPORARY
+    CUSTOM_BODY_MODIFIED=$(echo "$SLACK_PARAM_CUSTOM" | jq '. + {"channel": "CDD5K9SBW"}')
     echo "$CUSTOM_BODY_MODIFIED"
 }
 
