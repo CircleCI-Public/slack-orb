@@ -3,12 +3,11 @@ description: >
   Must be the last step in a job.
 
 parameters:
-  webhook:
+  oauth_token:
     type: string
-    default: ${SLACK_WEBHOOK}
+    default: ${SLACK_OAUTH_TOKEN}
     description: >
-      Enter either your Webhook value or use the CircleCI UI to add your
-      token under the 'SLACK_WEBHOOK' env var
+      Enter either your 'Bot User OAuth Access Token' from Slack. The token should be available at https://api.slack.com/apps/A01AW6YH22J/oauth? or use the CircleCI UI to add your token under the 'SLACK_OAUTH_TOKEN' env var. Typically 'xoxb-##########-#############-************************'
 
   success_message:
     type: string
@@ -65,9 +64,9 @@ parameters:
 
   channel:
     type: string
-    default: ""
+    default: '#general'
     description: >
-      ID of channel if set, overrides webhook's default channel setting
+      Defaults to #general best to set this to a channel that does not have the entire org
 
 steps:
   - run:
@@ -112,10 +111,10 @@ steps:
         done
 
         if [ "x" == "x<< parameters.only_for_branches>>" ] || [ "$current_branch_in_filter" = true ]; then
-          # Provide error if no webhook is set and error. Otherwise continue
-          if [ -z "<< parameters.webhook >>" ]; then
-            echo "NO SLACK WEBHOOK SET"
-            echo "Please input your SLACK_WEBHOOK value either in the settings for this project, or as a parameter for this orb."
+          # Provide error if no oAuth Token is set and error. Otherwise continue
+        if [ -z "<< parameters.oauth_token >>" ]; then
+          echo "NO SLACK OAuth Token SET"
+          echo "Please input your SLACK_OAUTH_TOKEN value either in the settings for this project, or as a parameter for this orb."
             exit 1
           else
             #Create Members string
@@ -139,6 +138,7 @@ steps:
                 echo '"fail_only" is set to "true". No Slack notification sent.'
               else
                 curl -X POST -H 'Content-type: application/json' \
+                  -H 'Authorization: Bearer << parameters.oauth_token >>' \
                   --data "{ \
                             <<# parameters.channel >>
                             \"channel\": \"<< parameters.channel >>\", \
@@ -175,7 +175,7 @@ steps:
                                 \"color\": \"#1CBF43\" \
                               } \
                             ] \
-                          } " << parameters.webhook >>
+                          } " 'https://slack.com/api/chat.postMessage'
                 echo "Job completed successfully. Alert sent."
               fi
             else
@@ -187,6 +187,7 @@ steps:
                 echo '"success_only" is set to "true". No Slack notification sent.'
               else
                 curl -X POST -H 'Content-type: application/json' \
+                  -H 'Authorization: Bearer << parameters.oauth_token >>' \
                   --data "{ \
                     <<# parameters.channel >>
                     \"channel\": \"<< parameters.channel >>\", \
@@ -223,7 +224,7 @@ steps:
                         \"color\": \"#ed5c5c\" \
                       } \
                     ] \
-                  } " << parameters.webhook >>
+                  } " 'https://slack.com/api/chat.postMessage'
                 echo "Job failed. Alert sent."
               fi
             fi

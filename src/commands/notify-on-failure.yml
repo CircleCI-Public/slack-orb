@@ -10,7 +10,21 @@ parameters:
       If set, a comma-separated list of branches for which to send
       notifications. No spaces.
 
+  oauth_token:
+    type: string
+    default: ${SLACK_OAUTH_TOKEN}
+    description: >
+      Enter either your 'Bot User OAuth Access Token' from Slack. The token should be available at https://api.slack.com/apps/A01AW6YH22J/oauth? or use the CircleCI UI to add your token under the 'SLACK_OAUTH_TOKEN' env var. Typically 'xoxb-##########-#############-************************'
+
+  channel:
+    type: string
+    default: '#general'
+    description: >
+      Defaults to #general best to set this to a channel that does not have the entire org
+
 steps:
   - status:
       fail_only: true
-      only_for_branches: <<parameters.only_for_branches>>
+      only_for_branches:  << parameters.only_for_branches >>
+      oauth_token:        << parameters.oauth_token >>
+      channel:            << parameters.channel >>

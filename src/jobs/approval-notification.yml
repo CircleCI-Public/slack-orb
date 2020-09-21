@@ -1,10 +1,11 @@
 description: Notify Slack about an awaiting approval job
 
 parameters:
-  webhook:
-    description: Enter either your Webhook value or use the CircleCI UI to add your token under the 'SLACK_WEBHOOK' env var
+  oauth_token:
     type: string
-    default: ${SLACK_WEBHOOK}
+    default: ${SLACK_OAUTH_TOKEN}
+    description: >
+      Enter either your 'Bot User OAuth Access Token' from Slack. The token should be available at https://api.slack.com/apps/A01AW6YH22J/oauth? or use the CircleCI UI to add your token under the 'SLACK_OAUTH_TOKEN' env var. Typically 'xoxb-##########-#############-************************'
 
   message:
     description: Enter custom message.
@@ -40,15 +41,15 @@ parameters:
 
   channel:
     type: string
-    default: ""
+    default: '#general'
     description: >
-      ID of channel if set, overrides webhook's default channel setting
+      Defaults to #general best to set this to a channel that does not have the entire org
 
 executor: alpine
 
 steps:
   - approval:
-      webhook: << parameters.webhook >>
+      oauth_token: << parameters.oauth_token >>
       message: << parameters.message >>
       color: << parameters.color >>
       mentions: << parameters.mentions >>
