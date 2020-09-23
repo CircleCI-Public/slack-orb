@@ -44,6 +44,18 @@ parameters:
     description: >
       ID of channel if set, overrides webhook's default channel setting
 
+  icon_emoji:
+    type: string
+    default: ""
+    description: >
+      Emoji to use for Slack message's avatar. Eg ":joy:". If unset, uses the webhook's default
+
+  username:
+    type: string
+    default: ""
+    description: >
+      Username to use for Slack message. Eg "CircleBot". If unset, uses the webhook's default
+
 executor: alpine
 
 steps:
@@ -56,3 +68,5 @@ steps:
       include_job_number_field: << parameters.include_job_number_field >>
       url: << parameters.url >>
       channel: << parameters.channel >>
+      icon_emoji: << parameters.icon_emoji >>
+      username: << parameters.username >>

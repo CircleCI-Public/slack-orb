@@ -38,6 +38,8 @@ Send a notification that a manual approval job is ready
 | `message` | `string` | A workflow in CircleCI is awaiting your approval. | Enter custom message. |
 | `url` | `string` | 'https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}' | The URL to link back to. |
 | `webhook` | `string` | '${SLACK_WEBHOOK}' | Enter either your Webhook value or use the CircleCI UI to add the webhook under the 'SLACK_WEBHOOK' env var |
+| `icon_emoji` | `string` | | Emoji to use for Slack message's avatar. Eg ":joy:". If unset, uses the webhook's default |
+| `username` | `string` | | Username to use for Slack message. Eg "CircleBot". If unset, uses the webhook's default |
 
 Example:
 
@@ -78,6 +80,8 @@ Notify a slack channel with a custom message at any point in a job with this cus
 | `include_job_number_field` | `boolean` | `true` | Whether or not to include the _Job Number_ field in the message |
 | `include_visit_job_action` | `boolean` | `true` | Whether or not to include the _Visit Job_ action in the message |
 | `channel` | `string` | | ID of channel if set, overrides webhook's default channel setting |
+| `icon_emoji` | `string` | | Emoji to use for Slack message's avatar. Eg ":joy:". If unset, uses the webhook's default |
+| `username` | `string` | | Username to use for Slack message. Eg "CircleBot". If unset, uses the webhook's default |
 
 [Slack message attachment]: https://api.slack.com/docs/message-attachments
 
@@ -121,6 +125,8 @@ Send a status alert at the end of a job based on success or failure. This must b
 | `include_job_number_field` | `boolean` | `true` | Whether or not to include the _Job Number_ field in the message |
 | `include_visit_job_action` | `boolean` | `true` | Whether or not to include the _Visit Job_ action in the message |
 | `channel` | `string` | | ID of channel if set, overrides webhook's default channel setting |
+| `icon_emoji` | `string` | | Emoji to use for Slack message's avatar. Eg ":joy:". If unset, uses the webhook's default |
+| `username` | `string` | | Username to use for Slack message. Eg "CircleBot". If unset, uses the webhook's default |
 
 Example:
 

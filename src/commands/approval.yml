@@ -44,6 +44,18 @@ parameters:
     description: >
       ID of channel if set, overrides webhook's default channel setting
 
+  icon_emoji:
+    type: string
+    default: ""
+    description: >
+      Emoji to use for Slack message's avatar. Eg ":joy:". If unset, uses the webhook's default
+
+  username:
+    type: string
+    default: ""
+    description: >
+      Username to use for Slack message. Eg "CircleBot". If unset, uses the webhook's default
+
 steps:
   - run:
       name: Provide error if non-bash shell
@@ -89,6 +101,12 @@ steps:
               <<# parameters.channel >>
               \"channel\": \"<< parameters.channel >>\", \
               <</ parameters.channel >>
+              <<# parameters.icon_emoji >>
+              \"icon_emoji\": \"<< parameters.icon_emoji >>\", \
+              <</ parameters.icon_emoji >>
+              <<# parameters.username >>
+              \"username\": \"<< parameters.username >>\", \
+              <</ parameters.username >>
               \"attachments\": [ \
                 { \
                   \"fallback\": \"<< parameters.message >> - << parameters.url >>\", \
