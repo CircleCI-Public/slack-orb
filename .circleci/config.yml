@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   orb-tools: circleci/orb-tools@8.27.3
-  slack: circleci/slack@dev:alpha
+  slack: circleci/slack@dev:staging
 
 jobs:
   notifytest:
