@@ -57,7 +57,7 @@ ModifyCustomTemplate() {
         CUSTOM_BODY_MODIFIED=$(echo "$SLACK_PARAM_CUSTOM" | jq '.')
     fi
     # Insert the default channel. THIS IS TEMPORARY
-    CUSTOM_BODY_MODIFIED=$(echo "$SLACK_PARAM_CUSTOM" | jq '. + {"channel": "CDD5K9SBW"}')
+    CUSTOM_BODY_MODIFIED=$(echo "$CUSTOM_BODY_MODIFIED" | jq '. + {"channel": "$SLACK_DEFAULT_CHANNEL"}')
     echo "$CUSTOM_BODY_MODIFIED"
 }
 
