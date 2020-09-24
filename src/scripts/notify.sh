@@ -24,6 +24,7 @@ BuildMessageBody() {
     fi
     # Insert the default channel. THIS IS TEMPORARY
     T2=$(echo "$T2" | jq '. + {"channel": "$SLACK_DEFAULT_CHANNEL"}')
+    echo $T2
     SLACK_MSG_BODY=$T2
 }
 
@@ -58,7 +59,6 @@ ModifyCustomTemplate() {
         # In case the text field was set manually.
         CUSTOM_BODY_MODIFIED=$(echo "$SLACK_PARAM_CUSTOM" | jq '.')
     fi
-    echo "$CUSTOM_BODY_MODIFIED"
 }
 
 InstallJq() {
