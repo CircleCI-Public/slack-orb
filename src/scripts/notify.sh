@@ -23,7 +23,7 @@ BuildMessageBody() {
         exit 1
     fi
     # Insert the default channel. THIS IS TEMPORARY
-    T2=$(echo "$T2" | jq '. + {"channel": "$SLACK_DEFAULT_CHANNEL"}')
+    T2=$(echo "$T2" | jq ". + {\"channel\": \"$SLACK_DEFAULT_CHANNEL\"}")
     echo $T2
     SLACK_MSG_BODY=$T2
 }
