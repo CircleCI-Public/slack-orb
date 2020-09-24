@@ -10,7 +10,6 @@ BuildMessageBody() {
     #   If none, error.
     if [ -n "$SLACK_PARAM_CUSTOM" ]; then
         ModifyCustomTemplate
-        echo
         CUSTOM_BODY_MODIFIED=$(echo $CUSTOM_BODY_MODIFIED | sed 's/"/\\"/g' | sed 's/\\n/\\\\n/g' | sed 's/|/\\|/g' | sed 's/</\\</g' | sed 's/>/\\>/g')
         T2=$(eval echo "$CUSTOM_BODY_MODIFIED")
     elif [ -n "$SLACK_PARAM_TEMPLATE" ]; then
@@ -22,13 +21,16 @@ BuildMessageBody() {
         echo "Select either a custom template or one of the pre-included ones via the 'custom' or 'template' parameters."
         exit 1
     fi
+    # Insert the default channel. THIS IS TEMPORARY
+    T2=$(echo "$T2" | jq ". + {\"channel\": \"$SLACK_DEFAULT_CHANNEL\"}")
     SLACK_MSG_BODY=$T2
 }
 
 PostToSlack() {
-    curl -f -X POST -H 'Content-type: application/json' \
+    curl -s -f -X POST -H 'Content-type: application/json' \
+        -H "Authorization: Bearer $SLACK_ACCESS_TOKEN" \
         --data \
-        "$SLACK_MSG_BODY" "$INTRNL_SLACK_WEBHOOK"
+        "$SLACK_MSG_BODY" https://slack.com/api/chat.postMessage > /dev/null
 }
 
 Notify() {
@@ -53,21 +55,20 @@ ModifyCustomTemplate() {
         CUSTOM_BODY_MODIFIED=$(echo "$SLACK_PARAM_CUSTOM" | jq '. + {"text": ""}')
     else
         # In case the text field was set manually.
-        CUSTOM_BODY_MODIFIED=$(echo $SLACK_PARAM_CUSTOM | jq '.')
+        CUSTOM_BODY_MODIFIED=$(echo "$SLACK_PARAM_CUSTOM" | jq '.')
     fi
-    echo "$CUSTOM_BODY_MODIFIED"
 }
 
 InstallJq() {
     if echo $OSTYPE | grep darwin > /dev/null 2>&1; then
         echo "Installing JQ for Mac."
-        brew install jq
+        brew install jq --quiet
         return $?
     fi
 
     if cat /etc/issue | grep Alpine > /dev/null 2>&1; then
         echo "Installing JQ for Alpine."
-        apk add jq
+        apk -q add jq
         return $?
     fi
 
@@ -76,8 +77,8 @@ InstallJq() {
             export SUDO="sudo";
         fi
         echo "Installing JQ for Debian."
-        $SUDO apt update
-        $SUDO apt install -y jq
+        $SUDO apt -qq update
+        $SUDO apt -qq install -y jq
         return $?
     fi
 
@@ -105,19 +106,11 @@ BranchFilter() {
 
 # Will not run if sourced from another script.
 # This is done so this script may be tested.
-
-echo "DEBUG: Checking bash values"
-echo "DEBUG: What is the current shell: $0"
-
 ORB_TEST_ENV="bats-core"
 if [ "${0#*$ORB_TEST_ENV}" == "$0" ]; then
     source "/tmp/SLACK_JOB_STATUS"
-    echo "DEBUG: Installing JQ"
     InstallJq
-    echo "DEBUG: Setting Env Vars"
     SetEnvVars
-    echo "DEBUG: Building Body"
     BuildMessageBody
-    echo "DEBUG: Send Notification"
     Notify
 fi

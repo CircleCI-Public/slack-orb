@@ -120,6 +120,7 @@ workflows:
       # jobs and commands to ensure they behave as expected. or, run other
       # integration tests of your choosing
       - integration-test-templates:
+          context: SLACK_NOTIFICATIONS_TEST
           matrix:
             parameters:
               runner: [cimg, mac]
