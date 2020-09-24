@@ -10,7 +10,6 @@ BuildMessageBody() {
     #   If none, error.
     if [ -n "$SLACK_PARAM_CUSTOM" ]; then
         ModifyCustomTemplate
-        echo
         CUSTOM_BODY_MODIFIED=$(echo $CUSTOM_BODY_MODIFIED | sed 's/"/\\"/g' | sed 's/\\n/\\\\n/g' | sed 's/|/\\|/g' | sed 's/</\\</g' | sed 's/>/\\>/g')
         T2=$(eval echo "$CUSTOM_BODY_MODIFIED")
     elif [ -n "$SLACK_PARAM_TEMPLATE" ]; then
@@ -24,7 +23,6 @@ BuildMessageBody() {
     fi
     # Insert the default channel. THIS IS TEMPORARY
     T2=$(echo "$T2" | jq ". + {\"channel\": \"$SLACK_DEFAULT_CHANNEL\"}")
-    echo $T2
     SLACK_MSG_BODY=$T2
 }
 
@@ -115,12 +113,8 @@ echo "DEBUG: What is the current shell: $0"
 ORB_TEST_ENV="bats-core"
 if [ "${0#*$ORB_TEST_ENV}" == "$0" ]; then
     source "/tmp/SLACK_JOB_STATUS"
-    echo "DEBUG: Installing JQ"
     InstallJq
-    echo "DEBUG: Setting Env Vars"
     SetEnvVars
-    echo "DEBUG: Building Body"
     BuildMessageBody
-    echo "DEBUG: Send Notification"
     Notify
 fi
