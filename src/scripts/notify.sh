@@ -27,10 +27,10 @@ BuildMessageBody() {
 }
 
 PostToSlack() {
-    curl -f -X POST -H 'Content-type: application/json' \
+    curl -s -f -X POST -H 'Content-type: application/json' \
         -H "Authorization: Bearer $SLACK_ACCESS_TOKEN" \
         --data \
-        "$SLACK_MSG_BODY" https://slack.com/api/chat.postMessage
+        "$SLACK_MSG_BODY" https://slack.com/api/chat.postMessage > /dev/null
 }
 
 Notify() {
@@ -62,13 +62,13 @@ ModifyCustomTemplate() {
 InstallJq() {
     if echo $OSTYPE | grep darwin > /dev/null 2>&1; then
         echo "Installing JQ for Mac."
-        brew install jq
+        brew install jq --quiet
         return $?
     fi
 
     if cat /etc/issue | grep Alpine > /dev/null 2>&1; then
         echo "Installing JQ for Alpine."
-        apk add jq
+        apk -q add jq
         return $?
     fi
 
@@ -77,8 +77,8 @@ InstallJq() {
             export SUDO="sudo";
         fi
         echo "Installing JQ for Debian."
-        $SUDO apt update
-        $SUDO apt install -y jq
+        $SUDO apt -qq update
+        $SUDO apt -qq install -y jq
         return $?
     fi
 
