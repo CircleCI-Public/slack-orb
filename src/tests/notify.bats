@@ -32,16 +32,14 @@ setup() {
     [ "$TEXTKEY" == '"User-Added text key"' ]
 }
 
-# @test "4: Test links -  #164" {
-#     # Ensure a custom template has the text key automatically affixed.
-#     TESTLINKURL="http://circleci.com"
-#     SLACK_PARAM_CUSTOM=$(cat $BATS_TEST_DIRNAME/sampleCustomTemplateWithLink.json)
-#     BuildMessageBody
-#     echo "test"
-#     echo $CUSTOM_BODY_MODIFIED
-#     echo "test"
-#     [ "$SLACK_MSG_BODY" == '{ \"blocks\": [ { \"type\": \"section\", \"text\": { \"type\": \"mrkdwn\", \"text\": \"Sample link using environment variable in markdown \<${TESTLINKURL}\|LINK \>\" } } ], \"text\": \"\", \"channel\": \"$SLACK_DEFAULT_CHANNEL\" }' ]
-# }
+@test "4: ModifyCustomTemplate with environment variable in link" {
+    TESTLINKURL="http://circleci.com"
+    SLACK_PARAM_CUSTOM=$(cat $BATS_TEST_DIRNAME/sampleCustomTemplateWithLink.json)
+    SLACK_DEFAULT_CHANNEL="xyz"
+    BuildMessageBody
+    EXPECTED=$(echo "{ \"blocks\": [ { \"type\": \"section\", \"text\": { \"type\": \"mrkdwn\", \"text\": \"Sample link using environment variable in markdown <${TESTLINKURL}|LINK >\" } } ], \"text\": \"\", \"channel\": \"$SLACK_DEFAULT_CHANNEL\" }" | jq)
+    [ "$SLACK_MSG_BODY" == "$EXPECTED" ]
+}
 
 @test "5: Branch Filter - case 1 | match-all default" {
     SLACK_PARAM_BRANCHPATTERN=".+"
