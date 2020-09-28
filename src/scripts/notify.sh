@@ -30,7 +30,7 @@ BuildMessageBody() {
 PostToSlack() {
     # Post once per channel listed by the channel parameter
     #    The channel must be modified in SLACK_MSG_BODY
-    for i in $(echo $SLACK_PARAM_CHANNEL  | sed "s/,/ /g")
+    for i in $(echo $(eval echo "$SLACK_PARAM_CHANNEL")  | sed "s/,/ /g")
     do
         echo "DEBUG: current channel is $i"
         SLACK_MSG_BODY=$(echo $SLACK_MSG_BODY | jq ".channel = $i")
