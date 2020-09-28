@@ -26,11 +26,19 @@ BuildMessageBody() {
     SLACK_MSG_BODY=$T2
 }
 
+
 PostToSlack() {
-    curl -s -f -X POST -H 'Content-type: application/json' \
+    # Post once per channel listed by the channel parameter
+    #    The channel must be modified in SLACK_MSG_BODY
+    for i in $(echo $SLACK_PARAM_CHANNEL  | sed "s/,/ /g")
+    do
+        echo "DEBUG: current channel is $i"
+        SLACK_MSG_BODY=$(echo $SLACK_MSG_BODY | jq ".channel = $i")
+        curl -s -f -X POST -H 'Content-type: application/json' \
         -H "Authorization: Bearer $SLACK_ACCESS_TOKEN" \
         --data \
         "$SLACK_MSG_BODY" https://slack.com/api/chat.postMessage > /dev/null
+    done
 }
 
 Notify() {
