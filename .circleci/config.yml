@@ -77,6 +77,21 @@ jobs:
                 }
               ]
             }
+      - slack/notify:
+          event: pass
+          custom: >
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Sorry for the ping. Please ignore this message, it will likely show twice if it works. \nThis notificiation is from the new Slack orb and supports sending messages to multiple channels at once."
+                  }
+                }
+              ]
+            }
+          channel: "$SLACK_DEFAULT_CHANNEL, G0110BV8CJD"
 
 workflows:
 
