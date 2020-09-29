@@ -1,8 +1,3 @@
-
-SetEnvVars() {
-    INTRNL_SLACK_WEBHOOK=$(eval echo "$SLACK_PARAM_WEBHOOK")
-}
-
 BuildMessageBody() {
     # Send message
     #   If sending message, default to custom template,
@@ -61,7 +56,6 @@ Notify() {
 
 ModifyCustomTemplate() {
     # Inserts the required "text" field to the custom json template from block kit builder.
-    # Block Kit Builder will not work with webhooks without this.
     if [ "$(echo "$SLACK_PARAM_CUSTOM" | jq '.text')" == "null" ]; then
         CUSTOM_BODY_MODIFIED=$(echo "$SLACK_PARAM_CUSTOM" | jq '. + {"text": ""}')
     else
@@ -121,7 +115,6 @@ ORB_TEST_ENV="bats-core"
 if [ "${0#*$ORB_TEST_ENV}" == "$0" ]; then
     source "/tmp/SLACK_JOB_STATUS"
     InstallJq
-    SetEnvVars
     BuildMessageBody
     Notify
 fi

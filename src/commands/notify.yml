@@ -1,10 +1,6 @@
 description: Notify a Slack channel with a custom message
 
 parameters:
-  webhook:
-    description: Enter the name of the envionment variable containing your Slack Webhook URL.
-    type: env_var_name
-    default: SLACK_WEBHOOK
   template:
     description: "Use one of the built-in templates. Select the template name. Preview each template on the gitHub Readme: "
     type: string
@@ -58,7 +54,6 @@ steps:
       name: Slack - Sending Notification
       environment:
         SLACK_PARAM_EVENT: "<<parameters.event>>"
-        SLACK_PARAM_WEBHOOK: "$<<parameters.webhook>>"
         SLACK_PARAM_TEMPLATE: "<<parameters.template>>"
         SLACK_PARAM_CUSTOM: "<<parameters.custom>>"
         SLACK_PARAM_MENTIONS: "<<parameters.mentions>>"
