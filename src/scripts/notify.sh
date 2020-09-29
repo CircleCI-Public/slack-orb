@@ -33,7 +33,10 @@ PostToSlack() {
     for i in $(echo $(eval echo "$SLACK_PARAM_CHANNEL")  | sed "s/,/ /g")
     do
         echo "DEBUG: current channel is $i"
-        SLACK_MSG_BODY=$(echo $SLACK_MSG_BODY | jq ".channel = $i")
+        echo "DEBUG: The Current Slack Body: "
+        echo "$SLACK_MSG_BODY"
+        echo "DEBUG: Modifying channel "
+        SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg channel "$i" '.channel = $channel')
         curl -s -f -X POST -H 'Content-type: application/json' \
         -H "Authorization: Bearer $SLACK_ACCESS_TOKEN" \
         --data \
