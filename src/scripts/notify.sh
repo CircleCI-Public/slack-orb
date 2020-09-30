@@ -36,7 +36,7 @@ PostToSlack() {
 }
 
 Notify() {
-    if [[ "$CCI_STATUS" == "$SLACK_PARAM_EVENT" || "$SLACK_PARAM_EVENT" == "always" ]]; then
+    if [ "$CCI_STATUS" = "$SLACK_PARAM_EVENT" ] || [ "$SLACK_PARAM_EVENT" = "always" ]; then
     BranchFilter # In the event the Slack notification would be sent, first ensure it is allowed to trigger on this branch.
     PostToSlack
     echo "Sending Notification"
@@ -52,7 +52,7 @@ Notify() {
 
 ModifyCustomTemplate() {
     # Inserts the required "text" field to the custom json template from block kit builder.
-    if [ "$(echo "$SLACK_PARAM_CUSTOM" | jq '.text')" == "null" ]; then
+    if [ "$(echo "$SLACK_PARAM_CUSTOM" | jq '.text')" = "null" ]; then
         CUSTOM_BODY_MODIFIED=$(echo "$SLACK_PARAM_CUSTOM" | jq '. + {"text": ""}')
     else
         # In case the text field was set manually.
@@ -74,7 +74,7 @@ InstallJq() {
     fi
 
     if cat /etc/issue | grep Debian > /dev/null 2>&1 || cat /etc/issue | grep Ubuntu > /dev/null 2>&1; then
-        if [[ $EUID == 0 ]]; then export SUDO=""; else # Check if we're root
+        if [ "$EUID" = 0 ]; then export SUDO=""; else # Check if we're root
             export SUDO="sudo";
         fi
         echo "Installing JQ for Debian."
@@ -108,8 +108,8 @@ BranchFilter() {
 # Will not run if sourced from another script.
 # This is done so this script may be tested.
 ORB_TEST_ENV="bats-core"
-if [ "${0#*$ORB_TEST_ENV}" == "$0" ]; then
-    source "/tmp/SLACK_JOB_STATUS"
+if [ "${0#*$ORB_TEST_ENV}" = "$0" ]; then
+    . "/tmp/SLACK_JOB_STATUS"
     InstallJq
     BuildMessageBody
     Notify
