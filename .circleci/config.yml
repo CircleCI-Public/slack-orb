@@ -4,6 +4,7 @@ orbs:
   slack: circleci/slack@<<pipeline.parameters.dev-orb-version>>
   orb-tools: circleci/orb-tools@9.3
   bats: circleci/bats@1.0
+  shellcheck: circleci/shellcheck@2.0
 
 # Pipeline parameters
 parameters:
@@ -84,6 +85,11 @@ workflows:
     unless: << pipeline.parameters.run-integration-tests >>
     jobs:
       - orb-tools/lint
+      # Shellcheck is set to validate on sh to attempt to maximize portability.
+      - shellcheck/check:
+          dir: ./src/scripts
+          exclude: SC2148, SC2001, SC1091
+          shell: sh
       - bats/run:
           path: ./src/tests
       # pack your orb YAML files to a single orb.yml
@@ -103,6 +109,7 @@ workflows:
           requires:
             - orb-tools/pack
             - orb-tools/lint
+            - shellcheck/check
             - bats/run
 
       # trigger an integration workflow to test the
