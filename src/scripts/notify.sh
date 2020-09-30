@@ -6,11 +6,11 @@ BuildMessageBody() {
     if [ -n "$SLACK_PARAM_CUSTOM" ]; then
         ModifyCustomTemplate
         CUSTOM_BODY_MODIFIED=$(echo "$CUSTOM_BODY_MODIFIED" | sed 's/"/\\"/g' | sed 's/\\n/\\\\n/g' | sed 's/|/\\|/g' | sed 's/</\\</g' | sed 's/>/\\>/g')
-        T2=$(eval echo "$CUSTOM_BODY_MODIFIED")
+        T2=$(eval echo $CUSTOM_BODY_MODIFIED)
     elif [ -n "$SLACK_PARAM_TEMPLATE" ]; then
         TEMPLATE="$(echo \$$SLACK_PARAM_TEMPLATE)"
-        T1=$(eval echo "$TEMPLATE" | sed 's/"/\\"/g' | sed 's/\\n/\\\\n/g')
-        T2=$(eval echo "$T1")
+        T1=$(eval echo $TEMPLATE | sed 's/"/\\"/g' | sed 's/\\n/\\\\n/g')
+        T2=$(eval echo $T1)
     else
         echo "Error: No message template selected."
         echo "Select either a custom template or one of the pre-included ones via the 'custom' or 'template' parameters."
