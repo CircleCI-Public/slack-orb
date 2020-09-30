@@ -5,12 +5,12 @@ BuildMessageBody() {
     #   If none, error.
     if [ -n "$SLACK_PARAM_CUSTOM" ]; then
         ModifyCustomTemplate
-        CUSTOM_BODY_MODIFIED=$(echo $CUSTOM_BODY_MODIFIED | sed 's/"/\\"/g' | sed 's/\\n/\\\\n/g' | sed 's/|/\\|/g' | sed 's/</\\</g' | sed 's/>/\\>/g')
+        CUSTOM_BODY_MODIFIED=$(echo "$CUSTOM_BODY_MODIFIED" | sed 's/"/\\"/g' | sed 's/\\n/\\\\n/g' | sed 's/|/\\|/g' | sed 's/</\\</g' | sed 's/>/\\>/g')
         T2=$(eval echo "$CUSTOM_BODY_MODIFIED")
     elif [ -n "$SLACK_PARAM_TEMPLATE" ]; then
         TEMPLATE="$(echo \$$SLACK_PARAM_TEMPLATE)"
-        T1=$(eval echo $TEMPLATE | sed 's/"/\\"/g' | sed 's/\\n/\\\\n/g')
-        T2=$(eval echo $T1)
+        T1=$(eval echo "$TEMPLATE" | sed 's/"/\\"/g' | sed 's/\\n/\\\\n/g')
+        T2=$(eval echo "$T1")
     else
         echo "Error: No message template selected."
         echo "Select either a custom template or one of the pre-included ones via the 'custom' or 'template' parameters."
@@ -27,10 +27,6 @@ PostToSlack() {
     #    The channel must be modified in SLACK_MSG_BODY
     for i in $(echo $(eval echo "$SLACK_PARAM_CHANNEL")  | sed "s/,/ /g")
     do
-        echo "DEBUG: current channel is $i"
-        echo "DEBUG: The Current Slack Body: "
-        echo "$SLACK_MSG_BODY"
-        echo "DEBUG: Modifying channel "
         SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg channel "$i" '.channel = $channel')
         curl -s -f -X POST -H 'Content-type: application/json' \
         -H "Authorization: Bearer $SLACK_ACCESS_TOKEN" \
@@ -65,7 +61,7 @@ ModifyCustomTemplate() {
 }
 
 InstallJq() {
-    if echo $OSTYPE | grep darwin > /dev/null 2>&1; then
+    if echo "$OSTYPE" | grep darwin > /dev/null 2>&1; then
         echo "Installing JQ for Mac."
         brew install jq --quiet
         return $?
