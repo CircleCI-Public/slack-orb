@@ -1,4 +1,4 @@
-
+#!/bin/sh
 SetEnvVars() {
     INTRNL_SLACK_WEBHOOK=$(eval echo "$SLACK_PARAM_WEBHOOK")
 }
@@ -89,7 +89,7 @@ BranchFilter() {
     FLAG_MATCHES_FILTER="false"
     for i in $(echo "$SLACK_PARAM_BRANCHPATTERN" | sed "s/,/ /g")
     do
-     if [[ "$CIRCLE_BRANCH" =~ ^${i}$ ]]; then
+     if echo "$CIRCLE_BRANCH" | grep -Eq ^${i}$ ; then
         FLAG_MATCHES_FILTER="true"
         break
      fi
