@@ -1,8 +1,3 @@
-#!/bin/sh
-SetEnvVars() {
-    INTRNL_SLACK_WEBHOOK=$(eval echo "$SLACK_PARAM_WEBHOOK")
-}
-
 BuildMessageBody() {
     # Send message
     #   If sending message, default to custom template,
@@ -10,8 +5,8 @@ BuildMessageBody() {
     #   If none, error.
     if [ -n "$SLACK_PARAM_CUSTOM" ]; then
         ModifyCustomTemplate
-        CUSTOM_BODY_MODIFIED=$(echo $CUSTOM_BODY_MODIFIED | sed 's/"/\\"/g' | sed 's/\\n/\\\\n/g' | sed 's/|/\\|/g' | sed 's/</\\</g' | sed 's/>/\\>/g')
-        T2=$(eval echo "$CUSTOM_BODY_MODIFIED")
+        CUSTOM_BODY_MODIFIED=$(echo "$CUSTOM_BODY_MODIFIED" | sed 's/"/\\"/g' | sed 's/\\n/\\\\n/g' | sed 's/|/\\|/g' | sed 's/</\\</g' | sed 's/>/\\>/g')
+        T2=$(eval echo $CUSTOM_BODY_MODIFIED)
     elif [ -n "$SLACK_PARAM_TEMPLATE" ]; then
         TEMPLATE="$(echo \$$SLACK_PARAM_TEMPLATE)"
         T1=$(eval echo $TEMPLATE | sed 's/"/\\"/g' | sed 's/\\n/\\\\n/g')
@@ -26,11 +21,18 @@ BuildMessageBody() {
     SLACK_MSG_BODY=$T2
 }
 
+
 PostToSlack() {
-    curl -s -f -X POST -H 'Content-type: application/json' \
+    # Post once per channel listed by the channel parameter
+    #    The channel must be modified in SLACK_MSG_BODY
+    for i in $(echo $(eval echo "$SLACK_PARAM_CHANNEL")  | sed "s/,/ /g")
+    do
+        SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg channel "$i" '.channel = $channel')
+        curl -s -f -X POST -H 'Content-type: application/json' \
         -H "Authorization: Bearer $SLACK_ACCESS_TOKEN" \
         --data \
         "$SLACK_MSG_BODY" https://slack.com/api/chat.postMessage > /dev/null
+    done
 }
 
 Notify() {
@@ -50,7 +52,6 @@ Notify() {
 
 ModifyCustomTemplate() {
     # Inserts the required "text" field to the custom json template from block kit builder.
-    # Block Kit Builder will not work with webhooks without this.
     if [ "$(echo "$SLACK_PARAM_CUSTOM" | jq '.text')" == "null" ]; then
         CUSTOM_BODY_MODIFIED=$(echo "$SLACK_PARAM_CUSTOM" | jq '. + {"text": ""}')
     else
@@ -60,7 +61,7 @@ ModifyCustomTemplate() {
 }
 
 InstallJq() {
-    if echo $OSTYPE | grep darwin > /dev/null 2>&1; then
+    if echo "$OSTYPE" | grep darwin > /dev/null 2>&1; then
         echo "Installing JQ for Mac."
         brew install jq --quiet
         return $?
@@ -110,7 +111,6 @@ ORB_TEST_ENV="bats-core"
 if [ "${0#*$ORB_TEST_ENV}" == "$0" ]; then
     source "/tmp/SLACK_JOB_STATUS"
     InstallJq
-    SetEnvVars
     BuildMessageBody
     Notify
 fi

@@ -1,6 +1,5 @@
 setup() {
     source ./src/scripts/notify.sh
-    export INTRNL_SLACK_WEBHOOK="x"
     export SLACK_PARAM_BRANCHPATTERN=$(cat $BATS_TEST_DIRNAME/sampleBranchFilters.txt)
 }
 

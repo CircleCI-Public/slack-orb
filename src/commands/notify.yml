@@ -1,10 +1,6 @@
 description: Notify a Slack channel with a custom message
 
 parameters:
-  webhook:
-    description: Enter the name of the envionment variable containing your Slack Webhook URL.
-    type: env_var_name
-    default: SLACK_WEBHOOK
   template:
     description: "Use one of the built-in templates. Select the template name. Preview each template on the gitHub Readme: "
     type: string
@@ -36,6 +32,11 @@ parameters:
       If the username contains a space, the Slack ID must be used with angled brackets: "<@U8XXXXXXX>"
     type: string
     default: ""
+  channel:
+      description: |
+        Select which channel in which to post to. Channel name or ID will work. You may include a comma separated list of channels if you wish to post to multiple channels at once. Set the "SLACK_DEFAULT_CHANNEL" environment variable for the default channel.
+      type: string
+      default: $SLACK_DEFAULT_CHANNEL
 
 steps:
   - run:
@@ -53,11 +54,11 @@ steps:
       name: Slack - Sending Notification
       environment:
         SLACK_PARAM_EVENT: "<<parameters.event>>"
-        SLACK_PARAM_WEBHOOK: "$<<parameters.webhook>>"
         SLACK_PARAM_TEMPLATE: "<<parameters.template>>"
         SLACK_PARAM_CUSTOM: "<<parameters.custom>>"
         SLACK_PARAM_MENTIONS: "<<parameters.mentions>>"
         SLACK_PARAM_BRANCHPATTERN: "<<parameters.branch_pattern>>"
+        SLACK_PARAM_CHANNEL: "<<parameters.channel>>"
         # import pre-built templates using the orb-pack local script include.
         basic_fail_1: "<<include(message_templates/basic_fail_1.json)>>"
         success_tagged_deploy_1: "<<include(message_templates/success_tagged_deploy_1.json)>>"
