@@ -24,6 +24,9 @@ executors:
   mac:
     macos:
       xcode: 11.7.0
+  alpine:
+    docker:
+      - image: alpine
 
 jobs:
   integration-test-templates:
@@ -130,7 +133,7 @@ workflows:
           context: SLACK_NOTIFICATIONS_TEST
           matrix:
             parameters:
-              runner: [cimg, mac]
+              runner: [cimg, mac, alpine]
 
       - orb-tools/dev-promote-prod-from-commit-subject:
           orb-name: circleci/slack
