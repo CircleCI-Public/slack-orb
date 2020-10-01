@@ -88,7 +88,7 @@ workflows:
       # Shellcheck is set to validate on sh to attempt to maximize portability.
       - shellcheck/check:
           dir: ./src/scripts
-          exclude: SC2148,SC2001,SC1091
+          exclude: SC2148,SC2001,SC1091,SC2086,SC2116,SC2046,SC2005,SC2002
           shell: sh
       - bats/run:
           path: ./src/tests
