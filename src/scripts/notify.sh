@@ -36,7 +36,7 @@ PostToSlack() {
 }
 
 Notify() {
-    if [[ "$CCI_STATUS" == "$SLACK_PARAM_EVENT" || "$SLACK_PARAM_EVENT" == "always" ]]; then
+    if [ "$CCI_STATUS" = "$SLACK_PARAM_EVENT" ] || [ "$SLACK_PARAM_EVENT" = "always" ]; then
     BranchFilter # In the event the Slack notification would be sent, first ensure it is allowed to trigger on this branch.
     PostToSlack
     echo "Sending Notification"
@@ -52,7 +52,7 @@ Notify() {
 
 ModifyCustomTemplate() {
     # Inserts the required "text" field to the custom json template from block kit builder.
-    if [ "$(echo "$SLACK_PARAM_CUSTOM" | jq '.text')" == "null" ]; then
+    if [ "$(echo "$SLACK_PARAM_CUSTOM" | jq '.text')" = "null" ]; then
         CUSTOM_BODY_MODIFIED=$(echo "$SLACK_PARAM_CUSTOM" | jq '. + {"text": ""}')
     else
         # In case the text field was set manually.
@@ -61,22 +61,21 @@ ModifyCustomTemplate() {
 }
 
 InstallJq() {
-    if echo "$OSTYPE" | grep darwin > /dev/null 2>&1; then
+    if [ "$(id -u)" = 0 ]; then export SUDO=""; else # Check if we're root
+        export SUDO="sudo";
+    fi
+    if uname -a | grep darwin > /dev/null 2>&1; then
         echo "Installing JQ for Mac."
-        brew install jq --quiet
+        HOMEBREW_NO_AUTO_UPDATE=1 brew install jq --quiet
         return $?
     fi
 
     if cat /etc/issue | grep Alpine > /dev/null 2>&1; then
-        echo "Installing JQ for Alpine."
-        apk -q add jq
-        return $?
+        command -v curl >/dev/null 2>&1 || { echo >&2 "SLACK ORB ERROR: CURL is required. Please install."; exit 1; }
+        command -v jq >/dev/null 2>&1 || { echo >&2 "SLACK ORB ERROR: JQ is required. Please install"; exit 1; }
     fi
 
     if cat /etc/issue | grep Debian > /dev/null 2>&1 || cat /etc/issue | grep Ubuntu > /dev/null 2>&1; then
-        if [[ $EUID == 0 ]]; then export SUDO=""; else # Check if we're root
-            export SUDO="sudo";
-        fi
         echo "Installing JQ for Debian."
         $SUDO apt -qq update
         $SUDO apt -qq install -y jq
@@ -90,7 +89,7 @@ BranchFilter() {
     FLAG_MATCHES_FILTER="false"
     for i in $(echo "$SLACK_PARAM_BRANCHPATTERN" | sed "s/,/ /g")
     do
-     if echo "$CIRCLE_BRANCH" | grep -Eq ^${i}$ ; then
+     if echo "$CIRCLE_BRANCH" | grep -Eq "^${i}$" ; then
         FLAG_MATCHES_FILTER="true"
         break
      fi
@@ -108,8 +107,8 @@ BranchFilter() {
 # Will not run if sourced from another script.
 # This is done so this script may be tested.
 ORB_TEST_ENV="bats-core"
-if [ "${0#*$ORB_TEST_ENV}" == "$0" ]; then
-    source "/tmp/SLACK_JOB_STATUS"
+if [ "${0#*$ORB_TEST_ENV}" = "$0" ]; then
+    . "/tmp/SLACK_JOB_STATUS"
     InstallJq
     BuildMessageBody
     Notify

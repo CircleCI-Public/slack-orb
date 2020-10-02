@@ -32,4 +32,5 @@ usage:
   workflows:
     send-notification:
       jobs:
-        - notify
+        - notify:
+            context: slack-secrets
