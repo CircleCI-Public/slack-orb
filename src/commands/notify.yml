@@ -37,20 +37,28 @@ parameters:
         Select which channel in which to post to. Channel name or ID will work. You may include a comma separated list of channels if you wish to post to multiple channels at once. Set the "SLACK_DEFAULT_CHANNEL" environment variable for the default channel.
       type: string
       default: $SLACK_DEFAULT_CHANNEL
+  windows:
+      description: |
+        Set to true if running in a Windows environment, this will set the correct shell path for Windows.
+      type: boolean
+      default: false
 
 steps:
   - run:
       when: on_fail
+      shell: <<# parameters.windows >>bash.exe<</ parameters.windows >><<^ parameters.windows >>/bin/sh<</ parameters.windows >>
       name: Slack - Detecting Job Status (FAIL)
       command: |
         echo 'export CCI_STATUS="fail"' > /tmp/SLACK_JOB_STATUS
   - run:
       when: on_success
+      shell: <<# parameters.windows >>bash.exe<</ parameters.windows >><<^ parameters.windows >>/bin/sh<</ parameters.windows >>
       name: Slack - Detecting Job Status (PASS)
       command: |
         echo 'export CCI_STATUS="pass"' > /tmp/SLACK_JOB_STATUS
   - run:
       when: always
+      shell: <<# parameters.windows >>bash.exe<</ parameters.windows >><<^ parameters.windows >>/bin/sh<</ parameters.windows >>
       name: Slack - Sending Notification
       environment:
         SLACK_PARAM_EVENT: "<<parameters.event>>"
