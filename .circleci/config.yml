@@ -5,7 +5,6 @@ orbs:
   orb-tools: circleci/orb-tools@9.3
   bats: circleci/bats@1.0
   shellcheck: circleci/shellcheck@2.0
-  win: circleci/windows@2.2.0
 
 # Pipeline parameters
 parameters:
@@ -83,34 +82,7 @@ jobs:
                 }
               ]
             }
-  integration-test-windows:
-    executor: win/default
-    steps:
-      - slack/notify:
-            windows: true
-            event: always
-            custom: |
-              {
-                "blocks": [
-                  {
-                    "type": "section",
-                    "text": {
-                      "type": "mrkdwn",
-                      "text": "Current Job: $CIRCLE_JOB"
-                    }
-                  },
-                  {
-                    "type": "section",
-                    "text": {
-                      "type": "mrkdwn",
-                      "text": "This test will @ a normal user, a user ID, and normal group name: <@U8C9ETTUG>, @orbs, @gabriel"
-                    }
-                  }
-                ]
-              }
-
 workflows:
-
   test-pack:
     unless: << pipeline.parameters.run-integration-tests >>
     jobs:
@@ -163,7 +135,6 @@ workflows:
           matrix:
             parameters:
               runner: [cimg, mac, alpine]
-      - integration-test-windows
 
       - orb-tools/dev-promote-prod-from-commit-subject:
           orb-name: circleci/slack
@@ -176,7 +147,6 @@ workflows:
           ssh-fingerprints: 79:ae:f5:10:17:8a:d2:9a:ed:63:5c:b0:92:66:23:49
           requires:
             - integration-test-templates
-            - integration-test-windows
           filters:
             branches:
               only: master
