@@ -24,5 +24,4 @@ usage:
     deploy_and_notify:
       jobs:
         - deploy:
-            context:
-              - slack-secrets
+            context: slack-secrets

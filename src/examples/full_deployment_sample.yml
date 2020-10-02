@@ -40,8 +40,7 @@ usage:
         # We will also make use of the Slack orb's "on-hold" job to notify us to this on-hold workflow, making it easy to respond.
         # Add a context containing your Slack OAuth token and optionally, default slack channel
         - slack/on-hold:
-            context:
-              - slack-secrets
+            context: slack-secrets
             requires:
               - test
             filters:
