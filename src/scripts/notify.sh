@@ -66,7 +66,7 @@ InstallJq() {
     fi
     if uname -a | grep darwin > /dev/null 2>&1; then
         echo "Installing JQ for Mac."
-        brew install jq --quiet
+        HOMEBREW_NO_AUTO_UPDATE=1 brew install jq --quiet
         return $?
     fi
 
