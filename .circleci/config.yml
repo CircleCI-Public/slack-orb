@@ -25,8 +25,9 @@ executors:
     macos:
       xcode: 11.7.0
   alpine:
+    # This image contains both CURL and JQ
     docker:
-      - image: curlimages/curl
+      - image: dwdraju/alpine-curl-jq
 
 jobs:
   integration-test-templates:

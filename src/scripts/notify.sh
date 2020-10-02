@@ -61,6 +61,9 @@ ModifyCustomTemplate() {
 }
 
 InstallJq() {
+    if [ "$(id -u)" = 0 ]; then export SUDO=""; else # Check if we're root
+        export SUDO="sudo";
+    fi
     if uname -a | grep darwin > /dev/null 2>&1; then
         echo "Installing JQ for Mac."
         brew install jq --quiet
@@ -68,15 +71,11 @@ InstallJq() {
     fi
 
     if cat /etc/issue | grep Alpine > /dev/null 2>&1; then
-        echo "Installing JQ for Alpine."
-        apk -q add jq
-        return $?
+        command -v curl >/dev/null 2>&1 || { echo >&2 "SLACK ORB ERROR: CURL is required. Please install."; exit 1; }
+        command -v JQ >/dev/null 2>&1 || { echo >&2 "SLACK ORB ERROR: JQ is required. Please install"; exit 1; }
     fi
 
     if cat /etc/issue | grep Debian > /dev/null 2>&1 || cat /etc/issue | grep Ubuntu > /dev/null 2>&1; then
-        if [ "$(id -u)" = 0 ]; then export SUDO=""; else # Check if we're root
-            export SUDO="sudo";
-        fi
         echo "Installing JQ for Debian."
         $SUDO apt -qq update
         $SUDO apt -qq install -y jq
