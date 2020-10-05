@@ -62,7 +62,7 @@ ModifyCustomTemplate() {
 }
 
 InstallJq() {
-    if echo "$OSTYPE" | grep darwin > /dev/null 2>&1; then
+    if uname -a | grep darwin > /dev/null 2>&1; then
         echo "Installing JQ for Mac."
         command -v jq >/dev/null 2>&1 || HOMEBREW_NO_AUTO_UPDATE=1 brew install jq --quiet
         return $?
@@ -75,7 +75,7 @@ InstallJq() {
     fi
 
     if cat /etc/issue | grep Debian > /dev/null 2>&1 || cat /etc/issue | grep Ubuntu > /dev/null 2>&1; then
-        if [[ $EUID == 0 ]]; then export SUDO=""; else # Check if we're root
+        if [ "$(id -u)" == 0 ]; then export SUDO=""; else # Check if we're root
             export SUDO="sudo";
         fi
         echo "Installing JQ for Debian."
@@ -109,7 +109,7 @@ BranchFilter() {
 # Will not run if sourced from another script.
 # This is done so this script may be tested.
 ORB_TEST_ENV="bats-core"
-if [ "${0#*$ORB_TEST_ENV}" == "$0" ]; then
+if [ "${0#*$ORB_TEST_ENV}" = "$0" ]; then
     . "/tmp/SLACK_JOB_STATUS"
     InstallJq
     BuildMessageBody
