@@ -33,7 +33,6 @@ jobs:
     executor: <<parameters.runner>>
     steps:
       - slack/notify:
-          name: Mention test
           event: always
           custom: |
             {
@@ -55,20 +54,16 @@ jobs:
               ]
               }
       - slack/notify:
-          name: Basic Fail
           template: basic_fail_1
           mentions: "@orbs"
           event: always
       - slack/notify:
-          name: Tagged deploy
           template: success_tagged_deploy_1
           event: always
       - slack/notify:
-          name: On Hold
           template: basic_on_hold_1
           event: always
       - slack/notify:
-          name: Link test
           event: pass
           custom: >
             {
