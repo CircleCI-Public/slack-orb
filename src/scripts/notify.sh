@@ -65,7 +65,7 @@ ModifyCustomTemplate() {
 }
 
 InstallJq() {
-    if uname -a | grep darwin > /dev/null 2>&1; then
+    if uname -a | grep Darwin > /dev/null 2>&1; then
         echo "Installing JQ for Mac."
         command -v jq >/dev/null 2>&1 || HOMEBREW_NO_AUTO_UPDATE=1 brew install jq --quiet
         return $?
