@@ -37,7 +37,7 @@ PostToSlack() {
 }
 
 Notify() {
-    if [[ "$CCI_STATUS" == "$SLACK_PARAM_EVENT" || "$SLACK_PARAM_EVENT" == "always" ]]; then
+    if [ "$CCI_STATUS" = "$SLACK_PARAM_EVENT" ] || [ "$SLACK_PARAM_EVENT" = "always" ]; then
     BranchFilter # In the event the Slack notification would be sent, first ensure it is allowed to trigger on this branch.
     PostToSlack
     echo "Sending Notification"
@@ -53,7 +53,7 @@ Notify() {
 
 ModifyCustomTemplate() {
     # Inserts the required "text" field to the custom json template from block kit builder.
-    if [ "$(echo "$SLACK_PARAM_CUSTOM" | jq '.text')" == "null" ]; then
+    if [ "$(echo "$SLACK_PARAM_CUSTOM" | jq '.text')" = "null" ]; then
         CUSTOM_BODY_MODIFIED=$(echo "$SLACK_PARAM_CUSTOM" | jq '. + {"text": ""}')
     else
         # In case the text field was set manually.
@@ -69,8 +69,8 @@ InstallJq() {
     fi
 
     if cat /etc/issue | grep Alpine > /dev/null 2>&1; then
-        echo "Installing JQ for Alpine."
-        apk -q add jq
+        command -v curl >/dev/null 2>&1 || { echo >&2 "SLACK ORB ERROR: CURL is required. Please install."; exit 1; }
+        command -v jq >/dev/null 2>&1 || { echo >&2 "SLACK ORB ERROR: JQ is required. Please install"; exit 1; }
         return $?
     fi
 
@@ -91,7 +91,7 @@ BranchFilter() {
     FLAG_MATCHES_FILTER="false"
     for i in $(echo "$SLACK_PARAM_BRANCHPATTERN" | sed "s/,/ /g")
     do
-     if echo "$CIRCLE_BRANCH" | grep -Eq ^${i}$ ; then
+     if echo "$CIRCLE_BRANCH" | grep -Eq "^${i}$" ; then
         FLAG_MATCHES_FILTER="true"
         break
      fi
@@ -110,7 +110,7 @@ BranchFilter() {
 # This is done so this script may be tested.
 ORB_TEST_ENV="bats-core"
 if [ "${0#*$ORB_TEST_ENV}" == "$0" ]; then
-    source "/tmp/SLACK_JOB_STATUS"
+    . "/tmp/SLACK_JOB_STATUS"
     InstallJq
     BuildMessageBody
     Notify
