@@ -66,15 +66,8 @@ InstallJq() {
         echo "Installing JQ for Mac."
         command -v jq >/dev/null 2>&1 || HOMEBREW_NO_AUTO_UPDATE=1 brew install jq --quiet
         return $?
-    fi
 
-    if cat /etc/issue | grep Alpine > /dev/null 2>&1; then
-        command -v curl >/dev/null 2>&1 || { echo >&2 "SLACK ORB ERROR: CURL is required. Please install."; exit 1; }
-        command -v jq >/dev/null 2>&1 || { echo >&2 "SLACK ORB ERROR: JQ is required. Please install"; exit 1; }
-        return $?
-    fi
-
-    if cat /etc/issue | grep Debian > /dev/null 2>&1 || cat /etc/issue | grep Ubuntu > /dev/null 2>&1; then
+    elif cat /etc/issue | grep Debian > /dev/null 2>&1 || cat /etc/issue | grep Ubuntu > /dev/null 2>&1; then
         if [ "$(id -u)" = 0 ]; then export SUDO=""; else # Check if we're root
             export SUDO="sudo";
         fi
@@ -82,8 +75,12 @@ InstallJq() {
         $SUDO apt -qq update
         $SUDO apt -qq install -y jq
         return $?
-    fi
 
+    elif cat /etc/issue | grep Alpine > /dev/null 2>&1; then
+        command -v curl >/dev/null 2>&1 || { echo >&2 "SLACK ORB ERROR: CURL is required. Please install."; exit 1; }
+        command -v jq >/dev/null 2>&1 || { echo >&2 "SLACK ORB ERROR: JQ is required. Please install"; exit 1; }
+        return $?
+    fi
 }
 
 BranchFilter() {
