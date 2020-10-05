@@ -25,6 +25,9 @@ BuildMessageBody() {
 PostToSlack() {
     # Post once per channel listed by the channel parameter
     #    The channel must be modified in SLACK_MSG_BODY
+
+    # If no channel is provided, quit with error
+    [ "$SLACK_PARAM_CHANNEL" != "" ] || echo "No channel was provided. Enter value for SLACK_DEFAULT_CHANNEL env var, or channel parameter"; exit 0;
     for i in $(echo $(eval echo "$SLACK_PARAM_CHANNEL")  | sed "s/,/ /g")
     do
         echo "Sending to Slack Channel: $i"
