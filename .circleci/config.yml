@@ -33,37 +33,42 @@ jobs:
     executor: <<parameters.runner>>
     steps:
       - slack/notify:
-            event: always
-            custom: |
-              {
-                "blocks": [
-                  {
-                    "type": "section",
-                    "text": {
-                      "type": "mrkdwn",
-                      "text": "Current Job: $CIRCLE_JOB"
-                    }
-                  },
-                  {
-                    "type": "section",
-                    "text": {
-                      "type": "mrkdwn",
-                      "text": "This test will @ a normal user, a user ID, and normal group name: <@U8C9ETTUG>, @orbs, @gabriel"
-                    }
+          name: Mention test
+          event: always
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Current Job: $CIRCLE_JOB"
                   }
-                ]
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "This test will @ a normal user, a user ID, and normal group name: <@U8C9ETTUG>, @orbs, @gabriel"
+                  }
+                }
+              ]
               }
       - slack/notify:
+          name: Basic Fail
           template: basic_fail_1
           mentions: "@orbs"
           event: always
       - slack/notify:
+          name: Tagged deploy
           template: success_tagged_deploy_1
           event: always
       - slack/notify:
+          name: On Hold
           template: basic_on_hold_1
           event: always
       - slack/notify:
+          name: Link test
           event: pass
           custom: >
             {
