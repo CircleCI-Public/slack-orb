@@ -23,8 +23,6 @@ BuildMessageBody() {
 
 
 PostToSlack() {
-    echo "DEBUG: Posting to Slack"
-    echo "DEBUG: Slack Channel - $SLACK_PARAM_CHANNEL"
     # Post once per channel listed by the channel parameter
     #    The channel must be modified in SLACK_MSG_BODY
 
