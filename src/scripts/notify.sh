@@ -75,7 +75,7 @@ InstallJq() {
     fi
 
     if cat /etc/issue | grep Debian > /dev/null 2>&1 || cat /etc/issue | grep Ubuntu > /dev/null 2>&1; then
-        if [ "$(id -u)" == 0 ]; then export SUDO=""; else # Check if we're root
+        if [ "$(id -u)" = 0 ]; then export SUDO=""; else # Check if we're root
             export SUDO="sudo";
         fi
         echo "Installing JQ for Debian."
