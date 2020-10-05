@@ -25,6 +25,12 @@ BuildMessageBody() {
 PostToSlack() {
     # Post once per channel listed by the channel parameter
     #    The channel must be modified in SLACK_MSG_BODY
+
+    # If no channel is provided, quit with error
+    if [ "$SLACK_PARAM_CHANNEL" = "" ]; then
+       echo "No channel was provided. Enter value for SLACK_DEFAULT_CHANNEL env var, or channel parameter"
+       exit 0
+    fi
     for i in $(echo $(eval echo "$SLACK_PARAM_CHANNEL")  | sed "s/,/ /g")
     do
         echo "Sending to Slack Channel: $i"
@@ -39,8 +45,8 @@ PostToSlack() {
 Notify() {
     if [ "$CCI_STATUS" = "$SLACK_PARAM_EVENT" ] || [ "$SLACK_PARAM_EVENT" = "always" ]; then
     BranchFilter # In the event the Slack notification would be sent, first ensure it is allowed to trigger on this branch.
-    PostToSlack
     echo "Sending Notification"
+    PostToSlack
     else
         # dont send message.
         echo "NO SLACK ALERT"
@@ -62,21 +68,21 @@ ModifyCustomTemplate() {
 }
 
 InstallJq() {
-    if uname -a | grep darwin > /dev/null 2>&1; then
-        echo "Installing JQ for Mac."
+    if uname -a | grep Darwin > /dev/null 2>&1; then
+        echo "Checking For JQ + CURL: MacOS"
         command -v jq >/dev/null 2>&1 || HOMEBREW_NO_AUTO_UPDATE=1 brew install jq --quiet
         return $?
 
     elif cat /etc/issue | grep Debian > /dev/null 2>&1 || cat /etc/issue | grep Ubuntu > /dev/null 2>&1; then
+        echo "Checking For JQ + CURL: Debian"
         if [ "$(id -u)" = 0 ]; then export SUDO=""; else # Check if we're root
             export SUDO="sudo";
         fi
-        echo "Installing JQ for Debian."
-        $SUDO apt -qq update
-        $SUDO apt -qq install -y jq
+        command -v jq >/dev/null 2>&1 || { $SUDO apt -qq update && $SUDO apt -qq install -y jq; }
         return $?
 
     elif cat /etc/issue | grep Alpine > /dev/null 2>&1; then
+        echo "Checking For JQ + CURL: Alpine"
         command -v curl >/dev/null 2>&1 || { echo >&2 "SLACK ORB ERROR: CURL is required. Please install."; exit 1; }
         command -v jq >/dev/null 2>&1 || { echo >&2 "SLACK ORB ERROR: JQ is required. Please install"; exit 1; }
         return $?
