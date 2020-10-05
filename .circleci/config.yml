@@ -4,7 +4,6 @@ orbs:
   slack: circleci/slack@<<pipeline.parameters.dev-orb-version>>
   orb-tools: circleci/orb-tools@9.3
   bats: circleci/bats@1.0
-  shellcheck: circleci/shellcheck@2.0
 
 # Pipeline parameters
 parameters:
@@ -24,10 +23,6 @@ executors:
   mac:
     macos:
       xcode: 11.7.0
-  alpine:
-    # This image contains both CURL and JQ
-    docker:
-      - image: dwdraju/alpine-curl-jq
 
 jobs:
   integration-test-templates:
@@ -82,29 +77,20 @@ jobs:
                 }
               ]
             }
+
 workflows:
+
   test-pack:
     unless: << pipeline.parameters.run-integration-tests >>
     jobs:
       - orb-tools/lint
-      # Shellcheck is set to validate on sh to attempt to maximize portability.
-      - shellcheck/check:
-          dir: ./src/scripts
-          exclude: SC2148,SC2001,SC1091,SC2086,SC2116,SC2046,SC2005,SC2002
-          shell: sh
       - bats/run:
           path: ./src/tests
       # pack your orb YAML files to a single orb.yml
       # validate the orb.yml file to ensure it is well-formed
       - orb-tools/pack:
           use-orb-pack: true
-      - hold-for-dev-publish:
-          type: approval
-          requires:
-            - orb-tools/lint
-            - orb-tools/pack
-            - bats/run
-            - shellcheck/check
+
       # release dev version of orb, for testing & possible publishing.
       # orb will be published as dev:alpha and dev:${CIRCLE_SHA1:0:7}.
       # requires a CircleCI API token to be stored as CIRCLE_TOKEN (default)
@@ -114,7 +100,10 @@ workflows:
       - orb-tools/publish-dev:
           orb-name: circleci/slack
           context: orb-publishing
-          requires: [hold-for-dev-publish]
+          requires:
+            - orb-tools/pack
+            - orb-tools/lint
+            - bats/run
 
       # trigger an integration workflow to test the
       # dev:${CIRCLE_SHA1:0:7} version of your orb
@@ -134,7 +123,7 @@ workflows:
           context: SLACK_NOTIFICATIONS_TEST
           matrix:
             parameters:
-              runner: [cimg, mac, alpine]
+              runner: [cimg, mac]
 
       - orb-tools/dev-promote-prod-from-commit-subject:
           orb-name: circleci/slack

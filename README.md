@@ -8,9 +8,7 @@ Send Slack notifications from your CircleCI pipelines even easier with Slack Orb
 
 ### Setup
 
-In order to use the Slack Orb on CircleCI you will need to create a Slack App and provide an OAuth token.
-
-Find the guide in the wiki: [How to setup slack orb](https://github.com/CircleCI-Public/slack-orb/wiki/Setup)
+In order to use the Slack Orb on CircleCI you will need to create a Slack App and provide an OAuth token. Find the guide in the wiki: [How to setup slack orb](https://github.com/CircleCI-Public/slack-orb/wiki/Setup)
 
 ### Use In Config
 
@@ -66,7 +64,36 @@ A comma separated list of regex matchable branch names. Notifications will only 
 See usage examples.
 
 ## FAQ
-See [FAQ Wiki Page](https://github.com/CircleCI-Public/slack-orb/wiki/FAQ)
+
+**Q:**
+  How can I stop duplicate messages in parallel jobs?
+
+**A:**
+  It is not possible to limit the output to a singular output. The notify command acts as a convenient and parametrizable way to send a `curl` request to the provided Slack WebHook. When a job is ran in parallel, each instance runs independently and sends its own notification.
+
+---
+
+**Q:**
+  Is it possible to receive only the final status of the Workflow?
+
+**A:**
+  Each job within a workflow operates independently, as the orb code executes within each job, they are not able to report on the outcome of the workflow after all jobs have completed. Each job can independently report its individual status.
+
+ ---
+
+**Q:**
+  How do I use custom environment variables?
+
+**A:**
+  Each step executes as a separate shell. To export environment variables for use in over steps, they must be added to `BASH_ENV`. View [Using Environment Variables](https://circleci.com/docs/2.0/env-vars/#using-parameters-and-bash-environment) and the included usage examples.
+
+---
+
+**Q:**
+  Can other orbs use this Slack Orb?
+
+**A:**
+  If you would like to integrate with this orb from your own orb or service, we recommend hacking your orb generate a `template.json` file containing the payload of your desired message and saving the destination to an environment variable. Make sure to export the environment variable to `$BASH_ENV`. The user can the select the environment variable created as the template for the Slack Orb notification.
 
 ---
 
