@@ -23,9 +23,10 @@ usage:
   workflows:
     deploy_and_notify:
       jobs:
-        - build
+        - build:
+            context: slack-secrets
         # This deploy job uses the native CircleCI workflow filters to specify that the entire job will not execute unless on the specified filtered branch.
-        # This Workflow level filter is independent from the Slack orb.
+        # This Workflow level filter is independent from the Slack orb, and controls if the entire job is executed, as opposed to just the command in the orb.
         - deploy:
             requires:
               - build
@@ -33,4 +34,3 @@ usage:
               branches:
                 only:
                   - production
-

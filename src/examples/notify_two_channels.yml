@@ -1,19 +1,21 @@
 description: |
-  Send a custom notification using Slack's Block Kit Builder.
-  Create the payload code and paste it in your notify command's custom parameter.
-  Detailed instructions in the GitHub readme.
-  https://app.slack.com/block-kit-builder
+  Send a Slack notification to two channels simultaniously.
+  By default, if no channel parameter is set, the $SLACK_DEFAULT_CHANNEL value will be used (must be set).
+  A custom channel, or comma-separated list of channels can be supplied.
+  It is recommended to use the channel ID for the value(s).
 usage:
   version: 2.1
   orbs:
     slack: circleci/slack@4.0
+    node: circleci/node:4.0
   jobs:
-    notify:
-      docker:
-        - image: cimg/base:stable
+    deploy:
+      executor:
+        name: node/default
       steps:
         - slack/notify:
             event: always
+            channel: ABCXYZ, ZXCVBN
             custom: |
               {
                 "blocks": [
@@ -30,7 +32,8 @@ usage:
                 ]
               }
   workflows:
-    send-notification:
+    deploy_and_notify:
       jobs:
-        - notify:
+        - deploy:
+            # Secure your Slack OAuth access token behind a restricted context
             context: slack-secrets
