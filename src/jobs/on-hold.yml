@@ -27,6 +27,11 @@ parameters:
       3. Paste value here.
     type: string
     default: ""
+  channel:
+      description: |
+        Select which channel in which to post to. Channel name or ID will work. You may include a comma separated list of channels if you wish to post to multiple channels at once. Set the "SLACK_DEFAULT_CHANNEL" environment variable for the default channel.
+      type: string
+      default: $SLACK_DEFAULT_CHANNEL
 
 docker:
   - image: cimg/base:stable
@@ -39,4 +44,5 @@ steps:
       branch_pattern: <<parameters.branch_pattern>>
       custom: <<parameters.custom>>
       mentions: <<parameters.mentions>>
+      channel: <<parameters.channel>>
 
