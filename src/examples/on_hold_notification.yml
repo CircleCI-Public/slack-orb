@@ -8,13 +8,12 @@ usage:
     on-hold-example:
       jobs:
         - my_test_job
-        # Send a slack notfication alerting the workflow will now be placed on-hold after this notification.
+        # Send a slack notfication alerting the workflow will now be placed on-hold.
         - slack/on-hold:
-            context: slack-secrets
             requires:
               - my_test_job
         # Jobs with the type of "approval" act as place holders to pause the workflow
-        # Wait for both the first job, and the notification to send before actually pausing.
+        # Wait for both the first job, and the notification to send before pausing.
         - pause_workflow:
             type: approval
             requires:
