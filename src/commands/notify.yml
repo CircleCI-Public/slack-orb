@@ -1,4 +1,4 @@
-description: Notify a Slack channel with a custom message
+description: Notify a Slack channel with a custom message.
 
 parameters:
   template:
