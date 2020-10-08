@@ -67,7 +67,7 @@ See usage examples.
 
 ## FAQ
 
-View the [full FAQ in the wiki](https://github.com/CircleCI-Public/slack-orb/wiki/FAQ)
+View the [FAQ in the wiki](https://github.com/CircleCI-Public/slack-orb/wiki/FAQ)
 
 ## Contributing
 
