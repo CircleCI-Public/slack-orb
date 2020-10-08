@@ -1,8 +1,10 @@
 description: |
   Send a Slack notification to two channels simultaniously.
   By default, if no channel parameter is set, the $SLACK_DEFAULT_CHANNEL value will be used (must be set).
-  A custom channel, or comma-separated list of channels can be supplied.
-  It is recommended to use the channel ID for the value(s).
+  A custom channel, or comma-separated list of channels can be supplied via the "channel" parameter.
+
+  It is recommended to use the "channel ID" for the value(s).
+  View the wiki: https://github.com/CircleCI-Public/slack-orb/wiki/How-to-set-Slack-channel
 usage:
   version: 2.1
   orbs:
