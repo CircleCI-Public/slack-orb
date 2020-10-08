@@ -1,0 +1,56 @@
+{
+	"blocks": [
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": "ON HOLD - Awaiting Approval :raised_hand:",
+				"emoji": true
+			}
+		},
+		{
+			"type": "section",
+			"fields": [
+				{
+					"type": "mrkdwn",
+					"text": "*Project*:\\n$CIRCLE_PROJECT_REPONAME"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Branch*:\\n$CIRCLE_BRANCH"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Author*:\\n$CIRCLE_USERNAME"
+				}
+			],
+			"accessory": {
+				"type": "image",
+				"image_url": "https://assets.brandfolder.com/otz5mn-bw4j2w-6jzqo8/original/circle-logo-badge-black.png",
+				"alt_text": "CircleCI logo"
+			}
+		},
+		{
+			"type": "section",
+			"fields": [
+				{
+					"type": "mrkdwn",
+					"text": "*Mentions*:\\n$SLACK_PARAM_MENTIONS"
+				}
+			]
+		},
+		{
+			"type": "actions",
+			"elements": [
+				{
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "View Workflow"
+					},
+					"url": "https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}"
+				}
+			]
+		}
+	]
+}

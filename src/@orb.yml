@@ -1,12 +1,8 @@
 version: 2.1
 
 description: >
-  Easily integrate custom Slack notifications into your CircleCI projects.
-  Create custom alert messages for any job or receive status updates.
-  View this orb's source: https://github.com/CircleCI-Public/slack-orb
+  Implement event-based notifications across all of your CI/CD pipelines. Utilizing built-in message templates or Slack's visual Block-Kit builder, create and customize notifications specific to your organization's needs.
 
-# Create your key here: https://api.slack.com/incoming-webhooks
-
-## Requirements ##
-## - Bash
-## - cURL
+display:
+  home_url: https://github.com/CircleCI-Public/slack-orb/wiki
+  source_url: https://github.com/CircleCI-Public/slack-orb

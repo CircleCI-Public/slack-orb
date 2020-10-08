@@ -1,255 +1,154 @@
 version: 2.1
 
 orbs:
-  orb-tools: circleci/orb-tools@8.27.3
-  slack: circleci/slack@dev:alpha
+  slack: circleci/slack@<<pipeline.parameters.dev-orb-version>>
+  orb-tools: circleci/orb-tools@9.3
+  bats: circleci/bats@1.0
+  shellcheck: circleci/shellcheck@2.0
+
+# Pipeline parameters
+parameters:
+  # These pipeline parameters are required by the "trigger-integration-tests-workflow"
+  # job, by default.
+  run-integration-tests:
+    type: boolean
+    default: false
+  dev-orb-version:
+    type: string
+    default: "dev:alpha"
+
+executors:
+  cimg:
+    docker:
+      - image: cimg/base:stable
+  mac:
+    macos:
+      xcode: 11.7.0
+  alpine:
+    # This image contains both CURL and JQ
+    docker:
+      - image: dwdraju/alpine-curl-jq
 
 jobs:
-  notifytest:
-    executor: orb-tools/ubuntu
+  integration-test-templates:
+    parameters:
+      runner:
+        type: executor
+        default: cimg
+    executor: <<parameters.runner>>
     steps:
-      - run: exit 0 #toggle this to force success or status for testing
       - slack/notify:
-          message: "notification test for the Slack orb, triggered by *<https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/commit/${CIRCLE_SHA1}|commit ${CIRCLE_SHA1}>* on ${CIRCLE_PROJECT_REPONAME}'s *${CIRCLE_BRANCH}* branch (<https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}|workflow here>)"
-          color: "#f4aa42"
-          mentions: "${ORBS_USER_GROUP_UUID}"
-
-  statustestpass-full:
-    executor: orb-tools/ubuntu
-
-    parameters:
-      only_for_branches:
-        type: string
-        default: ""
-
-    steps:
-      - run: exit 0 #toggle this to force success or status for testing
-      - slack/status:
-          mentions: "${ORBS_USER_GROUP_UUID}"
-          only_for_branches: <<parameters.only_for_branches>>
-
-  statustestpass-minimal:
-    executor: orb-tools/ubuntu
-
-    parameters:
-      only_for_branches:
-        type: string
-        default: ""
-
-    steps:
-      - run: exit 0 #toggle this to force success or status for testing
-      - slack/status:
-          mentions: "${ORBS_USER_GROUP_UUID}"
-          only_for_branches: <<parameters.only_for_branches>>
-          include_project_field: false
-          include_job_number_field: false
-          include_visit_job_action: false
-
-  approvaltest:
-    executor: orb-tools/ubuntu
-    steps:
-      - slack/approval:
-          mentions: "${ORBS_USER_GROUP_UUID}"
-
-  approvaltest-mention-here:
-    executor: orb-tools/ubuntu
-    steps:
-      - slack/approval:
-          mentions: "here"
-
-  approvaltest-mention-here-2:
-    executor: orb-tools/ubuntu
-    steps:
-      - slack/approval:
-          mentions: "foo-here-bar"
-
-# yaml anchor filters
-integration-dev_filters: &integration-dev_filters
-  branches:
-    ignore: /.*/
-  tags:
-    only: /integration-.*/
-
-integration-master_filters: &integration-master_filters
-  branches:
-    ignore: /.*/
-  tags:
-    only: /master-.*/
-
-prod-deploy_requires: &prod-deploy_requires
-  [
-    notifytest-master,
-    statustestpass-full-master,
-    statustestpass-minimal-master,
-    statustestpass-shouldnt-trigger-master,
-    approvaltest-master,
-    approvaltest-mention-here-master,
-    approvaltest-mention-here-2-master,
-    approval-notification-job-master
-  ]
-
-# add-ssh-keys: &add-ssh-keys
-#   [add_ssh_keys: {fingerprints: ["40:21:b7:d7:fe:ea:dd:80:ca:c8:34:7a:37:b4:b4:d2"]}]
+          event: always
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Current Job: $CIRCLE_JOB"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "This test will @ a normal user, a user ID, and normal group name: <@U8C9ETTUG>, @orbs, @gabriel"
+                  }
+                }
+              ]
+              }
+      - slack/notify:
+          template: basic_fail_1
+          mentions: "@orbs"
+          event: always
+      - slack/notify:
+          template: success_tagged_deploy_1
+          event: always
+      - slack/notify:
+          template: basic_on_hold_1
+          event: always
+      - slack/notify:
+          event: pass
+          custom: >
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Sample link using environment variable in markdown <${CIRCLE_BUILD_URL}|LINK >"
+                  }
+                }
+              ]
+            }
 
 workflows:
-  lint_pack-validate_publish-dev:
+
+  test-pack:
+    unless: << pipeline.parameters.run-integration-tests >>
     jobs:
       - orb-tools/lint
-
+      - shellcheck/check:
+          dir: ./src/scripts
+          exclude: SC2148,SC2001,SC1091,SC2086,SC2116,SC2046,SC2005,SC2002
+          shell: sh
+      - bats/run:
+          path: ./src/tests
+      # pack your orb YAML files to a single orb.yml
+      # validate the orb.yml file to ensure it is well-formed
       - orb-tools/pack:
-          requires: [orb-tools/lint]
-
+          use-orb-pack: true
+      - hold-for-dev-publish:
+          type: approval
+          requires:
+            - orb-tools/lint
+            - orb-tools/pack
+            - bats/run
+            - shellcheck/check
+      # release dev version of orb, for testing & possible publishing.
+      # orb will be published as dev:alpha and dev:${CIRCLE_SHA1:0:7}.
+      # requires a CircleCI API token to be stored as CIRCLE_TOKEN (default)
+      # https://circleci.com/docs/2.0/managing-api-tokens
+      # store CIRCLE_TOKEN as a project env var or Contexts resource
+      # if using Contexts, add your context below
       - orb-tools/publish-dev:
-          context: orb-publishing
           orb-name: circleci/slack
-          requires: [orb-tools/pack]
-
-      - orb-tools/trigger-integration-workflow:
           context: orb-publishing
-          name: trigger-integration-dev
-          ssh-fingerprints: 79:ae:f5:10:17:8a:d2:9a:ed:63:5c:b0:92:66:23:49
-          cleanup-tags: true
-          requires: [orb-tools/publish-dev]
-          filters:
-            branches:
-              ignore: master
+          requires:
+            - hold-for-dev-publish
 
-      - orb-tools/trigger-integration-workflow:
-          name: trigger-integration-master
+      # trigger an integration workflow to test the
+      # dev:${CIRCLE_SHA1:0:7} version of your orb
+      - orb-tools/trigger-integration-tests-workflow:
+          name: trigger-integration-dev
+          context: orb-publishing
+          requires:
+            - orb-tools/publish-dev
+
+  integration-test_deploy:
+    when: << pipeline.parameters.run-integration-tests >>
+    jobs:
+      # your integration test jobs go here: essentially, run all your orb's
+      # jobs and commands to ensure they behave as expected. or, run other
+      # integration tests of your choosing
+      - integration-test-templates:
+          context: SLACK_NOTIFICATIONS_TEST
+          matrix:
+            parameters:
+              runner: [cimg, mac, alpine]
+
+      - orb-tools/dev-promote-prod-from-commit-subject:
+          orb-name: circleci/slack
+          context: orb-publishing
+          add-pr-comment: true
+          bot-token-variable: GHI_TOKEN
+          bot-user: cpe-bot
+          fail-if-semver-not-indicated: true
+          publish-version-tag: true
           ssh-fingerprints: 79:ae:f5:10:17:8a:d2:9a:ed:63:5c:b0:92:66:23:49
-          cleanup-tags: true
-          tag: master
-          requires: [orb-tools/publish-dev]
+          requires:
+            - integration-test-templates
           filters:
             branches:
               only: master
-
-  integration_tests-prod_deploy:
-    jobs:
-      # triggered by non-master branch commits
-      - notifytest:
-          name: notifytest-dev
-          context: orb-publishing
-          filters: *integration-dev_filters
-
-      - statustestpass-full:
-          name: statustestpass-full-dev
-          context: orb-publishing
-          filters: *integration-dev_filters
-
-      - statustestpass-minimal:
-          name: statustestpass-minimal-dev
-          context: orb-publishing
-          filters: *integration-dev_filters
-
-      - statustestpass-minimal:
-          name: statustestpass-shouldnt-trigger-dev
-          context: orb-publishing
-          only_for_branches: master,staging
-          filters: *integration-dev_filters
-
-      - approvaltest:
-          name: approvaltest-dev
-          context: orb-publishing
-          filters: *integration-dev_filters
-
-      - approvaltest-mention-here:
-          name: approvaltest-mention-here-dev
-          context: orb-publishing
-          filters: *integration-dev_filters
-
-      - approvaltest-mention-here-2:
-          name: approvaltest-mention-here-2-dev
-          context: orb-publishing
-          filters: *integration-dev_filters
-
-      - slack/approval-notification:
-          name: approval-notification-job-dev
-          context: orb-publishing
-          mentions: "${ORBS_USER_GROUP_UUID}"
-          filters: *integration-dev_filters
-
-      # triggered by master branch commits
-      - notifytest:
-          name: notifytest-master
-          context: orb-publishing
-          filters: *integration-master_filters
-
-      - statustestpass-full:
-          name: statustestpass-full-master
-          context: orb-publishing
-          filters: *integration-master_filters
-
-      - statustestpass-minimal:
-          name: statustestpass-minimal-master
-          context: orb-publishing
-          filters: *integration-master_filters
-
-      - statustestpass-minimal:
-          name: statustestpass-shouldnt-trigger-master
-          context: orb-publishing
-          only_for_branches: master,staging
-          filters: *integration-master_filters
-
-      - approvaltest:
-          name: approvaltest-master
-          context: orb-publishing
-          filters: *integration-master_filters
-
-      - approvaltest-mention-here:
-          name: approvaltest-mention-here-master
-          context: orb-publishing
-          filters: *integration-master_filters
-
-      - approvaltest-mention-here-2:
-          name: approvaltest-mention-here-2-master
-          context: orb-publishing
-          filters: *integration-master_filters
-
-      - slack/approval-notification:
-          name: approval-notification-job-master
-          context: orb-publishing
-          mentions: "${ORBS_USER_GROUP_UUID}"
-          filters: *integration-master_filters
-
-      # patch, minor, or major publishing
-      - orb-tools/dev-promote-prod:
-          name: dev-promote-patch
-          context: orb-publishing
-          orb-name: circleci/slack
-          cleanup-tags: true
-          ssh-fingerprints: 79:ae:f5:10:17:8a:d2:9a:ed:63:5c:b0:92:66:23:49
-          requires: *prod-deploy_requires
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /master-patch.*/
-
-      - orb-tools/dev-promote-prod:
-          name: dev-promote-minor
-          release: minor
-          context: orb-publishing
-          orb-name: circleci/slack
-          cleanup-tags: true
-          ssh-fingerprints: 79:ae:f5:10:17:8a:d2:9a:ed:63:5c:b0:92:66:23:49
-          requires: *prod-deploy_requires
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /master-minor.*/
-
-      - orb-tools/dev-promote-prod:
-          name: dev-promote-major
-          release: major
-          context: orb-publishing
-          orb-name: circleci/slack
-          cleanup-tags: true
-          ssh-fingerprints: 79:ae:f5:10:17:8a:d2:9a:ed:63:5c:b0:92:66:23:49
-          requires: *prod-deploy_requires
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /master-major.*/
