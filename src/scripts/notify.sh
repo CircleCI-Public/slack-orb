@@ -103,7 +103,7 @@ BranchFilter() {
         # dont send message.
         echo "NO SLACK ALERT"
         echo
-        echo 'Current branch does not match any item from the "branch_list" parameter'
+        echo 'Current branch does not match any item from the "branch_pattern" parameter'
         echo "Current branch: ${CIRCLE_BRANCH}"
         exit 0
     fi
