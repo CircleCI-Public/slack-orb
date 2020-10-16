@@ -52,13 +52,12 @@ The Slack Orb comes with a number of included templates to get your started with
         }
   ```
 
+## Branch or Tag Filtering
 
-## Branch Filtering
-
-Limit Slack notifications to particular branches with the "branch_pattern" parameter.
+Limit Slack notifications to particular branches with the "branch_pattern" or "tag_pattern" parameter.
 
 ```
-A comma separated list of regex matchable branch names. Notifications will only be sent if sent from a job from these branches. By default ".+" will be used to match all branches. Pattern must match the full string, no partial matches.
+A comma separated list of regex matchable branch or tag names. Notifications will only be sent if sent from a job from these branches/tags. By default ".+" will be used to match all branches/tags. Pattern must match the full string, no partial matches. Keep in mind that "branch_pattern" and "tag_pattern" are mutually exclusive.
 ```
 
 See [usage examples](https://circleci.com/developer/orbs/orb/circleci/slack#usage-examples).
