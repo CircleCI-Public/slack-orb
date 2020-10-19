@@ -38,7 +38,7 @@ PostToSlack() {
         curl -s -f -X POST -H 'Content-type: application/json' \
         -H "Authorization: Bearer $SLACK_ACCESS_TOKEN" \
         --data \
-        "$SLACK_MSG_BODY" https://slack.com/api/chat.postMessage > /dev/null
+        "$SLACK_MSG_BODY" https://slack.com/api/chat.postMessage | jq '{ok: .ok, error: .error}'
     done
 }
 
