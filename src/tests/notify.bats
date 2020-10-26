@@ -40,12 +40,12 @@ setup() {
     [ "$SLACK_MSG_BODY" == "$EXPECTED" ]
 }
 
-@test "5: ModifyCustomTemplate parentheses and asterisks" {
+@test "5: ModifyCustomTemplate special chars" {
     TESTLINKURL="http://circleci.com"
-    SLACK_PARAM_CUSTOM=$(cat $BATS_TEST_DIRNAME/sampleCustomTemplateWithParensAndAsterisks.json)
+    SLACK_PARAM_CUSTOM=$(cat $BATS_TEST_DIRNAME/sampleCustomTemplateWithSpecialChars.json)
     SLACK_DEFAULT_CHANNEL="xyz"
     BuildMessageBody
-    EXPECTED=$(echo "{ \"blocks\": [ { \"type\": \"section\", \"text\": { \"type\": \"mrkdwn\", \"text\": \"These asterisks are not glob patterns **t** (parentheses). [Link](https://example.org)\" } } ], \"text\": \"\", \"channel\": \"$SLACK_DEFAULT_CHANNEL\" }" | jq)
+    EXPECTED=$(echo "{ \"blocks\": [ { \"type\": \"section\", \"text\": { \"type\": \"mrkdwn\", \"text\": \"These asterisks are not \`glob\`  patterns **t** (parentheses). [Link](https://example.org)\" } } ], \"text\": \"\", \"channel\": \"$SLACK_DEFAULT_CHANNEL\" }" | jq)
     [ "$SLACK_MSG_BODY" == "$EXPECTED" ]
 }
 
