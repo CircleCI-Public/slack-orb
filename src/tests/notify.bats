@@ -40,7 +40,16 @@ setup() {
     [ "$SLACK_MSG_BODY" == "$EXPECTED" ]
 }
 
-@test "5: Branch Filter - case 1 | match-all default" {
+@test "5: ModifyCustomTemplate special chars" {
+    TESTLINKURL="http://circleci.com"
+    SLACK_PARAM_CUSTOM=$(cat $BATS_TEST_DIRNAME/sampleCustomTemplateWithSpecialChars.json)
+    SLACK_DEFAULT_CHANNEL="xyz"
+    BuildMessageBody
+    EXPECTED=$(echo "{ \"blocks\": [ { \"type\": \"section\", \"text\": { \"type\": \"mrkdwn\", \"text\": \"These asterisks are not \`glob\`  patterns **t** (parentheses'). [Link](https://example.org)\" } } ], \"text\": \"\", \"channel\": \"$SLACK_DEFAULT_CHANNEL\" }" | jq)
+    [ "$SLACK_MSG_BODY" == "$EXPECTED" ]
+}
+
+@test "6: Branch Filter - case 1 | match-all default" {
     SLACK_PARAM_BRANCHPATTERN=".+"
     CIRCLE_BRANCH="xyz-123"
     run BranchFilter
@@ -50,7 +59,7 @@ setup() {
     [ "$status" -eq 0 ] # In any case, this should return a 0 exit as to not block a build/deployment.
 }
 
-@test "6: Branch Filter - case 2 | string" {
+@test "7: Branch Filter - case 2 | string" {
     CIRCLE_BRANCH="master"
     run BranchFilter
     echo "Error output debug: $output"
@@ -58,7 +67,7 @@ setup() {
     [ "$status" -eq 0 ] # In any case, this should return a 0 exit as to not block a build/deployment.
 }
 
-@test "7: Branch Filter - case 3 | regex numbers" {
+@test "8: Branch Filter - case 3 | regex numbers" {
     CIRCLE_BRANCH="pr-123"
     run BranchFilter
     echo "Error output debug: $output"
@@ -66,7 +75,7 @@ setup() {
     [ "$status" -eq 0 ] # In any case, this should return a 0 exit as to not block a build/deployment.
 }
 
-@test "8: Branch Filter - case 4 | non-match" {
+@test "9: Branch Filter - case 4 | non-match" {
     CIRCLE_BRANCH="x"
     run BranchFilter
     echo "Error output debug: $output"
@@ -74,7 +83,7 @@ setup() {
     [ "$status" -eq 0 ] # In any case, this should return a 0 exit as to not block a build/deployment.
 }
 
-@test "9: Branch Filter - case 5 | no partial-match" {
+@test "10: Branch Filter - case 5 | no partial-match" {
     CIRCLE_BRANCH="pr-"
     run BranchFilter
     echo "Error output debug: $output"

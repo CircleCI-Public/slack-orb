@@ -5,12 +5,13 @@ BuildMessageBody() {
     #   If none, error.
     if [ -n "$SLACK_PARAM_CUSTOM" ]; then
         ModifyCustomTemplate
-        CUSTOM_BODY_MODIFIED=$(echo "$CUSTOM_BODY_MODIFIED" | sed 's/"/\\"/g' | sed 's/\\n/\\\\n/g' | sed 's/|/\\|/g' | sed 's/</\\</g' | sed 's/>/\\>/g')
-        T2=$(eval echo $CUSTOM_BODY_MODIFIED)
+        # shellcheck disable=SC2016
+        CUSTOM_BODY_MODIFIED=$(echo "$CUSTOM_BODY_MODIFIED" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed 's/`/\\`/g')
+        T2=$(eval echo \""$CUSTOM_BODY_MODIFIED"\")
     elif [ -n "$SLACK_PARAM_TEMPLATE" ]; then
-        TEMPLATE="$(echo \$$SLACK_PARAM_TEMPLATE)"
-        T1=$(eval echo $TEMPLATE | sed 's/"/\\"/g' | sed 's/\\n/\\\\n/g')
-        T2=$(eval echo $T1)
+        TEMPLATE="\$$SLACK_PARAM_TEMPLATE"
+        T1=$(eval echo "$TEMPLATE" | sed 's/"/\\"/g')
+        T2=$(eval echo \""$T1"\")
     else
         echo "Error: No message template selected."
         echo "Select either a custom template or one of the pre-included ones via the 'custom' or 'template' parameters."
@@ -31,7 +32,8 @@ PostToSlack() {
        echo "No channel was provided. Enter value for SLACK_DEFAULT_CHANNEL env var, or channel parameter"
        exit 0
     fi
-    for i in $(echo $(eval echo "$SLACK_PARAM_CHANNEL")  | sed "s/,/ /g")
+    # shellcheck disable=SC2001
+    for i in $(eval echo \""$SLACK_PARAM_CHANNEL"\" | sed "s/,/ /g")
     do
         echo "Sending to Slack Channel: $i"
         SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg channel "$i" '.channel = $channel')
