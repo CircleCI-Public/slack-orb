@@ -17,7 +17,7 @@ usage:
         - run:
             command: npm run deploy
         - slack/notify:
-            event: success
+            event: pass
             template: basic_fail_1
             channel: ABCXYZ
   workflows:
