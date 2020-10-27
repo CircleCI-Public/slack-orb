@@ -27,11 +27,6 @@ PostToSlack() {
     # Post once per channel listed by the channel parameter
     #    The channel must be modified in SLACK_MSG_BODY
 
-    # If no channel is provided, quit with error
-    if [ "$SLACK_PARAM_CHANNEL" = "" ]; then
-       echo "No channel was provided. Enter value for SLACK_DEFAULT_CHANNEL env var, or channel parameter"
-       exit 0
-    fi
     # shellcheck disable=SC2001
     for i in $(eval echo \""$SLACK_PARAM_CHANNEL"\" | sed "s/,/ /g")
     do
@@ -111,11 +106,30 @@ BranchFilter() {
     fi
 }
 
+CheckEnvVars() {
+    if [ -z "$SLACK_ACCESS_TOKEN" ]; then
+        echo "In order to use the Slack Orb (v4 +), an OAuth token must be present via the SLACK_ACCESS_TOKEN environment variable."
+        echo "Follow the setup guide available in the wiki: https://github.com/CircleCI-Public/slack-orb/wiki/Setup"
+        exit 1
+    fi
+    # If no channel is provided, quit with error
+    if [ "$SLACK_PARAM_CHANNEL" = "" ]; then
+       echo "No channel was provided. Enter value for SLACK_DEFAULT_CHANNEL env var, or channel parameter"
+       exit 1
+    fi
+    if [ -n "$SLACK_WEBHOOK" ]; then
+        echo "It appears you have a Slack Webhook token present in this job."
+        echo "Please note, Webhooks are no longer used for the Slack Orb (v4 +)."
+        echo "Follow the setup guide available in the wiki: https://github.com/CircleCI-Public/slack-orb/wiki/Setup"
+    fi
+}
+
 # Will not run if sourced from another script.
 # This is done so this script may be tested.
 ORB_TEST_ENV="bats-core"
 if [ "${0#*$ORB_TEST_ENV}" = "$0" ]; then
     . "/tmp/SLACK_JOB_STATUS"
+    CheckEnvVars
     InstallJq
     BuildMessageBody
     Notify
