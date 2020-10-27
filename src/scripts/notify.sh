@@ -113,7 +113,7 @@ CheckEnvVars() {
         exit 1
     fi
     # If no channel is provided, quit with error
-    if [ "$SLACK_PARAM_CHANNEL" = "" ]; then
+    if [ -z "$SLACK_PARAM_CHANNEL" ]; then
        echo "No channel was provided. Enter value for SLACK_DEFAULT_CHANNEL env var, or channel parameter"
        exit 1
     fi
