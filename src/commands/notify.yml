@@ -25,6 +25,11 @@ parameters:
       A comma separated list of regex matchable branch names. Notifications will only be sent if sent from a job from these branches. By default ".+" will be used to match all branches. Pattern must match the full string, no partial matches.
     type: string
     default: ".+"
+  tag_pattern:
+    description: |
+      A comma separated list of regex matchable tag names. Notifications will only be sent if sent from a job from these branches. By default ".+" will be used to match all tags. Pattern must match the full string, no partial matches.
+    type: string
+    default: ".+"
   mentions:
     description: |
       Exports to the "$SLACK_PARAM_MENTIONS" environment variable for use in templates.
@@ -33,10 +38,10 @@ parameters:
     type: string
     default: ""
   channel:
-      description: |
-        Select which channel in which to post to. Channel name or ID will work. You may include a comma separated list of channels if you wish to post to multiple channels at once. Set the "SLACK_DEFAULT_CHANNEL" environment variable for the default channel.
-      type: string
-      default: $SLACK_DEFAULT_CHANNEL
+    description: |
+      Select which channel in which to post to. Channel name or ID will work. You may include a comma separated list of channels if you wish to post to multiple channels at once. Set the "SLACK_DEFAULT_CHANNEL" environment variable for the default channel.
+    type: string
+    default: $SLACK_DEFAULT_CHANNEL
 
 steps:
   - run:
@@ -58,6 +63,7 @@ steps:
         SLACK_PARAM_CUSTOM: "<<parameters.custom>>"
         SLACK_PARAM_MENTIONS: "<<parameters.mentions>>"
         SLACK_PARAM_BRANCHPATTERN: "<<parameters.branch_pattern>>"
+        SLACK_PARAM_TAGPATTERN: "<<parameters.tag_pattern>>"
         SLACK_PARAM_CHANNEL: "<<parameters.channel>>"
         # import pre-built templates using the orb-pack local script include.
         basic_fail_1: "<<include(message_templates/basic_fail_1.json)>>"
