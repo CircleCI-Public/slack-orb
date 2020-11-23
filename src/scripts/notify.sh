@@ -39,26 +39,6 @@ PostToSlack() {
     done
 }
 
-Notify() {
-    if [ "$CCI_STATUS" = "$SLACK_PARAM_EVENT" ] || [ "$SLACK_PARAM_EVENT" = "always" ]; then
-
-    # In the event the Slack notification would be sent, first ensure it is allowed to trigger
-    # on this branch or this tag.
-    FilterBy "$SLACK_PARAM_BRANCHPATTERN" "$CIRCLE_BRANCH"
-    FilterBy "$SLACK_PARAM_TAGPATTERN" "$CIRCLE_TAG"
-
-    echo "Sending Notification"
-    PostToSlack
-    else
-        # dont send message.
-        echo "NO SLACK ALERT"
-        echo
-        echo "This command is set to send an alert on: $SLACK_PARAM_EVENT"
-        echo "Current status: ${CCI_STATUS}"
-        exit 0
-    fi
-}
-
 ModifyCustomTemplate() {
     # Inserts the required "text" field to the custom json template from block kit builder.
     if [ "$(echo "$SLACK_PARAM_CUSTOM" | jq '.text')" = "null" ]; then
@@ -133,13 +113,33 @@ CheckEnvVars() {
     fi
 }
 
+ShouldPost() {
+    if [ "$CCI_STATUS" = "$SLACK_PARAM_EVENT" ] || [ "$SLACK_PARAM_EVENT" = "always" ]; then
+        # In the event the Slack notification would be sent, first ensure it is allowed to trigger
+        # on this branch or this tag.
+        FilterBy "$SLACK_PARAM_BRANCHPATTERN" "$CIRCLE_BRANCH"
+        FilterBy "$SLACK_PARAM_TAGPATTERN" "$CIRCLE_TAG"
+
+        echo "Posting Status"
+    else 
+        # dont send message.
+        echo "NO SLACK ALERT"
+        echo
+        echo "This command is set to send an alert on: $SLACK_PARAM_EVENT"
+        echo "Current status: ${CCI_STATUS}"
+        exit 0
+    fi
+}
+
 # Will not run if sourced from another script.
 # This is done so this script may be tested.
 ORB_TEST_ENV="bats-core"
 if [ "${0#*$ORB_TEST_ENV}" = "$0" ]; then
-    . "/tmp/SLACK_JOB_STATUS" # this is required for fetching the job status set by the notify.yml command.
+    ShouldPost
     CheckEnvVars
+    . "/tmp/SLACK_JOB_STATUS"
     InstallJq
     BuildMessageBody
-    Notify
+    PostToSlack
+
 fi
