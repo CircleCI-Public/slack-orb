@@ -7,7 +7,7 @@ setup() {
     CCI_STATUS="success"
     SLACK_PARAM_EVENT="fail"
     echo "Running notify"
-    run Notify
+    run ShouldPost
     echo "test output status: $status"
     echo "Output:"
     echo "$output"
