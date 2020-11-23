@@ -137,7 +137,7 @@ ORB_TEST_ENV="bats-core"
 if [ "${0#*$ORB_TEST_ENV}" = "$0" ]; then
     ShouldPost
     CheckEnvVars
-    source "/tmp/SLACK_JOB_STATUS"
+    . "/tmp/SLACK_JOB_STATUS"
     InstallJq
     BuildMessageBody
     PostToSlack
