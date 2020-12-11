@@ -2,11 +2,21 @@
 	"text": "",
 	"blocks": [
 		{
+			"type": "context",
+			"elements":[
+				{
+					"type": "mrkdwn",
+					"text": "*Project:* ${CIRCLE_PROJECT_REPONAME}"
+				}
+			]
+		},
+		{
 			"type": "section",
 			"text": {
 				"type": "mrkdwn",
-				"text": "Your job *${CIRCLE_JOB}* has failed ⚠️ "
+				"text": "Your job *${CIRCLE_JOB}* has failed *⚠️* "
 			},
+
 			"fields": [
 				{
 					"type": "mrkdwn",
