@@ -1,34 +1,36 @@
 {
-	"text": "",
 	"blocks": [
 		{
-			"type": "context",
-			"elements":[
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": "JOB FAILED - :red_circle:",
+				"emoji": true
+			}
+		},
+		{
+			"type": "section",
+			"fields": [
 				{
 					"type": "mrkdwn",
-					"text": "*Project:* ${CIRCLE_PROJECT_REPONAME}"
+					"text": "*Job*: ${CIRCLE_JOB}"
 				}
 			]
 		},
 		{
 			"type": "section",
-			"text": {
-				"type": "mrkdwn",
-				"text": "Your job *${CIRCLE_JOB}* has failed *⚠️* "
-			},
-
 			"fields": [
 				{
 					"type": "mrkdwn",
-					"text": "*Commiter*:\\n${CIRCLE_USERNAME}"
+					"text": "*Project*:\\n$CIRCLE_PROJECT_REPONAME"
 				},
 				{
 					"type": "mrkdwn",
-					"text": "*SHA*:\\n${CIRCLE_SHA1}"
+					"text": "*Branch*:\\n$CIRCLE_BRANCH"
 				},
 				{
 					"type": "mrkdwn",
-					"text": "*Mentions*:\\n${SLACK_PARAM_MENTIONS}"
+					"text": "*Author*:\\n$CIRCLE_USERNAME"
 				}
 			],
 			"accessory": {
@@ -36,6 +38,15 @@
 				"image_url": "https://assets.brandfolder.com/otz5mn-bw4j2w-6jzqo8/original/circle-logo-badge-black.png",
 				"alt_text": "CircleCI logo"
 			}
+		},
+		{
+			"type": "section",
+			"fields": [
+				{
+					"type": "mrkdwn",
+					"text": "*Mentions*:\\n$SLACK_PARAM_MENTIONS"
+				}
+			]
 		},
 		{
 			"type": "actions",
