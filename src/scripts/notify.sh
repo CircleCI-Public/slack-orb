@@ -121,7 +121,7 @@ ShouldPost() {
         FilterBy "$SLACK_PARAM_TAGPATTERN" "$CIRCLE_TAG"
 
         echo "Posting Status"
-    else 
+    else
         # dont send message.
         echo "NO SLACK ALERT"
         echo
