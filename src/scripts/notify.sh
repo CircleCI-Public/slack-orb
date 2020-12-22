@@ -32,10 +32,17 @@ PostToSlack() {
     do
         echo "Sending to Slack Channel: $i"
         SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg channel "$i" '.channel = $channel')
-        curl -s -f -X POST -H 'Content-type: application/json' \
-        -H "Authorization: Bearer $SLACK_ACCESS_TOKEN" \
-        --data \
-        "$SLACK_MSG_BODY" https://slack.com/api/chat.postMessage | jq '{ok: .ok, error: .error}'
+        SLACK_SENT_RESPONSE=$(curl -s -f -X POST -H 'Content-type: application/json' -H "Authorization: Bearer $SLACK_ACCESS_TOKEN" --data "$SLACK_MSG_BODY" https://slack.com/api/chat.postMessage)
+        SLACK_ERROR_MSG=$(echo "$SLACK_SENT_RESPONSE" | jq '.error')
+        if [ -n "$SLACK_ERROR_MSG" ]; then
+            echo "There was an error sending the Slack message. Please view the error below."
+            echo "ERROR: $SLACK_ERROR_MSG"
+            echo
+            echo "View the Setup Guide: https://github.com/CircleCI-Public/slack-orb/wiki/Setup"
+            if [ "$SLACK_PARAM_EXIT_ON_FAIL" == "true" ]; then
+                exit 1
+            fi
+        fi
     done
 }
 
