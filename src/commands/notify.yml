@@ -70,7 +70,7 @@ steps:
         SLACK_PARAM_BRANCHPATTERN: "<<parameters.branch_pattern>>"
         SLACK_PARAM_TAGPATTERN: "<<parameters.tag_pattern>>"
         SLACK_PARAM_CHANNEL: "<<parameters.channel>>"
-        SLACK_PARAM_EXIT_ON_FAIL: "parameters.exit_on_fail"
+        SLACK_PARAM_EXIT_ON_FAIL: "<<parameters.exit_on_fail>>"
         # import pre-built templates using the orb-pack local script include.
         basic_fail_1: "<<include(message_templates/basic_fail_1.json)>>"
         success_tagged_deploy_1: "<<include(message_templates/success_tagged_deploy_1.json)>>"
