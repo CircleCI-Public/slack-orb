@@ -39,8 +39,7 @@ PostToSlack() {
             echo "ERROR: $SLACK_ERROR_MSG"
             echo
             echo "View the Setup Guide: https://github.com/CircleCI-Public/slack-orb/wiki/Setup"
-            echo "DEBUG: $SLACK_PARAM_EXIT_ON_FAIL"
-            if [ "$SLACK_PARAM_EXIT_ON_FAIL" = "true" ]; then
+            if [ "$SLACK_PARAM_EXIT_ON_FAIL" = "1" ]; then
                 exit 1
             fi
         fi
