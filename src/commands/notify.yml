@@ -45,9 +45,9 @@ parameters:
   ignore_errors:
       description: |
         Ignore errors posting to Slack.
-        Enable this to prevent Slack outages from affecting your pipeline.
+        Disable to catch initial setup errors. Re-enable to prevent Slack errors from affecting your pipeline.
       type: boolean
-      default: false
+      default: true
 steps:
   - run:
       when: on_fail
