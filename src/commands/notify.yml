@@ -42,7 +42,12 @@ parameters:
       Select which channel in which to post to. Channel name or ID will work. You may include a comma separated list of channels if you wish to post to multiple channels at once. Set the "SLACK_DEFAULT_CHANNEL" environment variable for the default channel.
     type: string
     default: $SLACK_DEFAULT_CHANNEL
-
+  ignore_errors:
+      description: |
+        Ignore errors posting to Slack.
+        Disable to catch initial setup errors. Re-enable to prevent Slack errors from affecting your pipeline.
+      type: boolean
+      default: true
 steps:
   - run:
       when: on_fail
@@ -65,6 +70,7 @@ steps:
         SLACK_PARAM_BRANCHPATTERN: "<<parameters.branch_pattern>>"
         SLACK_PARAM_TAGPATTERN: "<<parameters.tag_pattern>>"
         SLACK_PARAM_CHANNEL: "<<parameters.channel>>"
+        SLACK_PARAM_IGNORE_ERRORS: "<<parameters.ignore_errors>>"
         # import pre-built templates using the orb-pack local script include.
         basic_fail_1: "<<include(message_templates/basic_fail_1.json)>>"
         success_tagged_deploy_1: "<<include(message_templates/success_tagged_deploy_1.json)>>"
