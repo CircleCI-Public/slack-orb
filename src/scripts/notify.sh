@@ -139,6 +139,12 @@ ShouldPost() {
     fi
 }
 
+# allow the injection of other data into the environment
+# by the build to be used in slack messages
+if [ -x "/tmp/slack-notify-enhance" ]; then
+    . "/tmp/slack-notify-enhance"
+fi
+
 # Will not run if sourced from another script.
 # This is done so this script may be tested.
 ORB_TEST_ENV="bats-core"
