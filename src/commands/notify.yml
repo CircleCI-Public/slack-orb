@@ -48,6 +48,21 @@ parameters:
         Disable to catch initial setup errors. Re-enable to prevent Slack errors from affecting your pipeline.
       type: boolean
       default: true
+  icon:
+    description: |
+      URL for the icon to be displayed with the post
+    type: string
+    default: ""
+  username:
+    description: |
+      The name of the poster, be displayed with the post
+    type: string
+    default: ""
+  color:
+    description: |
+      Vertical bar color on the leading-edge of the post
+    type: string
+    default: ""
 steps:
   - run:
       when: on_fail
@@ -71,6 +86,9 @@ steps:
         SLACK_PARAM_TAGPATTERN: "<<parameters.tag_pattern>>"
         SLACK_PARAM_CHANNEL: "<<parameters.channel>>"
         SLACK_PARAM_IGNORE_ERRORS: "<<parameters.ignore_errors>>"
+        SLACK_PARAM_ICON: "<<parameters.icon>>"
+        SLACK_PARAM_USERNAME: "<<parameters.username>>"
+        SLACK_PARAM_COLOR: "<<parameters.color>>"
         # import pre-built templates using the orb-pack local script include.
         basic_fail_1: "<<include(message_templates/basic_fail_1.json)>>"
         success_tagged_deploy_1: "<<include(message_templates/success_tagged_deploy_1.json)>>"
