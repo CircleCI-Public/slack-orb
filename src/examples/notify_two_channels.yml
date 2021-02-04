@@ -1,5 +1,5 @@
 description: |
-  Send a Slack notification to two channels simultaniously.
+  Send a Slack notification to two channels simultaneously.
   By default, if no channel parameter is set, the $SLACK_DEFAULT_CHANNEL value will be used (must be set).
   A custom channel, or comma-separated list of channels can be supplied via the "channel" parameter.
 
