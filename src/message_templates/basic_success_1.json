@@ -4,7 +4,7 @@
 			"type": "header",
 			"text": {
 				"type": "plain_text",
-				"text": "Job Succeeded. :green_circle:",
+				"text": "Job Succeeded. :white_check_mark:",
 				"emoji": true
 			}
 		},
