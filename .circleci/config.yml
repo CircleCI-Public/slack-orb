@@ -67,6 +67,9 @@ jobs:
           mentions: "@orbs"
           event: always
       - slack/notify:
+          template: basic_success_1
+          event: always
+      - slack/notify:
           template: success_tagged_deploy_1
           event: always
       - slack/notify:
