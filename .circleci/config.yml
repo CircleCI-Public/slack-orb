@@ -76,6 +76,9 @@ jobs:
           template: basic_on_hold_1
           event: always
       - slack/notify:
+          template: workflow_success_1
+          event: always
+      - slack/notify:
           event: pass
           custom: >
             {
