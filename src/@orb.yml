@@ -2,6 +2,7 @@ version: 2.1
 
 description: >
   Implement event-based notifications across all of your CI/CD pipelines. Utilizing built-in message templates or Slack's visual Block-Kit builder, create and customize notifications specific to your organization's needs.
+  Arm64 V8 compatible.
 
 display:
   home_url: https://github.com/CircleCI-Public/slack-orb/wiki
