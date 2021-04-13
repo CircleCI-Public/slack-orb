@@ -3,12 +3,12 @@ BuildMessageBody() {
     #   If sending message, default to custom template,
     #   if none is supplied, check for a pre-selected template value.
     #   If none, error.
-    if [ -n "$SLACK_PARAM_CUSTOM" ]; then
+    if [ -n "${SLACK_PARAM_CUSTOM:-}" ]; then
         ModifyCustomTemplate
         # shellcheck disable=SC2016
         CUSTOM_BODY_MODIFIED=$(echo "$CUSTOM_BODY_MODIFIED" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed 's/`/\\`/g')
         T2=$(eval echo \""$CUSTOM_BODY_MODIFIED"\")
-    elif [ -n "$SLACK_PARAM_TEMPLATE" ]; then
+    elif [ -n "${SLACK_PARAM_TEMPLATE:-}" ]; then
         TEMPLATE="\$$SLACK_PARAM_TEMPLATE"
         T1=$(eval echo "$TEMPLATE" | sed 's/"/\\"/g')
         T2=$(eval echo \""$T1"\")
@@ -104,17 +104,17 @@ FilterBy() {
 }
 
 CheckEnvVars() {
-    if [ -z "$SLACK_ACCESS_TOKEN" ]; then
+    if [ -z "${SLACK_ACCESS_TOKEN:-}" ]; then
         echo "In order to use the Slack Orb (v4 +), an OAuth token must be present via the SLACK_ACCESS_TOKEN environment variable."
         echo "Follow the setup guide available in the wiki: https://github.com/CircleCI-Public/slack-orb/wiki/Setup"
         exit 1
     fi
     # If no channel is provided, quit with error
-    if [ -z "$SLACK_PARAM_CHANNEL" ]; then
+    if [ -z "${SLACK_PARAM_CHANNEL:-}" ]; then
        echo "No channel was provided. Enter value for SLACK_DEFAULT_CHANNEL env var, or channel parameter"
        exit 1
     fi
-    if [ -n "$SLACK_WEBHOOK" ]; then
+    if [ -n "${SLACK_WEBHOOK:-}" ]; then
         echo "It appears you have a Slack Webhook token present in this job."
         echo "Please note, Webhooks are no longer used for the Slack Orb (v4 +)."
         echo "Follow the setup guide available in the wiki: https://github.com/CircleCI-Public/slack-orb/wiki/Setup"
