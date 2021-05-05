@@ -122,7 +122,7 @@ CheckEnvVars() {
 }
 
 ShouldPost() {
-    if [ "$CCI_STATUS" = "$SLACK_PARAM_EVENT" ] || [ "$SLACK_PARAM_EVENT" = "always" ]; then
+    if [[ -n $(eval echo $SLACK_PARAM_OVERRIDE_EVENT) ]] || [ "$CCI_STATUS" = "$SLACK_PARAM_EVENT" ] || [ "$SLACK_PARAM_EVENT" = "always" ]; then
         # In the event the Slack notification would be sent, first ensure it is allowed to trigger
         # on this branch or this tag.
         FilterBy "$SLACK_PARAM_BRANCHPATTERN" "${CIRCLE_BRANCH:-}"
