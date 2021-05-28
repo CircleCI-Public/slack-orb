@@ -90,9 +90,7 @@ FilterBy() {
         fi
     done
     if [ "$FLAG_MATCHES_FILTER" = "false" ]; then
-        AbortPost \
-            "Current reference \"$2\" does not match any matching parameter" \
-            "Current matching pattern: $1"
+        return 1
     fi
 }
 
@@ -135,9 +133,17 @@ ShouldPost() {
     # In the event the Slack notification would be sent, first ensure it is allowed to trigger
     # on this branch or this tag.
     if [ -n "${CIRCLE_BRANCH:-}" ]; then
-        FilterBy "$SLACK_PARAM_BRANCHPATTERN" "${CIRCLE_BRANCH:-}"
+        if ! FilterBy "$SLACK_PARAM_BRANCHPATTERN" "${CIRCLE_BRANCH:-}"; then
+            AbortPost \
+                "Branch pattern does not match: ${SLACK_PARAM_BRANCHPATTERN}" \
+                "CI was triggered by branch: ${CIRCLE_BRANCH}"
+        fi
     elif [ -n "${CIRCLE_TAG:-}" ]; then
-        FilterBy "$SLACK_PARAM_TAGPATTERN" "${CIRCLE_TAG:-}"
+        if ! FilterBy "$SLACK_PARAM_TAGPATTERN" "${CIRCLE_TAG:-}"; then
+            AbortPost \
+                "Tag pattern does not match: ${SLACK_PARAM_TAGPATTERN}" \
+                "CI was triggered by tag: ${CIRCLE_TAG}"
+        fi
     else
         AbortPost \
             "Neither CIRCLE_BRANCH nor CIRCLE_TAG was set" \
