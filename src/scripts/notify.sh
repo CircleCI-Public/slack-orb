@@ -133,13 +133,13 @@ ShouldPost() {
     # In the event the Slack notification would be sent, first ensure it is allowed to trigger
     # on this branch or this tag.
     if [ -n "${CIRCLE_BRANCH:-}" ]; then
-        if ! FilterBy "$SLACK_PARAM_BRANCHPATTERN" "${CIRCLE_BRANCH:-}"; then
+        if ! FilterBy "$SLACK_PARAM_BRANCHPATTERN" "$CIRCLE_BRANCH"; then
             AbortPost \
                 "Branch pattern does not match: ${SLACK_PARAM_BRANCHPATTERN}" \
                 "CI was triggered by branch: ${CIRCLE_BRANCH}"
         fi
     elif [ -n "${CIRCLE_TAG:-}" ]; then
-        if ! FilterBy "$SLACK_PARAM_TAGPATTERN" "${CIRCLE_TAG:-}"; then
+        if ! FilterBy "$SLACK_PARAM_TAGPATTERN" "$CIRCLE_TAG"; then
             AbortPost \
                 "Tag pattern does not match: ${SLACK_PARAM_TAGPATTERN}" \
                 "CI was triggered by tag: ${CIRCLE_TAG}"
