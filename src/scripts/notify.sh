@@ -124,7 +124,14 @@ AbortPost() {
 }
 
 ShouldPost() {
-    if [ "$CCI_STATUS" = "$SLACK_PARAM_EVENT" ] || [ "$SLACK_PARAM_EVENT" = "always" ]; then
+    if [ "$CCI_STATUS" != "$SLACK_PARAM_EVENT" ]; then
+        if [ "$SLACK_PARAM_EVENT" != "always" ]; then
+            AbortPost \
+                "This command is set to send an alert on: $SLACK_PARAM_EVENT" \
+                "Current status: ${CCI_STATUS}"
+        fi
+    fi
+
         # In the event the Slack notification would be sent, first ensure it is allowed to trigger
         # on this branch or this tag.
         if [ -n "${CIRCLE_BRANCH:-}" ]; then
@@ -138,11 +145,6 @@ ShouldPost() {
         fi
 
         echo "Posting Status"
-    else
-        AbortPost \
-            "This command is set to send an alert on: $SLACK_PARAM_EVENT" \
-            "Current status: ${CCI_STATUS}"
-    fi
 }
 
 # Will not run if sourced from another script.
