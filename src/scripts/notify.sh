@@ -90,12 +90,9 @@ FilterBy() {
         fi
     done
     if [ "$FLAG_MATCHES_FILTER" = "false" ]; then
-        # dont send message.
-        echo "NO SLACK ALERT"
-        echo
-        echo "Current reference \"$2\" does not match any matching parameter"
-        echo "Current matching pattern: $1"
-        exit 0
+        AbortPost \
+            "Current reference \"$2\" does not match any matching parameter" \
+            "Current matching pattern: $1"
     fi
 }
 
@@ -117,6 +114,15 @@ CheckEnvVars() {
     fi
 }
 
+AbortPost() {
+    echo "NO SLACK ALERT"
+    echo
+    for s in "$@"; do
+        echo "$s"
+    done
+    exit 0
+}
+
 ShouldPost() {
     if [ "$CCI_STATUS" = "$SLACK_PARAM_EVENT" ] || [ "$SLACK_PARAM_EVENT" = "always" ]; then
         # In the event the Slack notification would be sent, first ensure it is allowed to trigger
@@ -126,22 +132,16 @@ ShouldPost() {
         elif [ -n "${CIRCLE_TAG:-}" ]; then
             FilterBy "$SLACK_PARAM_TAGPATTERN" "${CIRCLE_TAG:-}"
         else
-            # dont send message.
-            echo "NO SLACK ALERT"
-            echo
-            echo "Neither CIRCLE_BRANCH nor CIRCLE_TAG was set"
-            echo "Unable to determine whether orb should post"
-            exit 0
+            AbortPost \
+                "Neither CIRCLE_BRANCH nor CIRCLE_TAG was set" \
+                "Unable to determine whether orb should post"
         fi
 
         echo "Posting Status"
     else
-        # dont send message.
-        echo "NO SLACK ALERT"
-        echo
-        echo "This command is set to send an alert on: $SLACK_PARAM_EVENT"
-        echo "Current status: ${CCI_STATUS}"
-        exit 0
+        AbortPost \
+            "This command is set to send an alert on: $SLACK_PARAM_EVENT" \
+            "Current status: ${CCI_STATUS}"
     fi
 }
 
