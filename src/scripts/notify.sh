@@ -129,6 +129,13 @@ ShouldPost() {
             FilterBy "$SLACK_PARAM_BRANCHPATTERN" "${CIRCLE_BRANCH:-}"
         elif [ -n "${CIRCLE_TAG:-}" ]; then
             FilterBy "$SLACK_PARAM_TAGPATTERN" "${CIRCLE_TAG:-}"
+        else
+            # dont send message.
+            echo "NO SLACK ALERT"
+            echo
+            echo "Neither CIRCLE_BRANCH nor CIRCLE_TAG was set"
+            echo "Unable to determine whether orb should post"
+            exit 0
         fi
 
         echo "Posting Status"
