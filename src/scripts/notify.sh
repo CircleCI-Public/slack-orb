@@ -80,10 +80,6 @@ InstallJq() {
 }
 
 FilterBy() {
-    if [ -z "$1" ] || [ -z "$2" ]; then
-      return
-    fi
-
     # If any pattern supplied matches the current branch or the current tag, proceed; otherwise, exit with message.
     FLAG_MATCHES_FILTER="false"
     for i in $(echo "$1" | sed "s/,/ /g")
@@ -94,12 +90,7 @@ FilterBy() {
         fi
     done
     if [ "$FLAG_MATCHES_FILTER" = "false" ]; then
-        # dont send message.
-        echo "NO SLACK ALERT"
-        echo
-        echo "Current reference \"$2\" does not match any matching parameter"
-        echo "Current matching pattern: $1"
-        exit 0
+        return 1
     fi
 }
 
@@ -121,22 +112,45 @@ CheckEnvVars() {
     fi
 }
 
-ShouldPost() {
-    if [ "$CCI_STATUS" = "$SLACK_PARAM_EVENT" ] || [ "$SLACK_PARAM_EVENT" = "always" ]; then
-        # In the event the Slack notification would be sent, first ensure it is allowed to trigger
-        # on this branch or this tag.
-        FilterBy "$SLACK_PARAM_BRANCHPATTERN" "${CIRCLE_BRANCH:-}"
-        FilterBy "$SLACK_PARAM_TAGPATTERN" "${CIRCLE_TAG:-}"
+AbortPost() {
+    echo "NO SLACK ALERT"
+    echo
+    for s in $@; do
+        echo "$s"
+    done
+    exit 0
+}
 
-        echo "Posting Status"
-    else
-        # dont send message.
-        echo "NO SLACK ALERT"
-        echo
-        echo "This command is set to send an alert on: $SLACK_PARAM_EVENT"
-        echo "Current status: ${CCI_STATUS}"
-        exit 0
+ShouldPost() {
+    if [ "$CCI_STATUS" != "$SLACK_PARAM_EVENT" ]; then
+        if [ "$SLACK_PARAM_EVENT" != "always" ]; then
+            AbortPost \
+                "This command is set to send an alert on: $SLACK_PARAM_EVENT" \
+                "Current status: ${CCI_STATUS}"
+        fi
     fi
+
+    # In the event the Slack notification would be sent, first ensure it is allowed to trigger
+    # on this branch or this tag.
+    if [ -n "${CIRCLE_BRANCH:-}" ]; then
+        if ! FilterBy "$SLACK_PARAM_BRANCHPATTERN" "$CIRCLE_BRANCH"; then
+            AbortPost \
+                "Branch pattern does not match: ${SLACK_PARAM_BRANCHPATTERN}" \
+                "CI was triggered by branch: ${CIRCLE_BRANCH}"
+        fi
+    elif [ -n "${CIRCLE_TAG:-}" ]; then
+        if ! FilterBy "$SLACK_PARAM_TAGPATTERN" "$CIRCLE_TAG"; then
+            AbortPost \
+                "Tag pattern does not match: ${SLACK_PARAM_TAGPATTERN}" \
+                "CI was triggered by tag: ${CIRCLE_TAG}"
+        fi
+    else
+        AbortPost \
+            "Neither CIRCLE_BRANCH nor CIRCLE_TAG was set" \
+            "Unable to determine whether orb should post"
+    fi
+
+    echo "Posting Status"
 }
 
 # Will not run if sourced from another script.
