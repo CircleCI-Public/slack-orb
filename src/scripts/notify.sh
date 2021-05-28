@@ -132,19 +132,19 @@ ShouldPost() {
         fi
     fi
 
-        # In the event the Slack notification would be sent, first ensure it is allowed to trigger
-        # on this branch or this tag.
-        if [ -n "${CIRCLE_BRANCH:-}" ]; then
-            FilterBy "$SLACK_PARAM_BRANCHPATTERN" "${CIRCLE_BRANCH:-}"
-        elif [ -n "${CIRCLE_TAG:-}" ]; then
-            FilterBy "$SLACK_PARAM_TAGPATTERN" "${CIRCLE_TAG:-}"
-        else
-            AbortPost \
-                "Neither CIRCLE_BRANCH nor CIRCLE_TAG was set" \
-                "Unable to determine whether orb should post"
-        fi
+    # In the event the Slack notification would be sent, first ensure it is allowed to trigger
+    # on this branch or this tag.
+    if [ -n "${CIRCLE_BRANCH:-}" ]; then
+        FilterBy "$SLACK_PARAM_BRANCHPATTERN" "${CIRCLE_BRANCH:-}"
+    elif [ -n "${CIRCLE_TAG:-}" ]; then
+        FilterBy "$SLACK_PARAM_TAGPATTERN" "${CIRCLE_TAG:-}"
+    else
+        AbortPost \
+            "Neither CIRCLE_BRANCH nor CIRCLE_TAG was set" \
+            "Unable to determine whether orb should post"
+    fi
 
-        echo "Posting Status"
+    echo "Posting Status"
 }
 
 # Will not run if sourced from another script.
