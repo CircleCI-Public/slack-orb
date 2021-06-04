@@ -10,6 +10,7 @@ BuildMessageBody() {
         T2=$(eval echo \""$CUSTOM_BODY_MODIFIED"\")
     elif [ -n "${SLACK_PARAM_TEMPLATE:-}" ]; then
         TEMPLATE="\$$SLACK_PARAM_TEMPLATE"
+        # shellcheck disable=SC2016
         T1=$(eval echo "$TEMPLATE" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed 's/`/\\`/g')
         T2=$(eval echo \""$T1"\")
     else
