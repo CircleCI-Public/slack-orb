@@ -64,7 +64,13 @@ InstallJq() {
         return $?
 
     elif [ ! -e /etc/issue ]; then
-        echo "/etc/issue doesn't exist, can't determine how to install jq." 
+        if command -v jq>/dev/null; then
+            echo "jq already installed, moving along."
+        else
+            echo "/etc/issue doesn't exist, and jq doesn't exist." 
+            echo "Unable to install jq automatically, please ensure your image contains it."
+            return 1 
+        fi
 
     elif cat /etc/issue | grep Debian > /dev/null 2>&1 || cat /etc/issue | grep Ubuntu > /dev/null 2>&1; then
         echo "Checking For JQ + CURL: Debian"
