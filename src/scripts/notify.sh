@@ -28,7 +28,7 @@ PostToSlack() {
     #    The channel must be modified in SLACK_MSG_BODY
 
     # shellcheck disable=SC2001
-    for i in $(eval echo \""$SLACK_PARAM_CHANNEL"\" | sed "s/,/ /g")
+    for i in $(eval echo \""$SLACK_PARAM_CHANNEL"\" | sed 's/,/ /g')
     do
         echo "Sending to Slack Channel: $i"
         SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg channel "$i" '.channel = $channel')
@@ -64,7 +64,7 @@ InstallJq() {
         return $?
 
     elif [ ! -e /etc/issue ]; then
-        echo "/etc/issue doesn't exist, can't determine how to install jq."
+        echo "/etc/issue doesn't exist, can't determine how to install jq." 
 
     elif cat /etc/issue | grep Debian > /dev/null 2>&1 || cat /etc/issue | grep Ubuntu > /dev/null 2>&1; then
         echo "Checking For JQ + CURL: Debian"
@@ -89,7 +89,7 @@ FilterBy() {
 
     # If any pattern supplied matches the current branch or the current tag, proceed; otherwise, exit with message.
     FLAG_MATCHES_FILTER="false"
-    for i in $(echo "$1" | sed "s/,/ /g")
+    for i in $(echo "$1" | sed 's/,/ /g')
     do
         if echo "$2" | grep -Eq "^${i}$"; then
             FLAG_MATCHES_FILTER="true"
