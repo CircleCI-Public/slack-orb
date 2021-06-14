@@ -63,6 +63,9 @@ InstallJq() {
         command -v jq >/dev/null 2>&1 || HOMEBREW_NO_AUTO_UPDATE=1 brew install jq --quiet
         return $?
 
+    elif [ ! -e /etc/issue ]; then
+        echo "/etc/issue doesn't exist, can't determine how to install jq."
+
     elif cat /etc/issue | grep Debian > /dev/null 2>&1 || cat /etc/issue | grep Ubuntu > /dev/null 2>&1; then
         echo "Checking For JQ + CURL: Debian"
         if [ "$(id -u)" = 0 ]; then export SUDO=""; else # Check if we're root
