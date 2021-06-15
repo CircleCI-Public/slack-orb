@@ -5,8 +5,9 @@ BuildMessageBody() {
     #   If none, error.
     if [ -n "${SLACK_PARAM_CUSTOM:-}" ]; then
         ModifyCustomTemplate
+        echo "$CUSTOM_BODY_MODIFIED"
         # shellcheck disable=SC2016
-        CUSTOM_BODY_MODIFIED=$(echo "$CUSTOM_BODY_MODIFIED" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed 's/`\/\\`/g')
+        CUSTOM_BODY_MODIFIED=$(echo "$CUSTOM_BODY_MODIFIED" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed 's/`/\\`/g')
         T2=$(eval echo \""$CUSTOM_BODY_MODIFIED"\")
     elif [ -n "${SLACK_PARAM_TEMPLATE:-}" ]; then
         TEMPLATE="\$$SLACK_PARAM_TEMPLATE"
@@ -48,6 +49,7 @@ PostToSlack() {
 }
 
 ModifyCustomTemplate() {
+    echo $SLACK_PARAM_CUSTOM
     # Inserts the required "text" field to the custom json template from block kit builder.
     if [ "$(echo "$SLACK_PARAM_CUSTOM" | jq '.text')" = "null" ]; then
         CUSTOM_BODY_MODIFIED=$(echo "$SLACK_PARAM_CUSTOM" | jq '. + {"text": ""}')
