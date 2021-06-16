@@ -5,6 +5,7 @@ BuildMessageBody() {
     #   If none, error.
     if [ -n "${SLACK_PARAM_CUSTOM:-}" ]; then
         ModifyCustomTemplate
+        echo "$CUSTOM_BODY_MODIFIED"
         # shellcheck disable=SC2016
         CUSTOM_BODY_MODIFIED=$(echo "$CUSTOM_BODY_MODIFIED" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed 's/`/\\`/g')
         T2=$(eval echo \""$CUSTOM_BODY_MODIFIED"\")
@@ -28,7 +29,7 @@ PostToSlack() {
     #    The channel must be modified in SLACK_MSG_BODY
 
     # shellcheck disable=SC2001
-    for i in $(eval echo \""$SLACK_PARAM_CHANNEL"\" | sed "s/,/ /g")
+    for i in $(eval echo \""$SLACK_PARAM_CHANNEL"\" | sed 's/,/ /g')
     do
         echo "Sending to Slack Channel: $i"
         SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg channel "$i" '.channel = $channel')
@@ -48,6 +49,7 @@ PostToSlack() {
 }
 
 ModifyCustomTemplate() {
+    echo $SLACK_PARAM_CUSTOM
     # Inserts the required "text" field to the custom json template from block kit builder.
     if [ "$(echo "$SLACK_PARAM_CUSTOM" | jq '.text')" = "null" ]; then
         CUSTOM_BODY_MODIFIED=$(echo "$SLACK_PARAM_CUSTOM" | jq '. + {"text": ""}')
@@ -62,6 +64,15 @@ InstallJq() {
         echo "Checking For JQ + CURL: MacOS"
         command -v jq >/dev/null 2>&1 || HOMEBREW_NO_AUTO_UPDATE=1 brew install jq --quiet
         return $?
+
+    elif [ ! -e /etc/issue ]; then
+        if command -v jq>/dev/null; then
+            echo "jq already installed, moving along."
+        else
+            echo "/etc/issue doesn't exist, and jq doesn't exist." 
+            echo "Unable to install jq automatically, please ensure your image contains it."
+            return 1 
+        fi
 
     elif cat /etc/issue | grep Debian > /dev/null 2>&1 || cat /etc/issue | grep Ubuntu > /dev/null 2>&1; then
         echo "Checking For JQ + CURL: Debian"
@@ -86,7 +97,7 @@ FilterBy() {
 
     # If any pattern supplied matches the current branch or the current tag, proceed; otherwise, exit with message.
     FLAG_MATCHES_FILTER="false"
-    for i in $(echo "$1" | sed "s/,/ /g")
+    for i in $(echo "$1" | sed 's/,/ /g')
     do
         if echo "$2" | grep -Eq "^${i}$"; then
             FLAG_MATCHES_FILTER="true"
