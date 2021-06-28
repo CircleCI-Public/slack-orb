@@ -1,0 +1,20 @@
+description: |
+  Send a custom notification which is imported from an external file.
+  The example below uses a json file. 
+  
+version: '2.1'
+orbs:
+  slack: circleci/slack@4.1
+jobs:
+  notify:
+    docker:
+      - image: 'cimg/base:stable'
+    steps:
+      - slack/notify:
+          custom_notification_filename: custom_notification.json
+          event: always
+workflows:
+  send-notification:
+    jobs:
+      - notify:
+          context: slack-secrets
