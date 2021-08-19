@@ -104,6 +104,11 @@ FilterBy() {
 }
 
 CheckEnvVars() {
+    if [ -n "${SLACK_WEBHOOK:-}" ]; then
+        echo "It appears you have a Slack Webhook token present in this job."
+        echo "Please note, Webhooks are no longer used for the Slack Orb (v4 +)."
+        echo "Follow the setup guide available in the wiki: https://github.com/CircleCI-Public/slack-orb/wiki/Setup"
+    fi
     if [ -z "${SLACK_ACCESS_TOKEN:-}" ]; then
         echo "In order to use the Slack Orb (v4 +), an OAuth token must be present via the SLACK_ACCESS_TOKEN environment variable."
         echo "Follow the setup guide available in the wiki: https://github.com/CircleCI-Public/slack-orb/wiki/Setup"
@@ -113,11 +118,6 @@ CheckEnvVars() {
     if [ -z "${SLACK_PARAM_CHANNEL:-}" ]; then
        echo "No channel was provided. Enter value for SLACK_DEFAULT_CHANNEL env var, or channel parameter"
        exit 1
-    fi
-    if [ -n "${SLACK_WEBHOOK:-}" ]; then
-        echo "It appears you have a Slack Webhook token present in this job."
-        echo "Please note, Webhooks are no longer used for the Slack Orb (v4 +)."
-        echo "Follow the setup guide available in the wiki: https://github.com/CircleCI-Public/slack-orb/wiki/Setup"
     fi
 }
 
