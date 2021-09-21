@@ -1,7 +1,7 @@
 description: >
   Use the "branch_pattern" parameter to limit notifications to specified branches.
   Useful when a job is executed on multiple branches but you only wish to be notified on a subset of branches.
-  For example: If your "build" job runs on every branch, but you wish to only be notified when a failure occurs on the "staging" branch, your config may look like this.
+  For example: If your "build" job runs on every branch, but you wish to only be notified when a failure occurs on the "main" branch, your config may look like this.
 usage:
   version: 2.1
   orbs:
