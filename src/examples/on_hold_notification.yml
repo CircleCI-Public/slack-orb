@@ -3,7 +3,7 @@ description: |
 usage:
   version: 2.1
   orbs:
-    slack: circleci/slack@4.4.4
+    slack: circleci/slack@4.4
   workflows:
     on-hold-example:
       jobs:
