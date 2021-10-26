@@ -23,19 +23,19 @@
 			"fields": [
 				{
 					"type": "mrkdwn",
-					"text": "*Project*:\n $CIRCLE_PROJECT_REPONAME"
+					"text": "*Project*:\\n $CIRCLE_PROJECT_REPONAME"
 				},
 				{
 					"type": "mrkdwn",
-					"text": "*Branch*:\n $CIRCLE_BRANCH"
-                },
-                {
-					"type": "mrkdwn",
-					"text": "*Commit*:\n $CIRCLE_SHA1"
+					"text": "*Branch*:\\n $CIRCLE_BRANCH"
 				},
 				{
 					"type": "mrkdwn",
-					"text": "*Author*:\n $CIRCLE_USERNAME"
+					"text": "*Commit*:\\n $CIRCLE_SHA1"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Author*:\\n $CIRCLE_USERNAME"
 				}
 			],
 			"accessory": {
