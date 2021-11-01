@@ -89,6 +89,9 @@ jobs:
                 }
               ]
             }
+      - slack/notify:
+          debug: true 
+            
 
 workflows:
 
