@@ -53,7 +53,7 @@ parameters:
        View payload and response being sent to slack api.
        Enable to view full payload being sent to slack and response being recieved from the API call.
       type: boolean
-      default: false      
+      default: false
 steps:
   - run:
       when: on_fail
