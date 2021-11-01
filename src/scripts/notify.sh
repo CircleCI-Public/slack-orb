@@ -32,7 +32,13 @@ PostToSlack() {
     do
         echo "Sending to Slack Channel: $i"
         SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg channel "$i" '.channel = $channel')
+        if [ -n "${SLACK_PARAM_DEBUG:-}" ]; then
+            echo "The message body being send to Slack is: $SLACK_MSG_BODY"
+        fi
         SLACK_SENT_RESPONSE=$(curl -s -f -X POST -H 'Content-type: application/json' -H "Authorization: Bearer $SLACK_ACCESS_TOKEN" --data "$SLACK_MSG_BODY" https://slack.com/api/chat.postMessage)
+        if [ -n "${SLACK_PARAM_DEBUG:-}" ]; then
+            echo "The response from the API call to slack is : $SLACK_SENT_RESPONSE"
+        fi        
         SLACK_ERROR_MSG=$(echo "$SLACK_SENT_RESPONSE" | jq '.error')
         if [ ! "$SLACK_ERROR_MSG" = "null" ]; then
             echo "Slack API returned an error message:"
