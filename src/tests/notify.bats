@@ -1,6 +1,8 @@
 setup() {
     source ./src/scripts/notify.sh
     export SLACK_PARAM_BRANCHPATTERN=$(cat $BATS_TEST_DIRNAME/sampleBranchFilters.txt)
+    export SLACK_PARAM_TAGPATTERN="tag1"
+    export SLACK_PARAM_EVENT="always"
 }
 
 @test "1: Skip message on no event" {
@@ -15,6 +17,7 @@ setup() {
     [ "$status" -eq 0 ] # Check for no exit error
     [[ $output == *"NO SLACK ALERT"* ]] # Ensure output contains expected string
 }
+
 @test "2: ModifyCustomTemplate" {
     # Ensure a custom template has the text key automatically affixed.
     SLACK_PARAM_CUSTOM=$(cat $BATS_TEST_DIRNAME/sampleCustomTemplate.json)
@@ -55,52 +58,104 @@ setup() {
     run FilterBy "$SLACK_PARAM_BRANCHPATTERN" "$CIRCLE_BRANCH"
     echo "Error SLACK_PARAM_BRANCHPATTERN debug: $SLACK_PARAM_BRANCHPATTERN"
     echo "Error output debug: $output"
-    [ "$output" == "" ] # Should match any branch: No output error
-    [ "$status" -eq 0 ] # In any case, this should return a 0 exit as to not block a build/deployment.
+    [ "$status" -eq 0 ]
 }
 
 @test "7: FilterBy - string" {
     CIRCLE_BRANCH="master"
     run FilterBy "$SLACK_PARAM_BRANCHPATTERN" "$CIRCLE_BRANCH"
     echo "Error output debug: $output"
-    [ "$output" == "" ] # "master" is in the list: No output error
-    [ "$status" -eq 0 ] # In any case, this should return a 0 exit as to not block a build/deployment.
+    [ "$status" -eq 0 ]
 }
 
 @test "8: FilterBy - regex numbers" {
     CIRCLE_BRANCH="pr-123"
     run FilterBy "$SLACK_PARAM_BRANCHPATTERN" "$CIRCLE_BRANCH"
     echo "Error output debug: $output"
-    [ "$output" == "" ] # "pr-[0-9]+" should match: No output error
-    [ "$status" -eq 0 ] # In any case, this should return a 0 exit as to not block a build/deployment.
+    [ "$status" -eq 0 ]
 }
 
 @test "9: FilterBy - non-match" {
     CIRCLE_BRANCH="x"
     run FilterBy "$SLACK_PARAM_BRANCHPATTERN" "$CIRCLE_BRANCH"
     echo "Error output debug: $output"
-    [[ "$output" =~ "NO SLACK ALERT" ]] # "x" is not included in the filter. Error message expected.
-    [ "$status" -eq 0 ] # In any case, this should return a 0 exit as to not block a build/deployment.
+    [ "$status" -eq 1 ]
 }
 
 @test "10: FilterBy - no partial-match" {
     CIRCLE_BRANCH="pr-"
     run FilterBy "$SLACK_PARAM_BRANCHPATTERN" "$CIRCLE_BRANCH"
     echo "Error output debug: $output"
-    [[ "$output" =~ "NO SLACK ALERT" ]] # Filter dictates that numbers should be included. Error message expected.
+    [ "$status" -eq 1 ]
+}
+
+@test "ShouldPost - FilterBy branch passes" {
+    CIRCLE_BRANCH="master"
+    run ShouldPost
+    echo "Error output debug: $output"
+    [[ "$output" =~ "Posting Status" ]]
     [ "$status" -eq 0 ] # In any case, this should return a 0 exit as to not block a build/deployment.
 }
 
-@test "11: FilterBy - SLACK_PARAM_BRANCHPATTERN is empty" {
+@test "ShouldPost - FilterBy branch fails" {
+    CIRCLE_BRANCH="x"
+    run ShouldPost
+    echo "Error output debug: $output"
+    [[ "$output" =~ "NO SLACK ALERT" ]]
+    [ "$status" -eq 0 ] # In any case, this should return a 0 exit as to not block a build/deployment.
+}
+
+@test "ShouldPost - CIRCLE_BRANCH is empty" {
+    unset CIRCLE_BRANCH
+    run ShouldPost
+    echo "Error output debug: $output"
+    [[ "$output" =~ "NO SLACK ALERT" ]]
+    [ "$status" -eq 0 ] # In any case, this should return a 0 exit as to not block a build/deployment.
+}
+
+@test "ShouldPost - SLACK_PARAM_BRANCHPATTERN is empty" {
     unset SLACK_PARAM_BRANCHPATTERN
     CIRCLE_BRANCH="master"
-    run FilterBy "$SLACK_PARAM_BRANCHPATTERN" "$CIRCLE_BRANCH"
+    run ShouldPost
     echo "Error output debug: $output"
+    [[ "$output" =~ "NO SLACK ALERT" ]]
     [ "$status" -eq 0 ] # In any case, this should return a 0 exit as to not block a build/deployment.
 }
 
-@test "12: FilterBy - CIRCLE_BRANCH is empty" {
-    run FilterBy "$SLACK_PARAM_BRANCHPATTERN" "$CIRCLE_BRANCH"
+@test "ShouldPost - FilterBy tag passes" {
+    unset CIRCLE_BRANCH
+    CIRCLE_TAG="tag1"
+    run ShouldPost
     echo "Error output debug: $output"
+    [[ "$output" =~ "Posting Status" ]]
+    [ "$status" -eq 0 ] # In any case, this should return a 0 exit as to not block a build/deployment.
+}
+
+@test "ShouldPost - FilterBy tag fails" {
+    unset CIRCLE_BRANCH
+    CIRCLE_TAG="x"
+    run ShouldPost
+    echo "Error output debug: $output"
+    [[ "$output" =~ "NO SLACK ALERT" ]]
+    [ "$status" -eq 0 ] # In any case, this should return a 0 exit as to not block a build/deployment.
+}
+
+@test "ShouldPost - CIRCLE_TAG is empty" {
+    unset CIRCLE_BRANCH
+    unset CIRCLE_TAG
+    run ShouldPost
+    echo "Error output debug: $output"
+    [[ "$output" =~ "NO SLACK ALERT" ]]
+    [ "$status" -eq 0 ] # In any case, this should return a 0 exit as to not block a build/deployment.
+}
+
+@test "ShouldPost - SLACK_PARAM_TAGPATTERN is empty" {
+    unset SLACK_PARAM_BRANCHPATTERN
+    unset SLACK_PARAM_TAGPATTERN
+    unset CIRCLE_BRANCH
+    CIRCLE_TAG="tag1"
+    run ShouldPost
+    echo "Error output debug: $output"
+    [[ "$output" =~ "NO SLACK ALERT" ]]
     [ "$status" -eq 0 ] # In any case, this should return a 0 exit as to not block a build/deployment.
 }
