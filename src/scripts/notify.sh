@@ -104,6 +104,17 @@ FilterBy() {
     fi
 }
 
+SetupEnvVars() {
+    echo "BASH_ENV file: $BASH_ENV"
+    if [ -f "$BASH_ENV" ]; then
+        echo "Exists. Sourcing into ENV"
+        # shellcheck disable=SC1090
+        . $BASH_ENV
+    else
+        echo "Does Not Exist. Skipping file execution"
+    fi
+}
+
 CheckEnvVars() {
     if [ -n "${SLACK_WEBHOOK:-}" ]; then
         echo "It appears you have a Slack Webhook token present in this job."
@@ -144,8 +155,7 @@ ShouldPost() {
 # This is done so this script may be tested.
 ORB_TEST_ENV="bats-core"
 if [ "${0#*$ORB_TEST_ENV}" = "$0" ]; then
-    # shellcheck disable=SC1090
-    . $BASH_ENV
+    SetupEnvVars
     CheckEnvVars
     . "/tmp/SLACK_JOB_STATUS"
     ShouldPost
