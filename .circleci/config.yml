@@ -91,6 +91,8 @@ jobs:
             }
       - slack/notify:
           debug: true
+          template: basic_success_1
+          event: always          
 
 workflows:
 
