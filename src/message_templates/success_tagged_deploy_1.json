@@ -14,15 +14,15 @@
 			"fields": [
 				{
 					"type": "mrkdwn",
-					"text": "*Project*:\\n$CIRCLE_PROJECT_REPONAME"
+					"text": "*Project*: $CIRCLE_PROJECT_REPONAME"
 				},
 				{
 					"type": "mrkdwn",
-					"text": "*When*:\\n$(date +'%m/%d/%Y %T')"
+					"text": "*When*: $(date +'%m/%d/%Y %T')"
 				},
 				{
 					"type": "mrkdwn",
-					"text": "*Tag*:\\n$CIRCLE_TAG"
+					"text": "*Tag*: $CIRCLE_TAG"
 				}
 			],
 			"accessory": {
