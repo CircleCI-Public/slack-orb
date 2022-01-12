@@ -22,6 +22,18 @@ BuildMessageBody() {
         T2=$(eval echo \""$T1"\")
         echo "!!!!!!!! T2 !!!!!!!"
         echo $T2
+
+        SLACK_PARAM_MENTIONS_VALUE=$(echo $T2 | jq -r '.blocks[] | select(.type == "section").fields[].text | select(contains("Mentions"))' | sed -e "s/\*Mentions\*: //")
+        # Checking if the string might contain an environment variable.
+        if [[ "$SLACK_PARAM_MENTIONS_VALUE" == *"\$"* ]]; then
+        
+            # If there is a "$" and no mentions with "@" we assume it's an environment variable, expanded it and update the json
+            if [[ "$SLACK_PARAM_MENTIONS_VALUE" != *"@"* ]]; then
+                EXPANDED_MENTION=$(eval echo "$SLACK_PARAM_MENTIONS_VALUE")
+                T2=$(echo $T2 | jq -r --arg mentions "*Mentions*: $EXPANDED_MENTION" \
+                    '(.blocks[] | select(.type == "section").fields[].text | select(contains("Mentions"))) = $mentions')
+            fi
+        fi
     else
         echo "Error: No message template selected."
         echo "Select either a custom template or one of the pre-included ones via the 'custom' or 'template' parameters."
