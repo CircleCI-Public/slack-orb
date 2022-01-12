@@ -10,26 +10,18 @@ BuildMessageBody() {
         T2=$(eval echo \""$CUSTOM_BODY_MODIFIED"\")
     elif [ -n "${SLACK_PARAM_TEMPLATE:-}" ]; then
         TEMPLATE="\$$SLACK_PARAM_TEMPLATE"
-
-        echo "!!!!!!!!!!!!!! TEMPLATE !!!!!!!!!!!!!!!"
-        echo $TEMPLATE
         # shellcheck disable=SC2016
         T1=$(eval echo "$TEMPLATE" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed 's/`/\\`/g')
-
-        echo "!!!!!!!! T1 !!!!!!!"
-        echo $T1
-
         T2=$(eval echo \""$T1"\")
-        echo "!!!!!!!! T2 !!!!!!!"
-        echo $T2
-
         SLACK_PARAM_MENTIONS_VALUE=$(echo $T2 | jq -r '.blocks[] | select(.type == "section").fields[].text | select(contains("Mentions"))' | sed -e "s/\*Mentions\*: //")
+
         # Checking if the string might contain an environment variable.
         if echo "$SLACK_PARAM_MENTIONS_VALUE" | grep -q "$" > /dev/null
         then
-            # If there is a "$" and no strings with "@" we assume it's an environment variable, expanded it and update the json
+            # If there is a "$" and no "@", we assume the string is an environment variable, expanded it and update the json
             if ! echo "$SLACK_PARAM_MENTIONS_VALUE" | grep -q "@" > /dev/null
             then
+                echo "Expading the environment variable: ${$SLACK_PARAM_MENTIONS_VALUE}"
                 EXPANDED_MENTION=$(eval echo "$SLACK_PARAM_MENTIONS_VALUE")
                 T2=$(echo $T2 | jq -r --arg mentions "*Mentions*: $EXPANDED_MENTION" \
                     '(.blocks[] | select(.type == "section").fields[].text | select(contains("Mentions"))) = $mentions')
