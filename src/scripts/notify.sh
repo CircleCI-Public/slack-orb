@@ -19,10 +19,9 @@ BuildMessageBody() {
         echo "!!!!!!!! T1 !!!!!!!"
         echo $T1
 
+        T2=$(eval echo \""$T1"\")
         echo "!!!!!!!! T2 !!!!!!!"
         echo $T2
-        
-        T2=$(eval echo \""$T1"\")
     else
         echo "Error: No message template selected."
         echo "Select either a custom template or one of the pre-included ones via the 'custom' or 'template' parameters."
