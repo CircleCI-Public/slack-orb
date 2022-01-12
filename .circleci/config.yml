@@ -64,7 +64,7 @@ jobs:
             grep "pass" /tmp/SLACK_JOB_STATUS
       - run:
           name: Export mention variable
-          command: echo 'export MY_MENTION=@orbs, everything looks good here!' >> $BASH_ENV
+          command: echo 'export MY_MENTION="@orbs, everything looks good here!"' >> $BASH_ENV
       - slack/notify:
           template: basic_fail_1
           mentions: "@orbs"
