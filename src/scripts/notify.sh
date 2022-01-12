@@ -21,7 +21,7 @@ BuildMessageBody() {
             # If there is a "$" and no "@", we assume the string is an environment variable, expanded it and update the json
             if ! echo "$SLACK_PARAM_MENTIONS_VALUE" | grep -q "@" > /dev/null
             then
-                echo "Expading the environment variable: ${$SLACK_PARAM_MENTIONS_VALUE}"
+                echo "Expading the environment variable: $SLACK_PARAM_MENTIONS_VALUE"
                 EXPANDED_MENTION=$(eval echo "$SLACK_PARAM_MENTIONS_VALUE")
                 T2=$(echo $T2 | jq -r --arg mentions "*Mentions*: $EXPANDED_MENTION" \
                     '(.blocks[] | select(.type == "section").fields[].text | select(contains("Mentions"))) = $mentions')
