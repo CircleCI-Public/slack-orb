@@ -1,4 +1,5 @@
 LOG_PATH=/tmp/slack-orb/logs
+mkdir -p LOG_PATH
 
 BuildMessageBody() {
     # Send message
@@ -153,7 +154,6 @@ ShouldPost() {
 # This is done so this script may be tested.
 ORB_TEST_ENV="bats-core"
 if [ "${0#*$ORB_TEST_ENV}" = "$0" ]; then
-    mkdir -p LOG_PATH
     CheckEnvVars
     . "/tmp/SLACK_JOB_STATUS"
     ShouldPost
