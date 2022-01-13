@@ -1,6 +1,3 @@
-LOG_PATH=/tmp/slack-orb/logs
-mkdir -p LOG_PATH
-
 BuildMessageBody() {
     # Send message
     #   If sending message, default to custom template,
@@ -150,10 +147,19 @@ ShouldPost() {
     fi
 }
 
+PrepareEnvinronment() {
+    LOG_PATH=/tmp/slack-orb/logs
+
+    if [ -L "$dirname" ]; then
+        mkdir -p LOG_PATH
+    fi
+}
+
 # Will not run if sourced from another script.
 # This is done so this script may be tested.
 ORB_TEST_ENV="bats-core"
 if [ "${0#*$ORB_TEST_ENV}" = "$0" ]; then
+    PrepareEnvinronment
     CheckEnvVars
     . "/tmp/SLACK_JOB_STATUS"
     ShouldPost
