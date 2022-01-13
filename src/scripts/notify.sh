@@ -1,3 +1,5 @@
+LOG_PATH=/tmp/slack-orb/logs
+
 BuildMessageBody() {
     # Send message
     #   If sending message, default to custom template,
@@ -37,6 +39,7 @@ PostToSlack() {
             echo "The message body being sent to Slack is: $SLACK_MSG_BODY"
         fi
         SLACK_SENT_RESPONSE=$(curl -s -f -X POST -H 'Content-type: application/json' -H "Authorization: Bearer $SLACK_ACCESS_TOKEN" --data "$SLACK_MSG_BODY" https://slack.com/api/chat.postMessage)
+        echo SLACK_SENT_RESPONSE > $LOG_PATH/SLACK_SENT_RESPONSE_LOG.txt
         if [ -n "${SLACK_PARAM_DEBUG:-}" ]; then
             echo "The response from the API call to slack is : $SLACK_SENT_RESPONSE"
         fi        
@@ -150,6 +153,7 @@ ShouldPost() {
 # This is done so this script may be tested.
 ORB_TEST_ENV="bats-core"
 if [ "${0#*$ORB_TEST_ENV}" = "$0" ]; then
+    mkdir -p LOG_PATH
     CheckEnvVars
     . "/tmp/SLACK_JOB_STATUS"
     ShouldPost
