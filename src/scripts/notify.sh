@@ -1,3 +1,5 @@
+LOG_PATH=/tmp/slack-orb/logs
+
 BuildMessageBody() {
     # Send message
     #   If sending message, default to custom template,
@@ -148,9 +150,7 @@ ShouldPost() {
 }
 
 PrepareEnvinronment() {
-    LOG_PATH=/tmp/slack-orb/logs
-
-    if [ -L "$dirname" ]; then
+    if [ -L "$LOG_PATH" ]; then
         mkdir -p LOG_PATH
     fi
 }
