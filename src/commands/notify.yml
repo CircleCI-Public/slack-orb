@@ -2,7 +2,10 @@ description: Notify a Slack channel with a custom message.
 
 parameters:
   template:
-    description: "Use one of the built-in templates. Select the template name. Preview each template on the gitHub Readme: "
+    description: |
+      Select which template to use for the notification by its name. The name must be available as an environment variable.
+      The built-in templates can be found and previewed at: https://github.com/CircleCI-Public/slack-orb/wiki#templates.
+      Alternatively, you can create and use your own dynamic templates: https://github.com/CircleCI-Public/slack-orb/wiki/Dynamic-Templates.
     type: string
     default: ""
   custom:
