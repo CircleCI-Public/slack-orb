@@ -27,7 +27,6 @@ BuildMessageBody() {
     SLACK_MSG_BODY=$T2
 }
 
-
 PostToSlack() {
     # Post once per channel listed by the channel parameter
     #    The channel must be modified in SLACK_MSG_BODY
@@ -168,5 +167,4 @@ if [ "${0#*$ORB_TEST_ENV}" = "$0" ]; then
     InstallJq
     BuildMessageBody
     PostToSlack
-
 fi
