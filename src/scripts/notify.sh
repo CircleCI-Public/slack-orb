@@ -151,7 +151,7 @@ ShouldPost() {
 SetupLogs() {
     $SUDO mkdir -p $LOG_PATH
 
-    if [ -f "$LOG_PATH/$SLACK_SENT_RESPONSE_LOG" ]; then
+    if [ ! -f "$LOG_PATH/$SLACK_SENT_RESPONSE_LOG" ]; then
         echo "[]" | $SUDO tee $LOG_PATH/$SLACK_SENT_RESPONSE_LOG
     fi
 }
