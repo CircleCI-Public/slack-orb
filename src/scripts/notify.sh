@@ -148,15 +148,16 @@ ShouldPost() {
     fi
 }
 
-SetupLogs()) {
+SetupLogs() {
     $SUDO mkdir -p $LOG_PATH
-    echo "[]" | $SUDO tee $LOG_PATH/SLACK_SENT_RESPONSE_LOG.txt
+    echo "[]" | $SUDO tee $LOG_PATH/$SLACK_SENT_RESPONSE_LOG
 }
 
 # Will not run if sourced from another script.
 # This is done so this script may be tested.
 ORB_TEST_ENV="bats-core"
 if [ "${0#*$ORB_TEST_ENV}" = "$0" ]; then
+    SetupLogs
     CheckEnvVars
     . "/tmp/SLACK_JOB_STATUS"
     ShouldPost
