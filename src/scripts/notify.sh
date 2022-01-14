@@ -41,7 +41,7 @@ PostToSlack() {
         fi
         SLACK_SENT_RESPONSE=$(curl -s -f -X POST -H 'Content-type: application/json' -H "Authorization: Bearer $SLACK_ACCESS_TOKEN" --data "$SLACK_MSG_BODY" https://slack.com/api/chat.postMessage)
         $SUDO mkdir -p $LOG_PATH
-        echo SLACK_SENT_RESPONSE > $LOG_PATH/SLACK_SENT_RESPONSE_LOG.txt
+        $SUDO echo SLACK_SENT_RESPONSE > $LOG_PATH/SLACK_SENT_RESPONSE_LOG.txt
         if [ -n "${SLACK_PARAM_DEBUG:-}" ]; then
             echo "The response from the API call to slack is : $SLACK_SENT_RESPONSE"
         fi        
