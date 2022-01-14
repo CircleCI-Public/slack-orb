@@ -152,10 +152,8 @@ ShouldPost() {
 }
 
 PrepareEnvinronment() {
-    if [ -L "$LOG_PATH" ]; then
-        $SUDO mkdir -p $LOG_PATH
-        $SUDO chmod -x $LOG_PATH
-    fi
+    $SUDO mkdir -p $LOG_PATH
+    $SUDO chmod -x $LOG_PATH
 }
 
 # Will not run if sourced from another script.
