@@ -1,6 +1,6 @@
 if [ "$(id -u)" = 0 ]; then export SUDO=""; else export SUDO="sudo"; fi
 LOG_PATH=/tmp/slack-orb/logs
-SLACK_SENT_RESPONSE_LOG=slack_sent_response.json
+POST_TO_SLACK_LOG=post-to-slack.json
 
 BuildMessageBody() {
     # Send message
@@ -41,7 +41,8 @@ PostToSlack() {
             echo "The message body being sent to Slack is: $SLACK_MSG_BODY"
         fi
         SLACK_SENT_RESPONSE=$(curl -s -f -X POST -H 'Content-type: application/json' -H "Authorization: Bearer $SLACK_ACCESS_TOKEN" --data "$SLACK_MSG_BODY" https://slack.com/api/chat.postMessage)
-        cat $LOG_PATH/$SLACK_SENT_RESPONSE_LOG | jq --argjson response "$SLACK_SENT_RESPONSE" '. += [$response]' | $SUDO tee $LOG_PATH/$SLACK_SENT_RESPONSE_LOG
+        cat $LOG_PATH/$POST_TO_SLACK_LOG | jq --argjson message "$SLACK_MSG_BODY"  --argjson response "$SLACK_SENT_RESPONSE" \
+            '. += [{"slackMessageBody": $message, "slackSentResponse": $response}]' | $SUDO tee $LOG_PATH/$POST_TO_SLACK_LOG
         if [ -n "${SLACK_PARAM_DEBUG:-}" ]; then
             echo "The response from the API call to slack is : $SLACK_SENT_RESPONSE"
         fi        
@@ -151,8 +152,8 @@ ShouldPost() {
 SetupLogs() {
     $SUDO mkdir -p $LOG_PATH
 
-    if [ ! -f "$LOG_PATH/$SLACK_SENT_RESPONSE_LOG" ]; then
-        echo "[]" | $SUDO tee $LOG_PATH/$SLACK_SENT_RESPONSE_LOG
+    if [ ! -f "$LOG_PATH/$POST_TO_SLACK_LOG" ]; then
+        echo "[]" | $SUDO tee $LOG_PATH/$POST_TO_SLACK_LOG
     fi
 }
 
