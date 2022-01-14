@@ -1,3 +1,5 @@
+if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
+
 LOG_PATH=/tmp/slack-orb/logs
 
 BuildMessageBody() {
@@ -151,7 +153,7 @@ ShouldPost() {
 
 PrepareEnvinronment() {
     if [ -L "$LOG_PATH" ]; then
-        mkdir -p LOG_PATH
+        $SUDO mkdir -p LOG_PATH
     fi
 }
 
