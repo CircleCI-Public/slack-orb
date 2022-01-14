@@ -1,3 +1,4 @@
+# shellcheck disable=SC2001
 if [ $EUID = 0 ]; then export SUDO=""; else export SUDO="sudo"; fi
 
 LOG_PATH=/tmp/slack-orb/logs
