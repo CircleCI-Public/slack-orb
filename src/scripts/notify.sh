@@ -1,3 +1,7 @@
+if [ "$(id -u)" = 0 ]; then export SUDO=""; else export SUDO="sudo"; fi
+LOG_PATH=/tmp/slack-orb/logs
+POST_TO_SLACK_LOG=post-to-slack.json
+
 BuildMessageBody() {
     # Send message
     #   If sending message, default to custom template,
@@ -23,7 +27,6 @@ BuildMessageBody() {
     SLACK_MSG_BODY=$T2
 }
 
-
 PostToSlack() {
     # Post once per channel listed by the channel parameter
     #    The channel must be modified in SLACK_MSG_BODY
@@ -37,6 +40,8 @@ PostToSlack() {
             echo "The message body being sent to Slack is: $SLACK_MSG_BODY"
         fi
         SLACK_SENT_RESPONSE=$(curl -s -f -X POST -H 'Content-type: application/json' -H "Authorization: Bearer $SLACK_ACCESS_TOKEN" --data "$SLACK_MSG_BODY" https://slack.com/api/chat.postMessage)
+        cat $LOG_PATH/$POST_TO_SLACK_LOG | jq --argjson message "$SLACK_MSG_BODY"  --argjson response "$SLACK_SENT_RESPONSE" \
+            '. += [{"slackMessageBody": $message, "slackSentResponse": $response}]' | $SUDO tee $LOG_PATH/$POST_TO_SLACK_LOG
         if [ -n "${SLACK_PARAM_DEBUG:-}" ]; then
             echo "The response from the API call to slack is : $SLACK_SENT_RESPONSE"
         fi        
@@ -72,9 +77,6 @@ InstallJq() {
 
     elif cat /etc/issue | grep Debian > /dev/null 2>&1 || cat /etc/issue | grep Ubuntu > /dev/null 2>&1; then
         echo "Checking For JQ + CURL: Debian"
-        if [ "$(id -u)" = 0 ]; then export SUDO=""; else # Check if we're root
-            export SUDO="sudo";
-        fi
         command -v jq >/dev/null 2>&1 || { $SUDO apt -qq update && $SUDO apt -qq install -y jq; }
         return $?
 
@@ -146,15 +148,23 @@ ShouldPost() {
     fi
 }
 
+SetupLogs() {
+    $SUDO mkdir -p $LOG_PATH
+
+    if [ ! -f "$LOG_PATH/$POST_TO_SLACK_LOG" ]; then
+        echo "[]" | $SUDO tee $LOG_PATH/$POST_TO_SLACK_LOG
+    fi
+}
+
 # Will not run if sourced from another script.
 # This is done so this script may be tested.
 ORB_TEST_ENV="bats-core"
 if [ "${0#*$ORB_TEST_ENV}" = "$0" ]; then
+    SetupLogs
     CheckEnvVars
     . "/tmp/SLACK_JOB_STATUS"
     ShouldPost
     InstallJq
     BuildMessageBody
     PostToSlack
-
 fi
