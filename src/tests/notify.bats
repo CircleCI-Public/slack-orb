@@ -113,6 +113,7 @@ setup() {
     MY_MENTIONS="I should show up in the template!"
     run ModifyCustomTemplate
     echo "ModifyMentions output debug: $output"
+    echo "T2 is $T2"
 
     MENTIONS=$(echo $T2 | jq -r '.blocks[] | select(.type == "section").fields[].text | select(contains("Mentions"))' | sed -e "s/\*Mentions\*: //")
     [[ $MENTIONS == $MY_MENTIONS ]]
