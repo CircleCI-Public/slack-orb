@@ -106,12 +106,9 @@ setup() {
 }
 
 @test "13: ModifyMentions - Should replace environment variable with its value" {
-    unset T2
-    unset MY_MENTIONS
-
     T2=$(cat $BATS_TEST_DIRNAME/sampleBasicFailWithVariableInMentions.json)
     MY_MENTIONS="I should show up in the template!"
-    ModifyCustomTemplate
+    ModifyMentions
     echo "Expansions is: $SLACK_PARAM_EXPANDED_MENTIONS"
     echo "T2 is $T2"
 
