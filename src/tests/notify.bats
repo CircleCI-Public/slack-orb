@@ -115,5 +115,7 @@ setup() {
     echo "T2 is $T2"
 
     MENTIONS=$(echo $T2 | jq -r '.blocks[] | select(.type == "section").fields[].text | select(contains("Mentions"))' | sed -e "s/\*Mentions\*: //")
+    echo "Mentions: $MENTIONS" 
+    
     [[ $MENTIONS == $MY_MENTIONS ]]
 }
