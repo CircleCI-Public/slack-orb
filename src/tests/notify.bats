@@ -104,3 +104,16 @@ setup() {
     echo "Error output debug: $output"
     [ "$status" -eq 0 ] # In any case, this should return a 0 exit as to not block a build/deployment.
 }
+
+@test "13: ModifyMentions - Should replace environment variable with its value" {
+    unset T2
+    unset MY_MENTIONS
+
+    T2=$(cat $BATS_TEST_DIRNAME/sampleBasicFailWithVariableInMentions.json)
+    MY_MENTIONS="I should show up in the template!"
+    run ModifyCustomTemplate
+    echo "ModifyMentions output debug: $output"
+
+    MENTIONS = $(echo $T2 | jq -r '.blocks[] | select(.type == "section").fields[].text | select(contains("Mentions"))' | sed -e "s/\*Mentions\*: //")
+    [[ $MENTIONS == $MY_MENTIONS ]]
+}

@@ -2,6 +2,23 @@ if [ "$(id -u)" = 0 ]; then export SUDO=""; else export SUDO="sudo"; fi
 LOG_PATH=/tmp/slack-orb/logs
 POST_TO_SLACK_LOG=post-to-slack.json
 
+ModifyMentions() {
+    echo "Checking the 'Mentions' parameter for environment variable."
+
+    SLACK_PARAM_MENTIONS=$(echo $T2 | jq -r '.blocks[] | select(.type == "section").fields[].text | select(contains("Mentions"))' | sed -e "s/\*Mentions\*: //")
+    SLACK_PARAM_EXPANDED_MENTIONS=${!SLACK_PARAM_MENTIONS}
+
+    if [ -z "$SLACK_PARAM_EXPANDED_MENTIONS" ]; then
+        echo "The 'Mentions' parameter doesn't contain an environment variable. Skipping variable expansion."
+        echo "If this is unexpected, please check the wiki: https://github.com/CircleCI-Public/slack-orb/wiki."
+    else
+        echo "Expanding the variable ${SLACK_PARAM_MENTIONS}."
+        echo "The mentions in the message body will be: ${SLACK_PARAM_EXPANDED_MENTIONS}"
+        T2=$(echo $T2 | jq -r --arg mentions "*Mentions*: $SLACK_PARAM_EXPANDED_MENTIONS" \
+                '(.blocks[] | select(.type == "section").fields[].text | select(contains("Mentions"))) = $mentions')
+    fi
+}
+
 BuildMessageBody() {
     # Send message
     #   If sending message, default to custom template,
@@ -17,6 +34,7 @@ BuildMessageBody() {
         # shellcheck disable=SC2016
         T1=$(eval echo "$TEMPLATE" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed 's/`/\\`/g')
         T2=$(eval echo \""$T1"\")
+        ModifyMentions
     else
         echo "Error: No message template selected."
         echo "Select either a custom template or one of the pre-included ones via the 'custom' or 'template' parameters."
@@ -165,6 +183,7 @@ if [ "${0#*$ORB_TEST_ENV}" = "$0" ]; then
     . "/tmp/SLACK_JOB_STATUS"
     ShouldPost
     InstallJq
+    ModifyMentions
     BuildMessageBody
     PostToSlack
 fi

@@ -1,0 +1,66 @@
+{
+    "text": "CircleCI job failed.",
+    "blocks": [
+        {
+            "type": "header",
+            "text": {
+                "type": "plain_text",
+                "text": "Job Failed. :red_circle:",
+                "emoji": true
+            }
+        },
+        {
+            "type": "section",
+            "fields": [
+                {
+                    "type": "mrkdwn",
+                    "text": "*Job*: integration-test-templates-cimg"
+                }
+            ]
+        },
+        {
+            "type": "section",
+            "fields": [
+                {
+                    "type": "mrkdwn",
+                    "text": "*Project*: slack-orb"
+                },
+                {
+                    "type": "mrkdwn",
+                    "text": "*Branch*: feat_mention_with_var"
+                },
+                {
+                    "type": "mrkdwn",
+                    "text": "*Author*: cpe-bot"
+                }
+            ],
+            "accessory": {
+                "type": "image",
+                "image_url": "https://assets.brandfolder.com/otz5mn-bw4j2w-6jzqo8/original/circle-logo-badge-black.png",
+                "alt_text": "CircleCI logo"
+            }
+        },
+        {
+            "type": "section",
+            "fields": [
+                {
+                    "type": "mrkdwn",
+                    "text": "*Mentions*: MY_MENTIONS"
+                }
+            ]
+        },
+        {
+            "type": "actions",
+            "elements": [
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "View Job"
+                    },
+                    "url": "https://circleci.com/gh/CircleCI-Public/slack-orb/3439"
+                }
+            ]
+        }
+    ]
+}
