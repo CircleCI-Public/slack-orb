@@ -5,8 +5,6 @@ POST_TO_SLACK_LOG=post-to-slack.json
 ModifyMentions() {
     echo "Checking the 'Mentions' parameter for environment variable."
 
-    echo "MENTIONS: $SLACK_PARAM_MENTIONS"
-
     SLACK_PARAM_MENTIONS_VAL=$(echo $T2 | jq -r '.blocks[] | select(.type == "section").fields[].text | select(contains("Mentions"))' | sed -e "s/\*Mentions\*: //")
     SLACK_PARAM_EXPANDED_MENTIONS=$(eval echo "$SLACK_PARAM_MENTIONS_VAL")
 
@@ -14,8 +12,8 @@ ModifyMentions() {
         echo "The 'Mentions' parameter is empty or doesn't contain an available environment variable. Skipping variable expansion."
         echo "If this is unexpected, please check the wiki: https://github.com/CircleCI-Public/slack-orb/wiki."
     else
-        echo "Expanding, if any, variables in ${SLACK_PARAM_MENTIONS_VAL}."
-        echo "The mentions in the message body will be: ${SLACK_PARAM_EXPANDED_MENTIONS}"
+        echo "Expanding, if any, variables in '${SLACK_PARAM_MENTIONS_VAL}'."
+        echo "The mentions in the message body will be: '${SLACK_PARAM_EXPANDED_MENTIONS}'."
         T2=$(echo $T2 | jq -r --arg mentions "*Mentions*: $SLACK_PARAM_EXPANDED_MENTIONS" \
                 '(.blocks[] | select(.type == "section").fields[].text | select(contains("Mentions"))) = $mentions')
     fi
@@ -36,9 +34,6 @@ BuildMessageBody() {
         # shellcheck disable=SC2016
         T1=$(eval echo "$TEMPLATE" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed 's/`/\\`/g')
         T2=$(eval echo \""$T1"\")
-
-        echo "T2 is: $T2"
-
         ModifyMentions
     else
         echo "Error: No message template selected."
