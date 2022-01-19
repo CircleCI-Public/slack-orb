@@ -4,8 +4,8 @@ setup() {
 }
 
 setupModifyMentions() {
-    T2=$(cat $BATS_TEST_DIRNAME/$1)
-    T2=$(echo $T2 | jq -r --arg mentions "*Mentions*: $2" \
+    T2=$(cat $BATS_TEST_DIRNAME/sampleBasicFail.json)
+    T2=$(echo $T2 | jq -r --arg mentions "*Mentions*: $1" \
             '(.blocks[] | select(.type == "section").fields[].text | select(contains("Mentions"))) = $mentions')
 }
 
@@ -116,7 +116,7 @@ setupModifyMentions() {
     TEMPLATE_MENTIONS_PARAM="\$MY_MENTIONS"
     MY_MENTIONS="I should show up in the template!"
 
-    setupModifyMentions "$TEMPLATE_PATH" "$TEMPLATE_MENTIONS_PARAM"
+    setupModifyMentions "$TEMPLATE_MENTIONS_PARAM"
 
     echo "T2 pre-function: $T2"
     ModifyMentions
@@ -131,7 +131,8 @@ setupModifyMentions() {
 @test "14: ModifyMentions - Should leave the mentions untouched" {
     TEMPLATE_PATH=$(cat $BATS_TEST_DIRNAME/sampleBasicFail.json)
     TEMPLATE_MENTIONS_PARAM="Hello there! I should not change!"
-    setupModifyMentions "$TEMPLATE_PATH" "$TEMPLATE_MENTIONS_PARAM"
+
+    setupModifyMentions "$TEMPLATE_MENTIONS_PARAM"
 
     MENTIONS_PRE_FUNCTION=$(echo $T2 | jq -r '.blocks[] | select(.type == "section").fields[].text | select(contains("Mentions"))' | sed -e "s/\*Mentions\*: //")
     echo "Mentions pre-function: $MENTIONS_PRE_FUNCTION"
@@ -152,7 +153,7 @@ setupModifyMentions() {
     MY_MENTIONS="@orbs and @potato"
     EXPECTED_MENTIONS_POST_FUNCTION="Hello there! I'm gonna ping @orbs and @potato to take a look at this!"
 
-    setupModifyMentions "$TEMPLATE_PATH" "$TEMPLATE_MENTIONS_PARAM"
+    setupModifyMentions "$TEMPLATE_MENTIONS_PARAM"
 
     echo "T2 pre-function: $T2"
     ModifyMentions
