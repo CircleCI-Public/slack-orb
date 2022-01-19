@@ -3,6 +3,12 @@ setup() {
     export SLACK_PARAM_BRANCHPATTERN=$(cat $BATS_TEST_DIRNAME/sampleBranchFilters.txt)
 }
 
+setupModifyMentions() {
+    T2=$(cat $BATS_TEST_DIRNAME/$1)
+    T2=$(echo $T2 | jq -r --arg mentions "*Mentions*: $2" \
+            '(.blocks[] | select(.type == "section").fields[].text | select(contains("Mentions"))) = $mentions')
+}
+
 @test "1: Skip message on no event" {
     CCI_STATUS="success"
     SLACK_PARAM_EVENT="fail"
@@ -106,14 +112,54 @@ setup() {
 }
 
 @test "13: ModifyMentions - Should replace environment variable with its value" {
-    T2=$(cat $BATS_TEST_DIRNAME/sampleBasicFailWithVariableInMentions.json)
+    TEMPLATE_PATH=$(cat $BATS_TEST_DIRNAME/sampleBasicFail.json)
+    TEMPLATE_MENTIONS_PARAM="\$MY_MENTIONS"
     MY_MENTIONS="I should show up in the template!"
-    ModifyMentions
-    echo "Expansions is: $SLACK_PARAM_EXPANDED_MENTIONS"
-    echo "T2 is $T2"
 
-    MENTIONS=$(echo $T2 | jq -r '.blocks[] | select(.type == "section").fields[].text | select(contains("Mentions"))' | sed -e "s/\*Mentions\*: //")
-    echo "Mentions: $MENTIONS" 
+    setupModifyMentions "$TEMPLATE_PATH" "$TEMPLATE_MENTIONS_PARAM"
+
+    echo "T2 pre-function: $T2"
+    ModifyMentions
+    echo "T2 post-function: $T2"
+
+    MENTIONS_POST_FUNCTION=$(echo $T2 | jq -r '.blocks[] | select(.type == "section").fields[].text | select(contains("Mentions"))' | sed -e "s/\*Mentions\*: //")
+    echo "Mentions post-function: $MENTIONS_POST_FUNCTION" 
     
-    [[ $MENTIONS == $MY_MENTIONS ]]
+    [[ $MENTIONS_POST_FUNCTION == $MY_MENTIONS ]]
+}
+
+@test "14: ModifyMentions - Should leave the mentions untouched" {
+    TEMPLATE_PATH=$(cat $BATS_TEST_DIRNAME/sampleBasicFail.json)
+    TEMPLATE_MENTIONS_PARAM="Hello there! I should not change!"
+    setupModifyMentions "$TEMPLATE_PATH" "$TEMPLATE_MENTIONS_PARAM"
+
+    MENTIONS_PRE_FUNCTION=$(echo $T2 | jq -r '.blocks[] | select(.type == "section").fields[].text | select(contains("Mentions"))' | sed -e "s/\*Mentions\*: //")
+    echo "Mentions pre-function: $MENTIONS_PRE_FUNCTION"
+
+    echo "T2 pre-function: $T2"
+    ModifyMentions
+    echo "T2 post-function: $T2"
+
+    MENTIONS_POST_FUNCTION=$(echo $T2 | jq -r '.blocks[] | select(.type == "section").fields[].text | select(contains("Mentions"))' | sed -e "s/\*Mentions\*: //")
+    echo "Mentions post-function: $MENTIONS_POST_FUNCTION" 
+    
+    [[ $MENTIONS_PRE_FUNCTION == $MENTIONS_POST_FUNCTION ]]
+}
+
+@test "15: ModifyMentions - Mixing variables and text should work" {
+    TEMPLATE_PATH=$(cat $BATS_TEST_DIRNAME/sampleBasicFail.json)
+    TEMPLATE_MENTIONS_PARAM="Hello there! I'm gonna ping \$MY_MENTIONS to take a look at this!"
+    MY_MENTIONS="@orbs and @potato"
+    EXPECTED_MENTIONS_POST_FUNCTION="Hello there! I'm gonna ping @orbs and @potato to take a look at this!"
+
+    setupModifyMentions "$TEMPLATE_PATH" "$TEMPLATE_MENTIONS_PARAM"
+
+    echo "T2 pre-function: $T2"
+    ModifyMentions
+    echo "T2 post-function: $T2"
+
+    MENTIONS_POST_FUNCTION=$(echo $T2 | jq -r '.blocks[] | select(.type == "section").fields[].text | select(contains("Mentions"))' | sed -e "s/\*Mentions\*: //")
+    echo "Mentions post-function: $MENTIONS_POST_FUNCTION" 
+    
+    [[ $MENTIONS_POST_FUNCTION == $EXPECTED_MENTIONS_POST_FUNCTION ]]
 }
