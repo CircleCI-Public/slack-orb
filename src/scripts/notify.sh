@@ -6,7 +6,7 @@ ModifyMentions() {
     echo "Checking the 'Mentions' parameter for environment variable."
 
     SLACK_PARAM_MENTIONS=$(echo $T2 | jq -r '.blocks[] | select(.type == "section").fields[].text | select(contains("Mentions"))' | sed -e "s/\*Mentions\*: //")
-    SLACK_PARAM_EXPANDED_MENTIONS=${!SLACK_PARAM_MENTIONS}
+    SLACK_PARAM_EXPANDED_MENTIONS=$(eval echo "\$$SLACK_PARAM_MENTIONS")
 
     if [ -z "$SLACK_PARAM_EXPANDED_MENTIONS" ]; then
         echo "The 'Mentions' parameter doesn't contain an environment variable. Skipping variable expansion."
