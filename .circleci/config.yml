@@ -62,6 +62,9 @@ jobs:
           name: Verify SLACK_JOB_STATUS is written
           command: |
             grep "pass" /tmp/SLACK_JOB_STATUS
+      - run:
+          name: Export mention variable
+          command: echo 'export MY_MENTIONS="@orbs and @potato"' >> $BASH_ENV     
       - slack/notify:
           template: basic_fail_1
           mentions: "@orbs"
@@ -93,7 +96,10 @@ jobs:
           debug: true
           template: basic_success_1
           event: always
-
+      - slack/notify:
+          template: basic_success_1
+          mentions: "Hello there! Pinging $MY_MENTIONS to take a look at this."
+          event: always
 workflows:
 
   test-pack:
