@@ -9,10 +9,10 @@ ModifyMentions() {
     SLACK_PARAM_EXPANDED_MENTIONS=$(eval echo "$SLACK_PARAM_MENTIONS")
 
     if [ -z "$SLACK_PARAM_EXPANDED_MENTIONS" ]; then
-        echo "The 'Mentions' parameter doesn't contain an environment variable. Skipping variable expansion."
+        echo "The 'Mentions' parameter is empty or doesn't contain an available environment variable. Skipping variable expansion."
         echo "If this is unexpected, please check the wiki: https://github.com/CircleCI-Public/slack-orb/wiki."
     else
-        echo "Expanding the variable ${SLACK_PARAM_MENTIONS}."
+        echo "Expanding, if any, variables in ${SLACK_PARAM_MENTIONS}."
         echo "The mentions in the message body will be: ${SLACK_PARAM_EXPANDED_MENTIONS}"
         T2=$(echo $T2 | jq -r --arg mentions "*Mentions*: $SLACK_PARAM_EXPANDED_MENTIONS" \
                 '(.blocks[] | select(.type == "section").fields[].text | select(contains("Mentions"))) = $mentions')

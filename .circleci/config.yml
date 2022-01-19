@@ -97,7 +97,7 @@ jobs:
           template: basic_success_1
           event: always
       - slack/notify:
-          template: basic_success_1
+          template: basic_fail_1
           mentions: "Hello there! Pinging $MY_MENTIONS to take a look at this."
           event: always
 workflows:
