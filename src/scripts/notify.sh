@@ -12,7 +12,7 @@ ModifyMentions() {
         echo "The 'Mentions' parameter is empty or doesn't contain an available environment variable. Skipping variable expansion."
         echo "If this is unexpected, please check the wiki: https://github.com/CircleCI-Public/slack-orb/wiki."
     else
-        echo "Expanding, if any, variables in '${SLACK_PARAM_MENTIONS_VAL}'."
+        echo "Expanding variables, if any, in '${SLACK_PARAM_MENTIONS_VAL}'."
         echo "The mentions in the message body will be: '${SLACK_PARAM_EXPANDED_MENTIONS}'."
         T2=$(echo $T2 | jq -r --arg mentions "*Mentions*: $SLACK_PARAM_EXPANDED_MENTIONS" \
                 '(.blocks[] | select(.type == "section").fields[].text | select(contains("Mentions"))) = $mentions')
@@ -183,7 +183,6 @@ if [ "${0#*$ORB_TEST_ENV}" = "$0" ]; then
     . "/tmp/SLACK_JOB_STATUS"
     ShouldPost
     InstallJq
-    ModifyMentions
     BuildMessageBody
     PostToSlack
 fi
