@@ -112,7 +112,6 @@ setupModifyMentions() {
 }
 
 @test "13: ModifyMentions - Should replace environment variable with its value" {
-    TEMPLATE_PATH=$(cat $BATS_TEST_DIRNAME/sampleBasicFail.json)
     TEMPLATE_MENTIONS_PARAM="\$MY_MENTIONS"
     MY_MENTIONS="I should show up in the template!"
 
@@ -129,7 +128,6 @@ setupModifyMentions() {
 }
 
 @test "14: ModifyMentions - Should leave the mentions untouched" {
-    TEMPLATE_PATH=$(cat $BATS_TEST_DIRNAME/sampleBasicFail.json)
     TEMPLATE_MENTIONS_PARAM="Hello there! I should not change!"
 
     setupModifyMentions "$TEMPLATE_MENTIONS_PARAM"
@@ -148,10 +146,9 @@ setupModifyMentions() {
 }
 
 @test "15: ModifyMentions - Mixing variables and text should work" {
-    TEMPLATE_PATH=$(cat $BATS_TEST_DIRNAME/sampleBasicFail.json)
-    TEMPLATE_MENTIONS_PARAM="Hello there! I'm gonna ping \$MY_MENTIONS to take a look at this!"
+    TEMPLATE_MENTIONS_PARAM="Hello there! Pinging \$MY_MENTIONS to take a look at this!"
     MY_MENTIONS="@orbs and @potato"
-    EXPECTED_MENTIONS_POST_FUNCTION="Hello there! I'm gonna ping @orbs and @potato to take a look at this!"
+    EXPECTED_MENTIONS_POST_FUNCTION="Hello there! Pinging @orbs and @potato to take a look at this!"
 
     setupModifyMentions "$TEMPLATE_MENTIONS_PARAM"
 
