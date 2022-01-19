@@ -111,8 +111,7 @@ setup() {
 
     T2=$(cat $BATS_TEST_DIRNAME/sampleBasicFailWithVariableInMentions.json)
     MY_MENTIONS="I should show up in the template!"
-    run ModifyCustomTemplate
-    echo "ModifyMentions output debug: $output"
+    ModifyCustomTemplate
     echo "T2 is $T2"
 
     MENTIONS=$(echo $T2 | jq -r '.blocks[] | select(.type == "section").fields[].text | select(contains("Mentions"))' | sed -e "s/\*Mentions\*: //")
