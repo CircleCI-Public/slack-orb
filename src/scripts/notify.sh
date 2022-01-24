@@ -1,3 +1,4 @@
+#!/bin/bash
 if [ "$(id -u)" = 0 ]; then export SUDO=""; else export SUDO="sudo"; fi
 LOG_PATH=/tmp/slack-orb/logs
 POST_TO_SLACK_LOG=post-to-slack.json
