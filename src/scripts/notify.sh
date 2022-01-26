@@ -1,5 +1,5 @@
 #!/bin/sh
-if ! which sudo &> /dev/null || [ "$(id -u)" = 0 ] ; then export SUDO=""; else export SUDO="sudo"; fi
+if ! which sudo > /dev/null 2>&1 || [ "$(id -u)" = 0 ] ; then export SUDO=""; else export SUDO="sudo"; fi
 LOG_PATH=/tmp/slack-orb/logs
 POST_TO_SLACK_LOG=post-to-slack.json
 
