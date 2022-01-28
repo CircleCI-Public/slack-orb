@@ -72,7 +72,7 @@ ModifyCustomTemplate() {
 }
 
 InstallJq() {
-    if command -v curl >/dev/null 2>&1 && ! command -v jq >/dev/null 2>&1 &&; then
+    if command -v curl >/dev/null 2>&1 && ! command -v jq >/dev/null 2>&1; then
         uname -a | grep Darwin > /dev/null 2>&1 && JQ_VERSION=jq-osx-amd64 || JQ_VERSION=jq-linux32
         curl -Ls -o $JQ_PATH https://github.com/stedolan/jq/releases/download/jq-1.6/${JQ_VERSION}
         chmod +x $JQ_PATH
