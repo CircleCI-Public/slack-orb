@@ -47,7 +47,9 @@ PostToSlack() {
             echo "The response from the API call to slack is : $SLACK_SENT_RESPONSE"
         fi        
         SLACK_ERROR_MSG=$(echo "$SLACK_SENT_RESPONSE" | jq '.error')
-        if [ ! "$SLACK_ERROR_MSG" = "null" ]; then
+        if [ -z "$SLACK_ERROR_MSG" ]; then
+            echo "The Slack API returned no errors."
+        else    
             echo "Slack API returned an error message:"
             echo "$SLACK_ERROR_MSG"
             echo
