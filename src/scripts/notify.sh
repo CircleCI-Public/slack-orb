@@ -139,6 +139,8 @@ ShouldPost() {
         FilterBy "$SLACK_PARAM_TAGPATTERN" "${CIRCLE_TAG:-}"
 
         echo "Posting Status"
+    elif [ "$SLACK_PARAM_EVENT" = "skip" ]; then
+        echo "This command is set to skip, not posting to slack"
     else
         # dont send message.
         echo "NO SLACK ALERT"
