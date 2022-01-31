@@ -1,5 +1,10 @@
 #!/bin/sh
-if ! which sudo > /dev/null 2>&1 || [ "$(id -u)" = 0 ] ; then export SUDO=""; else export SUDO="sudo"; fi
+if ! which sudo > /dev/null 2>&1 || [ "$(id -u)" = 0 ]; then
+    SUDO="${SUDO:-''}";
+else
+    SUDO="${SUDO:-sudo}";
+fi
+
 LOG_PATH=/tmp/slack-orb/logs
 POST_TO_SLACK_LOG=post-to-slack.json
 
@@ -45,7 +50,7 @@ PostToSlack() {
             '. += [{"slackMessageBody": $message, "slackSentResponse": $response}]' | $SUDO tee $LOG_PATH/$POST_TO_SLACK_LOG
         if [ -n "${SLACK_PARAM_DEBUG:-}" ]; then
             echo "The response from the API call to slack is : $SLACK_SENT_RESPONSE"
-        fi        
+        fi
         SLACK_ERROR_MSG=$(echo "$SLACK_SENT_RESPONSE" | jq '.error')
         if [ ! "$SLACK_ERROR_MSG" = "null" ]; then
             echo "Slack API returned an error message:"
