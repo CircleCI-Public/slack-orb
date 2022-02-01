@@ -1,8 +1,8 @@
 #!/bin/sh
 if ! which sudo > /dev/null 2>&1 || [ "$(id -u)" = 0 ]; then
-    SUDO="${SUDO:-''}";
+    SUDO=${SUDO:-""};
 else
-    SUDO="${SUDO:-sudo}";
+    SUDO=${SUDO:-sudo};
 fi
 
 LOG_PATH=/tmp/slack-orb/logs
