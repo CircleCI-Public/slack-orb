@@ -1,4 +1,7 @@
-description: Notify a Slack channel with a custom message.
+description: |
+  Notify a Slack channel with a custom message.
+  The environment variables SLACK_ACCESS_TOKEN and SLACK_DEFAULT_CHANNEL must be set for this orb to work.
+  For instructions on how to set them, follow the setup guide available in the wiki: https://github.com/CircleCI-Public/slack-orb/wiki/Setup.
 
 parameters:
   template:
