@@ -6,6 +6,7 @@ else
 fi
 
 LOG_PATH=/tmp/slack-orb/logs
+JQ_PATH=/usr/local/bin/jq
 POST_TO_SLACK_LOG=post-to-slack.json
 
 BuildMessageBody() {
@@ -76,18 +77,14 @@ ModifyCustomTemplate() {
 }
 
 InstallJq() {
-    if uname -a | grep Darwin > /dev/null 2>&1; then
-        echo "Checking For JQ + CURL: MacOS"
-        command -v jq >/dev/null 2>&1 || HOMEBREW_NO_AUTO_UPDATE=1 brew install jq --quiet
+    echo "Checking For JQ + CURL"
+    if command -v curl >/dev/null 2>&1 && ! command -v jq >/dev/null 2>&1; then
+        uname -a | grep Darwin > /dev/null 2>&1 && JQ_VERSION=jq-osx-amd64 || JQ_VERSION=jq-linux32
+        curl -Ls -o $JQ_PATH https://github.com/stedolan/jq/releases/download/jq-1.6/${JQ_VERSION}
+        chmod +x $JQ_PATH
+        command -v jq >/dev/null 2>&1
         return $?
-
-    elif cat /etc/issue | grep Debian > /dev/null 2>&1 || cat /etc/issue | grep Ubuntu > /dev/null 2>&1; then
-        echo "Checking For JQ + CURL: Debian"
-        command -v jq >/dev/null 2>&1 || { $SUDO apt -qq update && $SUDO apt -qq install -y jq; }
-        return $?
-
-    elif cat /etc/issue | grep Alpine > /dev/null 2>&1; then
-        echo "Checking For JQ + CURL: Alpine"
+    else
         command -v curl >/dev/null 2>&1 || { echo >&2 "SLACK ORB ERROR: CURL is required. Please install."; exit 1; }
         command -v jq >/dev/null 2>&1 || { echo >&2 "SLACK ORB ERROR: JQ is required. Please install"; exit 1; }
         return $?
