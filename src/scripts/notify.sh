@@ -77,6 +77,7 @@ InstallJq() {
         uname -a | grep Darwin > /dev/null 2>&1 && JQ_VERSION=jq-osx-amd64 || JQ_VERSION=jq-linux32
         curl -Ls -o $JQ_PATH https://github.com/stedolan/jq/releases/download/jq-1.6/${JQ_VERSION}
         chmod +x $JQ_PATH
+        command -v jq >/dev/null 2>&1
         return $?
     else
         command -v curl >/dev/null 2>&1 || { echo >&2 "SLACK ORB ERROR: CURL is required. Please install."; exit 1; }
