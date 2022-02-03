@@ -96,8 +96,8 @@ jobs:
       - run:
           name: Export template as environment variable
           command: |
+            echo "I'm at $(pwd)"
             echo 'export SLACK_SUCCESS_TEMPLATE=$(cat ./src/message_templates/basic_success_1.json)' >> $BASH_ENV
-            echo $SLACK_SUCCESS_TEMPLATE
       - slack/notify:
           event: always
           template: SLACK_SUCCESS_TEMPLATE
