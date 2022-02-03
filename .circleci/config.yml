@@ -93,6 +93,7 @@ jobs:
           debug: true
           template: basic_success_1
           event: always
+      - checkout
       - run:
           name: Export template as environment variable
           command: |
