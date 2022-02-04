@@ -95,7 +95,7 @@ jobs:
           template: basic_success_1
           event: always
       - run:
-          name: Change mention and export template as environment variable
+          name: Dynamically populate the mention and export the template as an environment variable
           command: |
             echo 'export COMMIT_MESSAGE="$(git log --format=oneline -n 1 $CIRCLE_SHA1)"' >> $BASH_ENV
             echo 'export SLACK_PARAM_MENTIONS="$COMMIT_MESSAGE"' >> $BASH_ENV
