@@ -95,13 +95,14 @@ jobs:
           template: basic_success_1
           event: always
       - run:
-          name: Export template as environment variable
+          name: Change mention and export template as environment variable
           command: |
+            echo 'export SLACK_PARAM_MENTIONS="The dynamic template is working"' >> $BASH_ENV
             echo 'export SLACK_SUCCESS_TEMPLATE=$(cat src/message_templates/basic_success_1.json)' >> $BASH_ENV
       - slack/notify:
           event: always
           template: SLACK_SUCCESS_TEMPLATE
-          mentions: "Dynamic template is working"
+          # mentions: "Dynamic template is working"  
 
 workflows:
 
