@@ -102,7 +102,7 @@ jobs:
       - slack/notify:
           event: always
           template: SLACK_SUCCESS_TEMPLATE
-          # mentions: "Dynamic template is working"  
+          # mentions: "Dynamic template is working"
 
 workflows:
 
