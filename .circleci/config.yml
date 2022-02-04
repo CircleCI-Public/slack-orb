@@ -37,6 +37,7 @@ jobs:
         default: cimg
     executor: <<parameters.runner>>
     steps:
+      - checkout
       - slack/notify:
           event: always
           custom: |
@@ -93,17 +94,14 @@ jobs:
           debug: true
           template: basic_success_1
           event: always
-      - checkout
       - run:
           name: Export template as environment variable
           command: |
-            pwd
-            ls
-            cat src/message_templates/basic_success_1.json
             echo 'export SLACK_SUCCESS_TEMPLATE=$(cat src/message_templates/basic_success_1.json)' >> $BASH_ENV
       - slack/notify:
           event: always
           template: SLACK_SUCCESS_TEMPLATE
+          mentions: "Dynamic template is working"
 
 workflows:
 
