@@ -103,9 +103,6 @@ jobs:
       - slack/notify:
           event: always
           template: MY_ORB_TEMPLATE
-      - run:
-          name: Forces a failed job.
-          command: exit 1
       - slack/notify
 
 workflows:

@@ -1,0 +1,26 @@
+
+description: |
+  Send a slack notification. This example uses the pre-included templates 'basic_success_1' and 'basic_fail_1'.
+  Ensure the "slack/notify" command is the last command in a job to accurately capture the status.
+usage:
+  version: 2.1
+  orbs:
+    slack: circleci/slack@4.8.1
+    node: circleci/node:5
+  jobs:
+    deploy:
+      executor:
+        name: node/default
+      steps:
+        - checkout
+        - node/install-packages
+        - run:
+            command: npm run deploy
+        # If no pre-included or custom template are provided, the command will choose between basic_success_1 and basic_fail_1 based on the pipeline status.
+        - slack/notify
+  workflows:
+    deploy_and_notify:
+      jobs:
+        - deploy:
+            # Secure your Slack OAuth access token behind a restricted context
+            context: slack-secrets
