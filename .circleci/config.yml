@@ -94,7 +94,6 @@ jobs:
           debug: true
           template: basic_success_1
           event: always
-      - slack/notify
       - run:
           name: Dynamically populate the mention and export the template as an environment variable
           command: |
@@ -104,7 +103,10 @@ jobs:
       - slack/notify:
           event: always
           template: MY_ORB_TEMPLATE
-
+      - run: 
+          name: Forces a failed job.
+          command: exit 1
+      - slack/notify
 
 workflows:
 
