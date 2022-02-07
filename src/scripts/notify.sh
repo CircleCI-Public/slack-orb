@@ -20,6 +20,7 @@ BuildMessageBody() {
         CUSTOM_BODY_MODIFIED=$(echo "$CUSTOM_BODY_MODIFIED" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed 's/`/\\`/g')
         T2=$(eval echo \""$CUSTOM_BODY_MODIFIED"\")
     else
+        # shellcheck disable=SC2154
         if [ -n "${SLACK_PARAM_TEMPLATE:-}" ]; then TEMPLATE="\$$SLACK_PARAM_TEMPLATE"
         elif [ "$CCI_STATUS" = "pass" ]; then TEMPLATE="$basic_success_1"
         elif [ "$CCI_STATUS" = "fail" ]; then TEMPLATE="$basic_fail_1"
