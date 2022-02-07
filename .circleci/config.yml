@@ -37,6 +37,7 @@ jobs:
         default: cimg
     executor: <<parameters.runner>>
     steps:
+      - checkout
       - slack/notify:
           event: always
           custom: |
@@ -93,6 +94,15 @@ jobs:
           debug: true
           template: basic_success_1
           event: always
+      - run:
+          name: Dynamically populate the mention and export the template as an environment variable
+          command: |
+            echo 'export COMMIT_MESSAGE="$(git log --format=oneline -n 1 $CIRCLE_SHA1)"' >> $BASH_ENV
+            echo 'export SLACK_PARAM_MENTIONS="$COMMIT_MESSAGE"' >> $BASH_ENV
+            echo 'export MY_ORB_TEMPLATE=$(cat src/message_templates/basic_success_1.json)' >> $BASH_ENV
+      - slack/notify:
+          event: always
+          template: MY_ORB_TEMPLATE
 
 workflows:
 
