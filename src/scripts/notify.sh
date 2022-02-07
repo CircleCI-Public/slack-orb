@@ -22,12 +22,12 @@ BuildMessageBody() {
     else
         # shellcheck disable=SC2154
         if [ -n "${SLACK_PARAM_TEMPLATE:-}" ]; then TEMPLATE="\$$SLACK_PARAM_TEMPLATE"
-        elif [ "$CCI_STATUS" = "pass" ]; then TEMPLATE=$basic_success_1
-        elif [ "$CCI_STATUS" = "fail" ]; then TEMPLATE=$basic_fail_1
+        elif [ "$CCI_STATUS" = "pass" ]; then TEMPLATE="basic_success_1"
+        elif [ "$CCI_STATUS" = "fail" ]; then TEMPLATE="basic_fail_1"
         else echo "A template wasn't provided nor is possible to infer it based on the pipeline status. The pipeline status: '$CCI_STATUS' is unexpected."; exit 1 
         fi
 
-        [ -z "${SLACK_PARAM_TEMPLATE:-}" ] && echo "No message template was explicitly chosen. The most appropriate template for the pipeline status '$CCI_STATUS' will be used."
+        [ -z "${SLACK_PARAM_TEMPLATE:-}" ] && echo "No message template was explicitly chosen. Based on the pipeline status '$CCI_STATUS' the template '$TEMPLATE' will be used."
         
         # shellcheck disable=SC2016
         T1=$(eval echo "$TEMPLATE" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed 's/`/\\`/g')
