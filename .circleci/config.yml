@@ -37,6 +37,7 @@ jobs:
         default: cimg
     executor: <<parameters.runner>>
     steps:
+      - checkout
       - slack/notify:
           event: always
           custom: |
@@ -89,6 +90,19 @@ jobs:
                 }
               ]
             }
+      - slack/notify:
+          debug: true
+          template: basic_success_1
+          event: always
+      - run:
+          name: Dynamically populate the mention and export the template as an environment variable
+          command: |
+            echo 'export COMMIT_MESSAGE="$(git log --format=oneline -n 1 $CIRCLE_SHA1)"' >> $BASH_ENV
+            echo 'export SLACK_PARAM_MENTIONS="$COMMIT_MESSAGE"' >> $BASH_ENV
+            echo 'export MY_ORB_TEMPLATE=$(cat src/message_templates/basic_success_1.json)' >> $BASH_ENV
+      - slack/notify:
+          event: always
+          template: MY_ORB_TEMPLATE
 
 workflows:
 
@@ -106,13 +120,6 @@ workflows:
       # validate the orb.yml file to ensure it is well-formed
       - orb-tools/pack:
           use-orb-pack: true
-      - hold-for-dev-publish:
-          type: approval
-          requires:
-            - orb-tools/lint
-            - orb-tools/pack
-            - bats/run
-            - shellcheck/check
       # release dev version of orb, for testing & possible publishing.
       # orb will be published as dev:alpha and dev:${CIRCLE_SHA1:0:7}.
       # requires a CircleCI API token to be stored as CIRCLE_TOKEN (default)
@@ -123,7 +130,10 @@ workflows:
           orb-name: circleci/slack
           context: orb-publishing
           requires:
-            - hold-for-dev-publish
+            - orb-tools/lint
+            - orb-tools/pack
+            - bats/run
+            - shellcheck/check
 
       # trigger an integration workflow to test the
       # dev:${CIRCLE_SHA1:0:7} version of your orb

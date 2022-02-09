@@ -1,3 +1,14 @@
+#!/bin/sh
+if ! which sudo > /dev/null 2>&1 || [ "$(id -u)" = 0 ]; then
+    SUDO=${SUDO:-""};
+else
+    SUDO=${SUDO:-sudo};
+fi
+
+LOG_PATH=/tmp/slack-orb/logs
+JQ_PATH=/usr/local/bin/jq
+POST_TO_SLACK_LOG=post-to-slack.json
+
 BuildMessageBody() {
     # Send message
     #   If sending message, default to custom template,
@@ -23,7 +34,6 @@ BuildMessageBody() {
     SLACK_MSG_BODY=$T2
 }
 
-
 PostToSlack() {
     # Post once per channel listed by the channel parameter
     #    The channel must be modified in SLACK_MSG_BODY
@@ -33,7 +43,15 @@ PostToSlack() {
     do
         echo "Sending to Slack Channel: $i"
         SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg channel "$i" '.channel = $channel')
+        if [ -n "${SLACK_PARAM_DEBUG:-}" ]; then
+            echo "The message body being sent to Slack is: $SLACK_MSG_BODY"
+        fi
         SLACK_SENT_RESPONSE=$(curl -s -f -X POST -H 'Content-type: application/json' -H "Authorization: Bearer $SLACK_ACCESS_TOKEN" --data "$SLACK_MSG_BODY" https://slack.com/api/chat.postMessage)
+        cat $LOG_PATH/$POST_TO_SLACK_LOG | jq --argjson message "$SLACK_MSG_BODY"  --argjson response "$SLACK_SENT_RESPONSE" \
+            '. += [{"slackMessageBody": $message, "slackSentResponse": $response}]' | $SUDO tee $LOG_PATH/$POST_TO_SLACK_LOG
+        if [ -n "${SLACK_PARAM_DEBUG:-}" ]; then
+            echo "The response from the API call to slack is : $SLACK_SENT_RESPONSE"
+        fi
         SLACK_ERROR_MSG=$(echo "$SLACK_SENT_RESPONSE" | jq '.error')
         if [ ! "$SLACK_ERROR_MSG" = "null" ]; then
             echo "Slack API returned an error message:"
@@ -59,21 +77,14 @@ ModifyCustomTemplate() {
 }
 
 InstallJq() {
-    if uname -a | grep Darwin > /dev/null 2>&1; then
-        echo "Checking For JQ + CURL: MacOS"
-        command -v jq >/dev/null 2>&1 || HOMEBREW_NO_AUTO_UPDATE=1 brew install jq --quiet
+    echo "Checking For JQ + CURL"
+    if command -v curl >/dev/null 2>&1 && ! command -v jq >/dev/null 2>&1; then
+        uname -a | grep Darwin > /dev/null 2>&1 && JQ_VERSION=jq-osx-amd64 || JQ_VERSION=jq-linux32
+        curl -Ls -o $JQ_PATH https://github.com/stedolan/jq/releases/download/jq-1.6/${JQ_VERSION}
+        chmod +x $JQ_PATH
+        command -v jq >/dev/null 2>&1
         return $?
-
-    elif cat /etc/issue | grep Debian > /dev/null 2>&1 || cat /etc/issue | grep Ubuntu > /dev/null 2>&1; then
-        echo "Checking For JQ + CURL: Debian"
-        if [ "$(id -u)" = 0 ]; then export SUDO=""; else # Check if we're root
-            export SUDO="sudo";
-        fi
-        command -v jq >/dev/null 2>&1 || { $SUDO apt -qq update && $SUDO apt -qq install -y jq; }
-        return $?
-
-    elif cat /etc/issue | grep Alpine > /dev/null 2>&1; then
-        echo "Checking For JQ + CURL: Alpine"
+    else
         command -v curl >/dev/null 2>&1 || { echo >&2 "SLACK ORB ERROR: CURL is required. Please install."; exit 1; }
         command -v jq >/dev/null 2>&1 || { echo >&2 "SLACK ORB ERROR: JQ is required. Please install"; exit 1; }
         return $?
@@ -151,16 +162,24 @@ ShouldPost() {
     fi
 }
 
+SetupLogs() {
+    $SUDO mkdir -p $LOG_PATH
+
+    if [ ! -f "$LOG_PATH/$POST_TO_SLACK_LOG" ]; then
+        echo "[]" | $SUDO tee $LOG_PATH/$POST_TO_SLACK_LOG
+    fi
+}
+
 # Will not run if sourced from another script.
 # This is done so this script may be tested.
 ORB_TEST_ENV="bats-core"
 if [ "${0#*$ORB_TEST_ENV}" = "$0" ]; then
     SetupEnvVars
+    SetupLogs
     CheckEnvVars
     . "/tmp/SLACK_JOB_STATUS"
     ShouldPost
     InstallJq
     BuildMessageBody
     PostToSlack
-
 fi

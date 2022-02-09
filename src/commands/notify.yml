@@ -1,8 +1,14 @@
-description: Notify a Slack channel with a custom message.
+description: |
+  Notify a Slack channel with a custom message.
+  The environment variables SLACK_ACCESS_TOKEN and SLACK_DEFAULT_CHANNEL must be set for this orb to work.
+  For instructions on how to set them, follow the setup guide available in the wiki: https://github.com/CircleCI-Public/slack-orb/wiki/Setup.
 
 parameters:
   template:
-    description: "Use one of the built-in templates. Select the template name. Preview each template on the gitHub Readme: "
+    description: |
+      Select which template to use for the notification by its name. The name must be available as an environment variable.
+      The built-in templates can be found and previewed at: https://github.com/CircleCI-Public/slack-orb/wiki#templates.
+      Alternatively, you can create and use your own dynamic templates: https://github.com/CircleCI-Public/slack-orb/wiki/Dynamic-Templates.
     type: string
     default: ""
   custom:
@@ -48,6 +54,12 @@ parameters:
         Disable to catch initial setup errors. Re-enable to prevent Slack errors from affecting your pipeline.
       type: boolean
       default: true
+  debug:
+      description: |
+       View payload and response being sent to slack api.
+       Enable to view full payload being sent to slack and response being recieved from the API call.
+      type: boolean
+      default: false
 steps:
   - run:
       when: on_fail
@@ -71,6 +83,7 @@ steps:
         SLACK_PARAM_TAGPATTERN: "<<parameters.tag_pattern>>"
         SLACK_PARAM_CHANNEL: "<<parameters.channel>>"
         SLACK_PARAM_IGNORE_ERRORS: "<<parameters.ignore_errors>>"
+        SLACK_PARAM_DEBUG: "<<parameters.debug>>"
         # import pre-built templates using the orb-pack local script include.
         basic_fail_1: "<<include(message_templates/basic_fail_1.json)>>"
         success_tagged_deploy_1: "<<include(message_templates/success_tagged_deploy_1.json)>>"
