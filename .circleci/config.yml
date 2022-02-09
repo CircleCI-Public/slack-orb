@@ -103,6 +103,7 @@ jobs:
       - slack/notify:
           event: always
           template: MY_ORB_TEMPLATE
+      - slack/notify
 
 workflows:
 

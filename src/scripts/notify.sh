@@ -19,15 +19,19 @@ BuildMessageBody() {
         # shellcheck disable=SC2016
         CUSTOM_BODY_MODIFIED=$(echo "$CUSTOM_BODY_MODIFIED" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed 's/`/\\`/g')
         T2=$(eval echo \""$CUSTOM_BODY_MODIFIED"\")
-    elif [ -n "${SLACK_PARAM_TEMPLATE:-}" ]; then
-        TEMPLATE="\$$SLACK_PARAM_TEMPLATE"
+    else
+        # shellcheck disable=SC2154
+        if [ -n "${SLACK_PARAM_TEMPLATE:-}" ]; then TEMPLATE="\$$SLACK_PARAM_TEMPLATE"
+        elif [ "$CCI_STATUS" = "pass" ]; then TEMPLATE="\$basic_success_1"
+        elif [ "$CCI_STATUS" = "fail" ]; then TEMPLATE="\$basic_fail_1"
+        else echo "A template wasn't provided nor is possible to infer it based on the job status. The job status: '$CCI_STATUS' is unexpected."; exit 1 
+        fi
+
+        [ -z "${SLACK_PARAM_TEMPLATE:-}" ] && echo "No message template was explicitly chosen. Based on the job status '$CCI_STATUS' the template '$TEMPLATE' will be used."
+        
         # shellcheck disable=SC2016
         T1=$(eval echo "$TEMPLATE" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed 's/`/\\`/g')
         T2=$(eval echo \""$T1"\")
-    else
-        echo "Error: No message template selected."
-        echo "Select either a custom template or one of the pre-included ones via the 'custom' or 'template' parameters."
-        exit 1
     fi
     # Insert the default channel. THIS IS TEMPORARY
     T2=$(echo "$T2" | jq ". + {\"channel\": \"$SLACK_DEFAULT_CHANNEL\"}")
@@ -173,7 +177,7 @@ SetupLogs() {
 # Will not run if sourced from another script.
 # This is done so this script may be tested.
 ORB_TEST_ENV="bats-core"
-if [ "${0#*$ORB_TEST_ENV}" = "$0" ]; then
+if [ "${0#*"$ORB_TEST_ENV"}" = "$0" ]; then
     SetupEnvVars
     SetupLogs
     CheckEnvVars

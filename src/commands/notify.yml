@@ -9,6 +9,7 @@ parameters:
       Select which template to use for the notification by its name. The name must be available as an environment variable.
       The built-in templates can be found and previewed at: https://github.com/CircleCI-Public/slack-orb/wiki#templates.
       Alternatively, you can create and use your own dynamic templates: https://github.com/CircleCI-Public/slack-orb/wiki/Dynamic-Templates.
+      If left empty and no custom template is provided, the template will be automatically selected based on the job status.
     type: string
     default: ""
   custom:
