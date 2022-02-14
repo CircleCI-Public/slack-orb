@@ -1,11 +1,5 @@
 #!/bin/sh
-if ! which sudo > /dev/null 2>&1 || [ "$(id -u)" = 0 ]; then
-    SUDO=${SUDO:-""};
-else
-    SUDO=${SUDO:-sudo};
-fi
-
-LOG_PATH=/tmp/slack-orb/logs
+LOG_PATH=$(mktemp -d)
 JQ_PATH=/usr/local/bin/jq
 POST_TO_SLACK_LOG=post-to-slack.json
 
@@ -24,11 +18,11 @@ BuildMessageBody() {
         if [ -n "${SLACK_PARAM_TEMPLATE:-}" ]; then TEMPLATE="\$$SLACK_PARAM_TEMPLATE"
         elif [ "$CCI_STATUS" = "pass" ]; then TEMPLATE="\$basic_success_1"
         elif [ "$CCI_STATUS" = "fail" ]; then TEMPLATE="\$basic_fail_1"
-        else echo "A template wasn't provided nor is possible to infer it based on the job status. The job status: '$CCI_STATUS' is unexpected."; exit 1 
+        else echo "A template wasn't provided nor is possible to infer it based on the job status. The job status: '$CCI_STATUS' is unexpected."; exit 1
         fi
 
         [ -z "${SLACK_PARAM_TEMPLATE:-}" ] && echo "No message template was explicitly chosen. Based on the job status '$CCI_STATUS' the template '$TEMPLATE' will be used."
-        
+
         # shellcheck disable=SC2016
         T1=$(eval echo "$TEMPLATE" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed 's/`/\\`/g')
         T2=$(eval echo \""$T1"\")
@@ -52,7 +46,7 @@ PostToSlack() {
         fi
         SLACK_SENT_RESPONSE=$(curl -s -f -X POST -H 'Content-type: application/json' -H "Authorization: Bearer $SLACK_ACCESS_TOKEN" --data "$SLACK_MSG_BODY" https://slack.com/api/chat.postMessage)
         cat $LOG_PATH/$POST_TO_SLACK_LOG | jq --argjson message "$SLACK_MSG_BODY"  --argjson response "$SLACK_SENT_RESPONSE" \
-            '. += [{"slackMessageBody": $message, "slackSentResponse": $response}]' | $SUDO tee $LOG_PATH/$POST_TO_SLACK_LOG
+            '. += [{"slackMessageBody": $message, "slackSentResponse": $response}]' | tee $LOG_PATH/$POST_TO_SLACK_LOG
         if [ -n "${SLACK_PARAM_DEBUG:-}" ]; then
             echo "The response from the API call to slack is : $SLACK_SENT_RESPONSE"
         fi
@@ -167,10 +161,8 @@ ShouldPost() {
 }
 
 SetupLogs() {
-    $SUDO mkdir -p $LOG_PATH
-
     if [ ! -f "$LOG_PATH/$POST_TO_SLACK_LOG" ]; then
-        echo "[]" | $SUDO tee $LOG_PATH/$POST_TO_SLACK_LOG
+        echo "[]" | tee $LOG_PATH/$POST_TO_SLACK_LOG
     fi
 }
 
