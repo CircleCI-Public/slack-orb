@@ -3,6 +3,25 @@ LOG_PATH=$(mktemp -d)
 JQ_PATH=/usr/local/bin/jq
 POST_TO_SLACK_LOG=post-to-slack.json
 
+stdmsg() {
+    local IFS=' '
+    printf '%s\n' "$*"
+}
+
+TrapExit() {
+  # It is critical that the first line capture the exit code. Nothing else can come before this.
+  # The exit code recorded here comes from the command that caused the script to exit.
+  local exit_status="$?"
+
+  rm -rf "$LOG_PATH"
+
+  if [ "$exit_status" -ne 0 ]; then
+    stdmsg 'The script did not complete successfully.'
+    stdmsg 'The exit code was '"$exit_status"
+  fi
+}
+trap TrapExit EXIT
+
 BuildMessageBody() {
     # Send message
     #   If sending message, default to custom template,
@@ -45,8 +64,8 @@ PostToSlack() {
             echo "The message body being sent to Slack is: $SLACK_MSG_BODY"
         fi
         SLACK_SENT_RESPONSE=$(curl -s -f -X POST -H 'Content-type: application/json' -H "Authorization: Bearer $SLACK_ACCESS_TOKEN" --data "$SLACK_MSG_BODY" https://slack.com/api/chat.postMessage)
-        cat $LOG_PATH/$POST_TO_SLACK_LOG | jq --argjson message "$SLACK_MSG_BODY"  --argjson response "$SLACK_SENT_RESPONSE" \
-            '. += [{"slackMessageBody": $message, "slackSentResponse": $response}]' | tee $LOG_PATH/$POST_TO_SLACK_LOG
+        cat "$LOG_PATH"/"$POST_TO_SLACK_LOG" | jq --argjson message "$SLACK_MSG_BODY"  --argjson response "$SLACK_SENT_RESPONSE" \
+            '. += [{"slackMessageBody": $message, "slackSentResponse": $response}]' | tee "$LOG_PATH"/"$POST_TO_SLACK_LOG"
         if [ -n "${SLACK_PARAM_DEBUG:-}" ]; then
             echo "The response from the API call to slack is : $SLACK_SENT_RESPONSE"
         fi
@@ -78,8 +97,8 @@ InstallJq() {
     echo "Checking For JQ + CURL"
     if command -v curl >/dev/null 2>&1 && ! command -v jq >/dev/null 2>&1; then
         uname -a | grep Darwin > /dev/null 2>&1 && JQ_VERSION=jq-osx-amd64 || JQ_VERSION=jq-linux32
-        curl -Ls -o $JQ_PATH https://github.com/stedolan/jq/releases/download/jq-1.6/${JQ_VERSION}
-        chmod +x $JQ_PATH
+        curl -Ls -o "$JQ_PATH" https://github.com/stedolan/jq/releases/download/jq-1.6/"${JQ_VERSION}"
+        chmod +x "$JQ_PATH"
         command -v jq >/dev/null 2>&1
         return $?
     else
@@ -161,8 +180,8 @@ ShouldPost() {
 }
 
 SetupLogs() {
-    if [ ! -f "$LOG_PATH/$POST_TO_SLACK_LOG" ]; then
-        echo "[]" | tee $LOG_PATH/$POST_TO_SLACK_LOG
+    if [ ! -f "$LOG_PATH"/"$POST_TO_SLACK_LOG" ]; then
+        echo "[]" | tee "$LOG_PATH"/"$POST_TO_SLACK_LOG"
     fi
 }
 
