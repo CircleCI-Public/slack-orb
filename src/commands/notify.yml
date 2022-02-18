@@ -59,7 +59,7 @@ parameters:
       description: |
        View payload and response being sent to Slack API.
        Enable to view full payload being sent to Slack and response being received from the API call.
-       Unredacted content can be viewed by re-running the job with SSH and accessing the content of the log files referenced in the job output.
+       Redacted content can be viewed by re-running the job with SSH and accessing the log files referenced in the job output.
       type: boolean
       default: false
 steps:
