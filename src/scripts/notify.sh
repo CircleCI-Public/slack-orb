@@ -40,14 +40,14 @@ PostToSlack() {
         echo "Sending to Slack Channel: $i"
         SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg channel "$i" '.channel = $channel')
         if [ -n "${SLACK_PARAM_DEBUG:-}" ]; then
-            printf "%s" "$SLACK_MSG_BODY" > "$SLACK_MSG_BODY_LOG"
+            printf "%s\n" "$SLACK_MSG_BODY" > "$SLACK_MSG_BODY_LOG"
             echo "The message body being sent to Slack can be found below. To view redacted values, rerun the job with SSH and access: ${SLACK_MSG_BODY_LOG}"
             echo "$SLACK_MSG_BODY"
         fi
         SLACK_SENT_RESPONSE=$(curl -s -f -X POST -H 'Content-type: application/json' -H "Authorization: Bearer $SLACK_ACCESS_TOKEN" --data "$SLACK_MSG_BODY" https://slack.com/api/chat.postMessage)
         
         if [ -n "${SLACK_PARAM_DEBUG:-}" ]; then
-            printf "%s" "$SLACK_SENT_RESPONSE" > "$SLACK_SENT_RESPONSE_LOG"
+            printf "%s\n" "$SLACK_SENT_RESPONSE" > "$SLACK_SENT_RESPONSE_LOG"
             echo "The response from the API call to Slack can be found below. To view redacted values, rerun the job with SSH and access: ${SLACK_SENT_RESPONSE_LOG}"
             echo "$SLACK_SENT_RESPONSE"
         fi
@@ -169,9 +169,9 @@ SetupLogs() {
         SLACK_SENT_RESPONSE_LOG="$LOG_PATH/response.json"
 
         touch "$SLACK_MSG_BODY_LOG"
-        touch "$SLACK_SENT_RESPONSE_LOG"
-        
         chmod 0600 "$SLACK_MSG_BODY_LOG"
+
+        touch "$SLACK_SENT_RESPONSE_LOG"        
         chmod 0600 "$SLACK_SENT_RESPONSE_LOG"
     fi
 }
