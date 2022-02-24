@@ -168,11 +168,8 @@ SetupLogs() {
         SLACK_MSG_BODY_LOG="$LOG_PATH/payload.json"
         SLACK_SENT_RESPONSE_LOG="$LOG_PATH/response.json"
 
-        touch "$SLACK_MSG_BODY_LOG"
-        chmod 0600 "$SLACK_MSG_BODY_LOG"
-
-        touch "$SLACK_SENT_RESPONSE_LOG"        
-        chmod 0600 "$SLACK_SENT_RESPONSE_LOG"
+        touch "$SLACK_MSG_BODY_LOG" "$SLACK_SENT_RESPONSE_LOG"
+        chmod 0600 "$SLACK_MSG_BODY_LOG" "$SLACK_SENT_RESPONSE_LOG"
     fi
 }
 
