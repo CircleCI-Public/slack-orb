@@ -1,7 +1,5 @@
 #!/bin/sh
-LOG_PATH=$(mktemp -d)
 JQ_PATH=/usr/local/bin/jq
-POST_TO_SLACK_LOG=post-to-slack.json
 
 BuildMessageBody() {
     # Send message
@@ -42,14 +40,18 @@ PostToSlack() {
         echo "Sending to Slack Channel: $i"
         SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg channel "$i" '.channel = $channel')
         if [ -n "${SLACK_PARAM_DEBUG:-}" ]; then
-            echo "The message body being sent to Slack is: $SLACK_MSG_BODY"
+            printf "%s\n" "$SLACK_MSG_BODY" > "$SLACK_MSG_BODY_LOG"
+            echo "The message body being sent to Slack can be found below. To view redacted values, rerun the job with SSH and access: ${SLACK_MSG_BODY_LOG}"
+            echo "$SLACK_MSG_BODY"
         fi
         SLACK_SENT_RESPONSE=$(curl -s -f -X POST -H 'Content-type: application/json' -H "Authorization: Bearer $SLACK_ACCESS_TOKEN" --data "$SLACK_MSG_BODY" https://slack.com/api/chat.postMessage)
-        cat $LOG_PATH/$POST_TO_SLACK_LOG | jq --argjson message "$SLACK_MSG_BODY"  --argjson response "$SLACK_SENT_RESPONSE" \
-            '. += [{"slackMessageBody": $message, "slackSentResponse": $response}]' | tee $LOG_PATH/$POST_TO_SLACK_LOG
+        
         if [ -n "${SLACK_PARAM_DEBUG:-}" ]; then
-            echo "The response from the API call to slack is : $SLACK_SENT_RESPONSE"
+            printf "%s\n" "$SLACK_SENT_RESPONSE" > "$SLACK_SENT_RESPONSE_LOG"
+            echo "The response from the API call to Slack can be found below. To view redacted values, rerun the job with SSH and access: ${SLACK_SENT_RESPONSE_LOG}"
+            echo "$SLACK_SENT_RESPONSE"
         fi
+
         SLACK_ERROR_MSG=$(echo "$SLACK_SENT_RESPONSE" | jq '.error')
         if [ ! "$SLACK_ERROR_MSG" = "null" ]; then
             echo "Slack API returned an error message:"
@@ -78,8 +80,8 @@ InstallJq() {
     echo "Checking For JQ + CURL"
     if command -v curl >/dev/null 2>&1 && ! command -v jq >/dev/null 2>&1; then
         uname -a | grep Darwin > /dev/null 2>&1 && JQ_VERSION=jq-osx-amd64 || JQ_VERSION=jq-linux32
-        curl -Ls -o $JQ_PATH https://github.com/stedolan/jq/releases/download/jq-1.6/${JQ_VERSION}
-        chmod +x $JQ_PATH
+        curl -Ls -o "$JQ_PATH" https://github.com/stedolan/jq/releases/download/jq-1.6/"${JQ_VERSION}"
+        chmod +x "$JQ_PATH"
         command -v jq >/dev/null 2>&1
         return $?
     else
@@ -161,8 +163,13 @@ ShouldPost() {
 }
 
 SetupLogs() {
-    if [ ! -f "$LOG_PATH/$POST_TO_SLACK_LOG" ]; then
-        echo "[]" | tee $LOG_PATH/$POST_TO_SLACK_LOG
+    if [ -n "${SLACK_PARAM_DEBUG:-}" ]; then
+        LOG_PATH="$(mktemp -d 'slack-orb-logs.XXXXXX')"
+        SLACK_MSG_BODY_LOG="$LOG_PATH/payload.json"
+        SLACK_SENT_RESPONSE_LOG="$LOG_PATH/response.json"
+
+        touch "$SLACK_MSG_BODY_LOG" "$SLACK_SENT_RESPONSE_LOG"
+        chmod 0600 "$SLACK_MSG_BODY_LOG" "$SLACK_SENT_RESPONSE_LOG"
     fi
 }
 
