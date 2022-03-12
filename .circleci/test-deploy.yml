@@ -83,7 +83,7 @@ jobs:
 workflows:
   test-deploy:
     jobs:
-      - command-tests:
+      - integration-test-templates:
           filters:
             tags:
               only: /.*/
@@ -107,7 +107,7 @@ workflows:
             - orb-tools/lint
             - orb-tools/review
             - orb-tools/pack
-            - command-tests
+            - integration-test-templates
           context: orb-publishing
           filters:
             branches:
