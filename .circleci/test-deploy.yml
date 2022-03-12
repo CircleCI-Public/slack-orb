@@ -84,9 +84,13 @@ workflows:
   test-deploy:
     jobs:
       - integration-test-templates:
+          context: orb-publishing
           filters:
             tags:
               only: /.*/
+          matrix:
+            parameters:
+              runner: [cimg, mac, alpine]
       - orb-tools/lint:
           filters:
             tags:
