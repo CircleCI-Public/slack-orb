@@ -20,7 +20,7 @@ workflows:
             tags:
               only: /.*/
       - shellcheck/check:
-          exclude: SC2148,SC2038,SC2086,SC2002,SC2016
+          exclude: SC2148,SC2001,SC1091,SC2086,SC2116,SC2046,SC2005,SC2002
           filters:
             tags:
               only: /.*/
