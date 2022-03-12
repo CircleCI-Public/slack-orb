@@ -7,10 +7,6 @@ orbs:
 workflows:
   lint-pack:
     jobs:
-      - orb-tools/lint:
-          filters:
-            tags:
-              only: /.*/
       - orb-tools/pack:
           filters:
             tags:
