@@ -91,6 +91,10 @@ workflows:
           matrix:
             parameters:
               runner: [cimg, mac, alpine]
+      - orb-tools/lint:
+          filters:
+            tags:
+              only: /.*/
       - orb-tools/pack:
           filters:
             tags:
@@ -104,6 +108,7 @@ workflows:
           vcs-type: << pipeline.project.type >>
           pub-type: production
           requires:
+            - orb-tools/lint
             - orb-tools/review
             - orb-tools/pack
             - integration-test-templates
