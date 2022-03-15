@@ -1,0 +1,129 @@
+version: 2.1
+orbs:
+  slack: circleci/slack@dev:<<pipeline.git.revision>>
+  orb-tools: circleci/orb-tools@11.1
+jobs:
+  integration-test-templates:
+    parameters:
+      runner:
+        type: executor
+        default: cimg
+    executor: <<parameters.runner>>
+    steps:
+      - checkout
+      - slack/notify:
+          event: always
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Current Job: $CIRCLE_JOB"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "This test will @ a normal user, a user ID, and normal group name: <@U8C9ETTUG>, @orbs, @gabriel"
+                  }
+                }
+              ]
+              }
+      - run:
+          name: Verify SLACK_JOB_STATUS is written
+          command: |
+            grep "pass" /tmp/SLACK_JOB_STATUS
+      - slack/notify:
+          template: basic_fail_1
+          mentions: "@orbs"
+          event: always
+      - slack/notify:
+          template: basic_success_1
+          event: always
+      - slack/notify:
+          template: success_tagged_deploy_1
+          event: always
+      - slack/notify:
+          template: basic_on_hold_1
+          event: always
+      - slack/notify:
+          event: pass
+          custom: >
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Sample link using environment variable in markdown <${CIRCLE_BUILD_URL}|LINK >"
+                  }
+                }
+              ]
+            }
+      - slack/notify:
+          debug: true
+          template: basic_success_1
+          event: always
+      - run:
+          name: Dynamically populate the mention and export the template as an environment variable
+          command: |
+            echo 'export COMMIT_MESSAGE="$(git log --format=oneline -n 1 $CIRCLE_SHA1)"' >> $BASH_ENV
+            echo 'export SLACK_PARAM_MENTIONS="$COMMIT_MESSAGE"' >> $BASH_ENV
+            echo 'export MY_ORB_TEMPLATE=$(cat src/message_templates/basic_success_1.json)' >> $BASH_ENV
+      - slack/notify:
+          event: always
+          template: MY_ORB_TEMPLATE
+      - slack/notify
+
+workflows:
+  test-deploy:
+    jobs:
+      - integration-test-templates:
+          context: SLACK_NOTIFICATIONS_TEST
+          filters:
+            tags:
+              only: /.*/
+          matrix:
+            parameters:
+              runner: [cimg, mac, alpine]
+      - orb-tools/lint:
+          filters:
+            tags:
+              only: /.*/
+      - orb-tools/pack:
+          filters:
+            tags:
+              only: /.*/
+      - orb-tools/review:
+          filters:
+            tags:
+              only: /.*/
+      - orb-tools/publish:
+          orb-name: circleci/slack
+          vcs-type: << pipeline.project.type >>
+          pub-type: production
+          requires:
+            - orb-tools/lint
+            - orb-tools/review
+            - orb-tools/pack
+            - integration-test-templates
+          context: orb-publishing
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
+executors:
+  cimg:
+    docker:
+      - image: cimg/base:stable
+  mac:
+    macos:
+      xcode: 11.7.0
+  alpine:
+    # This image contains both CURL and JQ
+    docker:
+      - image: dwdraju/alpine-curl-jq
