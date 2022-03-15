@@ -53,8 +53,6 @@ jobs:
           event: pass
           custom: >
             {
-
-
               "blocks": [
                 {
                   "type": "section",
