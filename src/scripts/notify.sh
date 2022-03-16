@@ -1,6 +1,18 @@
 #!/bin/sh
 JQ_PATH=/usr/local/bin/jq
 
+ExitIfNotIgnoreErrors() {
+    if [ "$SLACK_PARAM_IGNORE_ERRORS" = "0" ]; then
+        exit 1
+    fi
+}
+
+LogDebug() {
+    if [ -n "${SLACK_PARAM_DEBUG:-}" ]; then
+        echo "$1"
+    fi
+}
+
 BuildMessageBody() {
     # Send message
     #   If sending message, default to custom template,
@@ -38,14 +50,29 @@ PostToSlack() {
     for i in $(eval echo \""$SLACK_PARAM_CHANNEL"\" | sed "s/,/ /g")
     do
         echo "Sending to Slack Channel: $i"
+
+        # Convert channel to a unique ID
+        channel_slug=$(printf "%s" "$i" | md5sum - | awk '{print $1}')
+        LogDebug "Channel slug: $channel_slug"
+
         SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg channel "$i" '.channel = $channel')
         if [ -n "${SLACK_PARAM_DEBUG:-}" ]; then
             printf "%s\n" "$SLACK_MSG_BODY" > "$SLACK_MSG_BODY_LOG"
             echo "The message body being sent to Slack can be found below. To view redacted values, rerun the job with SSH and access: ${SLACK_MSG_BODY_LOG}"
             echo "$SLACK_MSG_BODY"
         fi
+        if [ "$SLACK_THREAD_MESSAGE" = "1" ] ; then
+            thread_ts_variable="SLACK_THREAD_TS_$channel_slug"
+            thread_ts=$(eval "echo \"\$$thread_ts_variable\"")
+            if [ -n "$thread_ts" ] ; then
+                SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg ts "$thread_ts" '.thread_ts = $ts')
+            else
+                echo "Can't load thread_ts for channel $i. This is expected if this is the first message sent to this channel in the job -- don't set thread_message in this case. Otherwise, you found an error in this Slack orb."
+                ExitIfNotIgnoreErrors
+            fi
+        fi
         SLACK_SENT_RESPONSE=$(curl -s -f -X POST -H 'Content-type: application/json' -H "Authorization: Bearer $SLACK_ACCESS_TOKEN" --data "$SLACK_MSG_BODY" https://slack.com/api/chat.postMessage)
-        
+
         if [ -n "${SLACK_PARAM_DEBUG:-}" ]; then
             printf "%s\n" "$SLACK_SENT_RESPONSE" > "$SLACK_SENT_RESPONSE_LOG"
             echo "The response from the API call to Slack can be found below. To view redacted values, rerun the job with SSH and access: ${SLACK_SENT_RESPONSE_LOG}"
@@ -59,10 +86,28 @@ PostToSlack() {
             echo
             echo
             echo "View the Setup Guide: https://github.com/CircleCI-Public/slack-orb/wiki/Setup"
-            if [ "$SLACK_PARAM_IGNORE_ERRORS" = "0" ]; then
-                exit 1
-            fi
+            ExitIfNotIgnoreErrors
+            return
         fi
+
+        # We only continue if the Slack post was successful
+
+        # If a thread_ts is not defined (for this channel), set it for
+        # subsequent commands.
+        thread_ts_variable="SLACK_THREAD_TS_$channel_slug"
+        thread_ts=$(eval "echo \"\$$thread_ts_variable\"")
+        if [ -z "$thread_ts" ] ; then
+            response_ts=$(echo "$SLACK_SENT_RESPONSE" | jq '.ts')
+            if [ "$response_ts" != "null" ]; then
+                echo "export SLACK_THREAD_TS_$channel_slug=\"$response_ts\"" >> "$BASH_ENV"
+            else
+                echo "Couldn't read ts (thread ID) from Slack's response. This is most likely a bug in the Slack orb."
+                ExitIfNotIgnoreErrors
+            fi
+        else
+            DebugLog "Not exporting thread_ts for this channel, one is already set."
+        fi
+
     done
 }
 

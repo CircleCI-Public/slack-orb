@@ -62,6 +62,16 @@ parameters:
        When run in a persistent build environment such as CircleCI Runner, these debug log files may remain in the system's temporary filesystem indefinitely and accumulate over time.
       type: boolean
       default: false
+  thread_message:
+      description: |
+        Post this message as a threaded reply to the most recent message sent by
+        this CircleCI job.
+
+        Whenever this orb successfully posts a message, it stores the thread ID
+        in an environment variable. It will post to this thread ID if you set
+        "thread_message: true" for subsequent messages.
+      type: boolean
+      default: false
 steps:
   - run:
       when: on_fail
@@ -86,6 +96,7 @@ steps:
         SLACK_PARAM_CHANNEL: "<<parameters.channel>>"
         SLACK_PARAM_IGNORE_ERRORS: "<<parameters.ignore_errors>>"
         SLACK_PARAM_DEBUG: "<<parameters.debug>>"
+        SLACK_THREAD_MESSAGE: "<<parameters.thread_message>>"
         # import pre-built templates using the orb-pack local script include.
         basic_fail_1: "<<include(message_templates/basic_fail_1.json)>>"
         success_tagged_deploy_1: "<<include(message_templates/success_tagged_deploy_1.json)>>"
