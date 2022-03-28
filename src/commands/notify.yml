@@ -62,6 +62,11 @@ parameters:
        When run in a persistent build environment such as CircleCI Runner, these debug log files may remain in the system's temporary filesystem indefinitely and accumulate over time.
       type: boolean
       default: false
+  circleci_host:
+      description: |
+       A CircleCI Host which used in a message template.
+      type: string
+      default: https://circleci.com
 steps:
   - run:
       when: on_fail
@@ -86,6 +91,7 @@ steps:
         SLACK_PARAM_CHANNEL: "<<parameters.channel>>"
         SLACK_PARAM_IGNORE_ERRORS: "<<parameters.ignore_errors>>"
         SLACK_PARAM_DEBUG: "<<parameters.debug>>"
+        SLACK_PARAM_CIRCLECI_HOST: "<<parameters.circleci_host>>"
         # import pre-built templates using the orb-pack local script include.
         basic_fail_1: "<<include(message_templates/basic_fail_1.json)>>"
         success_tagged_deploy_1: "<<include(message_templates/success_tagged_deploy_1.json)>>"
