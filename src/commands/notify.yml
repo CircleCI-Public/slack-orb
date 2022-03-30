@@ -71,16 +71,19 @@ steps:
   - run:
       when: on_fail
       name: Slack - Detecting Job Status (FAIL)
+      shell: bash
       command: |
         echo 'export CCI_STATUS="fail"' > /tmp/SLACK_JOB_STATUS
   - run:
       when: on_success
-      name: Slack - Detecting Job Status (PASS)
+      name: Slack - Detecting Job Status (PASS)      
+      shell: bash
       command: |
         echo 'export CCI_STATUS="pass"' > /tmp/SLACK_JOB_STATUS
   - run:
       when: always
-      name: Slack - Sending Notification
+      name: Slack - Sending Notification      
+      shell: bash
       environment:
         SLACK_PARAM_EVENT: "<<parameters.event>>"
         SLACK_PARAM_TEMPLATE: "<<parameters.template>>"
