@@ -38,6 +38,11 @@ parameters:
        Enable to view full payload being sent to slack and response being recieved from the API call.
       type: boolean
       default: false
+  circleci_host:
+      description: |
+       CircleCI Host (used as the base for the Workflow URL)
+      type: string
+      default: https://circleci.com
 
 docker:
   - image: cimg/base:stable
@@ -52,4 +57,5 @@ steps:
       mentions: <<parameters.mentions>>
       channel: <<parameters.channel>>
       debug: <<parameters.debug>>
+      circleci_host: <<parameters.circleci_host>>
 
