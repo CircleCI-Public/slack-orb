@@ -177,11 +177,11 @@ SetupLogs() {
 # This is done so this script may be tested.
 ORB_TEST_ENV="bats-core"
 if [ "${0#*"$ORB_TEST_ENV"}" = "$0" ]; then
+    . "/tmp/SLACK_JOB_STATUS"
+    ShouldPost
     SetupEnvVars
     SetupLogs
     CheckEnvVars
-    . "/tmp/SLACK_JOB_STATUS"
-    ShouldPost
     InstallJq
     BuildMessageBody
     PostToSlack
