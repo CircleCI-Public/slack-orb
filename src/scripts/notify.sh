@@ -96,11 +96,17 @@ FilterBy() {
       return
     fi
 
+    # Add the "invert-match" flag to grep if it is set.
+    INVERT_MATCH=""
+    if [ "$SLACK_PARAM_INVERT_MATCH" -eq 1 ]; then
+        INVERT_MATCH="--invert-match"
+    fi
+
     # If any pattern supplied matches the current branch or the current tag, proceed; otherwise, exit with message.
+    # However, if the invert_match parameter is set, invert the match.
     FLAG_MATCHES_FILTER="false"
-    for i in $(echo "$1" | sed "s/,/ /g")
-    do
-        if echo "$2" | grep -Eq "^${i}$"; then
+    for i in $(echo "$1" | sed "s/,/ /g"); do
+        if echo "$2" | grep -Eq ${INVERT_MATCH:+"$INVERT_MATCH"} "^${i}$"; then
             FLAG_MATCHES_FILTER="true"
             break
         fi
