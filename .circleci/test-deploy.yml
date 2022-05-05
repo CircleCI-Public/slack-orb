@@ -77,6 +77,10 @@ jobs:
           event: always
           template: MY_ORB_TEMPLATE
       - slack/notify
+      # Should run for every branch but master
+      - slack/notify:
+          branch_pattern: "master"
+          invert_match: true
 
 workflows:
   test-deploy:
