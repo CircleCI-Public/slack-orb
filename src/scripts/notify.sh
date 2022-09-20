@@ -45,7 +45,7 @@ PostToSlack() {
             echo "$SLACK_MSG_BODY"
         fi
         SLACK_SENT_RESPONSE=$(curl -s -f -X POST -H 'Content-type: application/json' -H "Authorization: Bearer $SLACK_ACCESS_TOKEN" --data "$SLACK_MSG_BODY" https://slack.com/api/chat.postMessage)
-        
+
         if [ "$SLACK_PARAM_DEBUG" -eq 1 ]; then
             printf "%s\n" "$SLACK_SENT_RESPONSE" > "$SLACK_SENT_RESPONSE_LOG"
             echo "The response from the API call to Slack can be found below. To view redacted values, rerun the job with SSH and access: ${SLACK_SENT_RESPONSE_LOG}"
@@ -96,22 +96,18 @@ FilterBy() {
       return
     fi
 
-    # Add the "invert-match" flag to grep if it is set.
-    INVERT_MATCH=""
-    if [ "$SLACK_PARAM_INVERT_MATCH" -eq 1 ]; then
-        INVERT_MATCH="--invert-match"
-    fi
-
     # If any pattern supplied matches the current branch or the current tag, proceed; otherwise, exit with message.
-    # However, if the invert_match parameter is set, invert the match.
     FLAG_MATCHES_FILTER="false"
     for i in $(echo "$1" | sed "s/,/ /g"); do
-        if echo "$2" | grep -Eq ${INVERT_MATCH:+"$INVERT_MATCH"} "^${i}$"; then
+        if echo "$2" | grep -Eq "^${i}$"; then
             FLAG_MATCHES_FILTER="true"
             break
         fi
     done
-    if [ "$FLAG_MATCHES_FILTER" = "false" ]; then
+    # If the invert_match parameter is set, invert the match.
+    if [ "$FLAG_MATCHES_FILTER" = "false" ] && [ "$SLACK_PARAM_INVERT_MATCH" -eq 0 ] ||
+       [ "$FLAG_MATCHES_FILTER" = "true" ] && [ "$SLACK_PARAM_INVERT_MATCH" -eq 1 ]
+    then
         # dont send message.
         echo "NO SLACK ALERT"
         echo
