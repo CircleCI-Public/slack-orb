@@ -1,161 +1,44 @@
 version: 2.1
-
+setup: true
 orbs:
-  slack: circleci/slack@<<pipeline.parameters.dev-orb-version>>
-  orb-tools: circleci/orb-tools@9.3
-  bats: circleci/bats@1.0
-  shellcheck: circleci/shellcheck@2.0
-
-# Pipeline parameters
-parameters:
-  # These pipeline parameters are required by the "trigger-integration-tests-workflow"
-  # job, by default.
-  run-integration-tests:
-    type: boolean
-    default: false
-  dev-orb-version:
-    type: string
-    default: "dev:alpha"
-
-executors:
-  cimg:
-    docker:
-      - image: cimg/base:stable
-  mac:
-    macos:
-      xcode: 11.7.0
-  alpine:
-    # This image contains both CURL and JQ
-    docker:
-      - image: dwdraju/alpine-curl-jq
-
-jobs:
-  integration-test-templates:
-    parameters:
-      runner:
-        type: executor
-        default: cimg
-    executor: <<parameters.runner>>
-    steps:
-      - slack/notify:
-          event: always
-          custom: |
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "Current Job: $CIRCLE_JOB"
-                  }
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "This test will @ a normal user, a user ID, and normal group name: <@U8C9ETTUG>, @orbs, @gabriel"
-                  }
-                }
-              ]
-              }
-      - run:
-          name: Verify SLACK_JOB_STATUS is written
-          command: |
-            grep "pass" /tmp/SLACK_JOB_STATUS
-      - slack/notify:
-          template: basic_fail_1
-          mentions: "@orbs"
-          event: always
-      - slack/notify:
-          template: basic_success_1
-          event: always
-      - slack/notify:
-          template: success_tagged_deploy_1
-          event: always
-      - slack/notify:
-          template: basic_on_hold_1
-          event: always
-      - slack/notify:
-          event: pass
-          custom: >
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "Sample link using environment variable in markdown <${CIRCLE_BUILD_URL}|LINK >"
-                  }
-                }
-              ]
-            }
+  orb-tools: circleci/orb-tools@11.1
+  shellcheck: circleci/shellcheck@3.1
 
 workflows:
-
-  test-pack:
-    unless: << pipeline.parameters.run-integration-tests >>
+  lint-pack:
     jobs:
-      - orb-tools/lint
-      - shellcheck/check:
-          dir: ./src/scripts
-          exclude: SC2148,SC2001,SC1091,SC2086,SC2116,SC2046,SC2005,SC2002
-          shell: sh
-      - bats/run:
-          path: ./src/tests
-      # pack your orb YAML files to a single orb.yml
-      # validate the orb.yml file to ensure it is well-formed
-      - orb-tools/pack:
-          use-orb-pack: true
-      - hold-for-dev-publish:
-          type: approval
-          requires:
-            - orb-tools/lint
-            - orb-tools/pack
-            - bats/run
-            - shellcheck/check
-      # release dev version of orb, for testing & possible publishing.
-      # orb will be published as dev:alpha and dev:${CIRCLE_SHA1:0:7}.
-      # requires a CircleCI API token to be stored as CIRCLE_TOKEN (default)
-      # https://circleci.com/docs/2.0/managing-api-tokens
-      # store CIRCLE_TOKEN as a project env var or Contexts resource
-      # if using Contexts, add your context below
-      - orb-tools/publish-dev:
-          orb-name: circleci/slack
-          context: orb-publishing
-          requires:
-            - hold-for-dev-publish
-
-      # trigger an integration workflow to test the
-      # dev:${CIRCLE_SHA1:0:7} version of your orb
-      - orb-tools/trigger-integration-tests-workflow:
-          name: trigger-integration-dev
-          context: orb-publishing
-          requires:
-            - orb-tools/publish-dev
-
-  integration-test_deploy:
-    when: << pipeline.parameters.run-integration-tests >>
-    jobs:
-      # your integration test jobs go here: essentially, run all your orb's
-      # jobs and commands to ensure they behave as expected. or, run other
-      # integration tests of your choosing
-      - integration-test-templates:
-          context: SLACK_NOTIFICATIONS_TEST
-          matrix:
-            parameters:
-              runner: [cimg, mac, alpine]
-
-      - orb-tools/dev-promote-prod-from-commit-subject:
-          orb-name: circleci/slack
-          context: orb-publishing
-          add-pr-comment: true
-          bot-token-variable: GHI_TOKEN
-          bot-user: cpe-bot
-          fail-if-semver-not-indicated: true
-          publish-version-tag: true
-          ssh-fingerprints: 79:ae:f5:10:17:8a:d2:9a:ed:63:5c:b0:92:66:23:49
-          requires:
-            - integration-test-templates
+      - orb-tools/lint:
           filters:
-            branches:
-              only: master
+            tags:
+              only: /.*/
+      - orb-tools/pack:
+          filters:
+            tags:
+              only: /.*/
+      - orb-tools/review:
+          filters:
+            tags:
+              only: /.*/
+      - shellcheck/check:
+          exclude: SC2148,SC2001,SC1091,SC2086,SC2116,SC2046,SC2005,SC2002
+          filters:
+            tags:
+              only: /.*/
+      - orb-tools/publish:
+          orb-name: circleci/slack
+          vcs-type: << pipeline.project.type >>
+          requires:
+            [orb-tools/lint, orb-tools/review, orb-tools/pack, shellcheck/check]
+          # Use a context to hold your publishing token.
+          context: orb-publishing
+          filters:
+            tags:
+              only: /.*/
+      # Triggers the next workflow in the Orb Development Kit.
+      - orb-tools/continue:
+          pipeline-number: << pipeline.number >>
+          vcs-type: << pipeline.project.type >>
+          requires: [orb-tools/publish]
+          filters:
+            tags:
+              only: /.*/

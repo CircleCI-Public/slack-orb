@@ -1,8 +1,15 @@
-description: Notify a Slack channel with a custom message.
+description: |
+  Notify a Slack channel with a custom message.
+  The environment variables SLACK_ACCESS_TOKEN and SLACK_DEFAULT_CHANNEL must be set for this orb to work.
+  For instructions on how to set them, follow the setup guide available in the wiki: https://github.com/CircleCI-Public/slack-orb/wiki/Setup.
 
 parameters:
   template:
-    description: "Use one of the built-in templates. Select the template name. Preview each template on the gitHub Readme: "
+    description: |
+      Select which template to use for the notification by its name. The name must be available as an environment variable.
+      The built-in templates can be found and previewed at: https://github.com/CircleCI-Public/slack-orb/wiki#templates.
+      Alternatively, you can create and use your own dynamic templates: https://github.com/CircleCI-Public/slack-orb/wiki/Dynamic-Templates.
+      If left empty and no custom template is provided, the template will be automatically selected based on the job status.
     type: string
     default: ""
   custom:
@@ -30,6 +37,12 @@ parameters:
       A comma separated list of regex matchable tag names. Notifications will only be sent if sent from a job from these branches. By default ".+" will be used to match all tags. Pattern must match the full string, no partial matches.
     type: string
     default: ".+"
+  invert_match:
+    description: |
+      Invert the branch and tag patterns.
+      If set to true, notifications will only be sent if sent from a job from branches and tags that do not match the patterns.
+    type: boolean
+    default: false
   mentions:
     description: |
       Exports to the "$SLACK_PARAM_MENTIONS" environment variable for use in templates.
@@ -48,6 +61,18 @@ parameters:
         Disable to catch initial setup errors. Re-enable to prevent Slack errors from affecting your pipeline.
       type: boolean
       default: true
+  debug:
+      description: |
+       Enable to view full payload being sent to Slack and response being received from the API call.
+       Redacted content can be viewed by re-running the job with SSH and accessing the log files referenced in the job output.
+       When run in a persistent build environment such as CircleCI Runner, these debug log files may remain in the system's temporary filesystem indefinitely and accumulate over time.
+      type: boolean
+      default: false
+  circleci_host:
+      description: |
+       A CircleCI Host which used in a message template.
+      type: string
+      default: https://circleci.com
 steps:
   - run:
       when: on_fail
@@ -69,8 +94,11 @@ steps:
         SLACK_PARAM_MENTIONS: "<<parameters.mentions>>"
         SLACK_PARAM_BRANCHPATTERN: "<<parameters.branch_pattern>>"
         SLACK_PARAM_TAGPATTERN: "<<parameters.tag_pattern>>"
+        SLACK_PARAM_INVERT_MATCH: "<<parameters.invert_match>>"
         SLACK_PARAM_CHANNEL: "<<parameters.channel>>"
         SLACK_PARAM_IGNORE_ERRORS: "<<parameters.ignore_errors>>"
+        SLACK_PARAM_DEBUG: "<<parameters.debug>>"
+        SLACK_PARAM_CIRCLECI_HOST: "<<parameters.circleci_host>>"
         # import pre-built templates using the orb-pack local script include.
         basic_fail_1: "<<include(message_templates/basic_fail_1.json)>>"
         success_tagged_deploy_1: "<<include(message_templates/success_tagged_deploy_1.json)>>"

@@ -1,3 +1,6 @@
+#!/bin/sh
+JQ_PATH=/usr/local/bin/jq
+
 BuildMessageBody() {
     # Send message
     #   If sending message, default to custom template,
@@ -8,20 +11,24 @@ BuildMessageBody() {
         # shellcheck disable=SC2016
         CUSTOM_BODY_MODIFIED=$(echo "$CUSTOM_BODY_MODIFIED" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed 's/`/\\`/g')
         T2=$(eval echo \""$CUSTOM_BODY_MODIFIED"\")
-    elif [ -n "${SLACK_PARAM_TEMPLATE:-}" ]; then
-        TEMPLATE="\$$SLACK_PARAM_TEMPLATE"
-        T1=$(eval echo "$TEMPLATE" | sed 's/"/\\"/g')
-        T2=$(eval echo \""$T1"\")
     else
-        echo "Error: No message template selected."
-        echo "Select either a custom template or one of the pre-included ones via the 'custom' or 'template' parameters."
-        exit 1
+        # shellcheck disable=SC2154
+        if [ -n "${SLACK_PARAM_TEMPLATE:-}" ]; then TEMPLATE="\$$SLACK_PARAM_TEMPLATE"
+        elif [ "$CCI_STATUS" = "pass" ]; then TEMPLATE="\$basic_success_1"
+        elif [ "$CCI_STATUS" = "fail" ]; then TEMPLATE="\$basic_fail_1"
+        else echo "A template wasn't provided nor is possible to infer it based on the job status. The job status: '$CCI_STATUS' is unexpected."; exit 1
+        fi
+
+        [ -z "${SLACK_PARAM_TEMPLATE:-}" ] && echo "No message template was explicitly chosen. Based on the job status '$CCI_STATUS' the template '$TEMPLATE' will be used."
+
+        # shellcheck disable=SC2016
+        T1=$(eval echo "$TEMPLATE" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed 's/`/\\`/g')
+        T2=$(eval echo \""$T1"\")
     fi
     # Insert the default channel. THIS IS TEMPORARY
     T2=$(echo "$T2" | jq ". + {\"channel\": \"$SLACK_DEFAULT_CHANNEL\"}")
     SLACK_MSG_BODY=$T2
 }
-
 
 PostToSlack() {
     # Post once per channel listed by the channel parameter
@@ -32,7 +39,19 @@ PostToSlack() {
     do
         echo "Sending to Slack Channel: $i"
         SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg channel "$i" '.channel = $channel')
+        if [ "$SLACK_PARAM_DEBUG" -eq 1 ]; then
+            printf "%s\n" "$SLACK_MSG_BODY" > "$SLACK_MSG_BODY_LOG"
+            echo "The message body being sent to Slack can be found below. To view redacted values, rerun the job with SSH and access: ${SLACK_MSG_BODY_LOG}"
+            echo "$SLACK_MSG_BODY"
+        fi
         SLACK_SENT_RESPONSE=$(curl -s -f -X POST -H 'Content-type: application/json' -H "Authorization: Bearer $SLACK_ACCESS_TOKEN" --data "$SLACK_MSG_BODY" https://slack.com/api/chat.postMessage)
+        
+        if [ "$SLACK_PARAM_DEBUG" -eq 1 ]; then
+            printf "%s\n" "$SLACK_SENT_RESPONSE" > "$SLACK_SENT_RESPONSE_LOG"
+            echo "The response from the API call to Slack can be found below. To view redacted values, rerun the job with SSH and access: ${SLACK_SENT_RESPONSE_LOG}"
+            echo "$SLACK_SENT_RESPONSE"
+        fi
+
         SLACK_ERROR_MSG=$(echo "$SLACK_SENT_RESPONSE" | jq '.error')
         if [ ! "$SLACK_ERROR_MSG" = "null" ]; then
             echo "Slack API returned an error message:"
@@ -58,21 +77,14 @@ ModifyCustomTemplate() {
 }
 
 InstallJq() {
-    if uname -a | grep Darwin > /dev/null 2>&1; then
-        echo "Checking For JQ + CURL: MacOS"
-        command -v jq >/dev/null 2>&1 || HOMEBREW_NO_AUTO_UPDATE=1 brew install jq --quiet
+    echo "Checking For JQ + CURL"
+    if command -v curl >/dev/null 2>&1 && ! command -v jq >/dev/null 2>&1; then
+        uname -a | grep Darwin > /dev/null 2>&1 && JQ_VERSION=jq-osx-amd64 || JQ_VERSION=jq-linux32
+        curl -Ls -o "$JQ_PATH" https://github.com/stedolan/jq/releases/download/jq-1.6/"${JQ_VERSION}"
+        chmod +x "$JQ_PATH"
+        command -v jq >/dev/null 2>&1
         return $?
-
-    elif cat /etc/issue | grep Debian > /dev/null 2>&1 || cat /etc/issue | grep Ubuntu > /dev/null 2>&1; then
-        echo "Checking For JQ + CURL: Debian"
-        if [ "$(id -u)" = 0 ]; then export SUDO=""; else # Check if we're root
-            export SUDO="sudo";
-        fi
-        command -v jq >/dev/null 2>&1 || { $SUDO apt -qq update && $SUDO apt -qq install -y jq; }
-        return $?
-
-    elif cat /etc/issue | grep Alpine > /dev/null 2>&1; then
-        echo "Checking For JQ + CURL: Alpine"
+    else
         command -v curl >/dev/null 2>&1 || { echo >&2 "SLACK ORB ERROR: CURL is required. Please install."; exit 1; }
         command -v jq >/dev/null 2>&1 || { echo >&2 "SLACK ORB ERROR: JQ is required. Please install"; exit 1; }
         return $?
@@ -80,11 +92,22 @@ InstallJq() {
 }
 
 FilterBy() {
+
+    if [ -z "$1" ] || [ -z "$2" ]; then
+      return
+    fi
+
+    # Add the "invert-match" flag to grep if it is set.
+    INVERT_MATCH=""
+    if [ "$SLACK_PARAM_INVERT_MATCH" -eq 1 ]; then
+        INVERT_MATCH="--invert-match"
+    fi
+
     # If any pattern supplied matches the current branch or the current tag, proceed; otherwise, exit with message.
+    # However, if the invert_match parameter is set, invert the match.
     FLAG_MATCHES_FILTER="false"
-    for i in $(echo "$1" | sed "s/,/ /g")
-    do
-        if echo "$2" | grep -Eq "^${i}$"; then
+    for i in $(echo "$1" | sed "s/,/ /g"); do
+        if echo "$2" | grep -Eq ${INVERT_MATCH:+"$INVERT_MATCH"} "^${i}$"; then
             FLAG_MATCHES_FILTER="true"
             break
         fi
@@ -94,7 +117,23 @@ FilterBy() {
     fi
 }
 
+SetupEnvVars() {
+    echo "BASH_ENV file: $BASH_ENV"
+    if [ -f "$BASH_ENV" ]; then
+        echo "Exists. Sourcing into ENV"
+        # shellcheck disable=SC1090
+        . $BASH_ENV
+    else
+        echo "Does Not Exist. Skipping file execution"
+    fi
+}
+
 CheckEnvVars() {
+    if [ -n "${SLACK_WEBHOOK:-}" ]; then
+        echo "It appears you have a Slack Webhook token present in this job."
+        echo "Please note, Webhooks are no longer used for the Slack Orb (v4 +)."
+        echo "Follow the setup guide available in the wiki: https://github.com/CircleCI-Public/slack-orb/wiki/Setup"
+    fi
     if [ -z "${SLACK_ACCESS_TOKEN:-}" ]; then
         echo "In order to use the Slack Orb (v4 +), an OAuth token must be present via the SLACK_ACCESS_TOKEN environment variable."
         echo "Follow the setup guide available in the wiki: https://github.com/CircleCI-Public/slack-orb/wiki/Setup"
@@ -104,11 +143,6 @@ CheckEnvVars() {
     if [ -z "${SLACK_PARAM_CHANNEL:-}" ]; then
        echo "No channel was provided. Enter value for SLACK_DEFAULT_CHANNEL env var, or channel parameter"
        exit 1
-    fi
-    if [ -n "${SLACK_WEBHOOK:-}" ]; then
-        echo "It appears you have a Slack Webhook token present in this job."
-        echo "Please note, Webhooks are no longer used for the Slack Orb (v4 +)."
-        echo "Follow the setup guide available in the wiki: https://github.com/CircleCI-Public/slack-orb/wiki/Setup"
     fi
 }
 
@@ -153,15 +187,27 @@ ShouldPost() {
     echo "Posting Status"
 }
 
+SetupLogs() {
+    if [ "$SLACK_PARAM_DEBUG" -eq 1 ]; then
+        LOG_PATH="$(mktemp -d 'slack-orb-logs.XXXXXX')"
+        SLACK_MSG_BODY_LOG="$LOG_PATH/payload.json"
+        SLACK_SENT_RESPONSE_LOG="$LOG_PATH/response.json"
+
+        touch "$SLACK_MSG_BODY_LOG" "$SLACK_SENT_RESPONSE_LOG"
+        chmod 0600 "$SLACK_MSG_BODY_LOG" "$SLACK_SENT_RESPONSE_LOG"
+    fi
+}
+
 # Will not run if sourced from another script.
 # This is done so this script may be tested.
 ORB_TEST_ENV="bats-core"
-if [ "${0#*$ORB_TEST_ENV}" = "$0" ]; then
-    CheckEnvVars
+if [ "${0#*"$ORB_TEST_ENV"}" = "$0" ]; then
     . "/tmp/SLACK_JOB_STATUS"
     ShouldPost
+    SetupEnvVars
+    SetupLogs
+    CheckEnvVars
     InstallJq
     BuildMessageBody
     PostToSlack
-
 fi
