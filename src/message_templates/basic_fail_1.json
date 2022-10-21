@@ -54,7 +54,7 @@
 			"elements": [
 				{
 					"type": "button",
-          "callback_id": "basic_fail_view",
+					"callback_id": "basic_fail_view",
 					"text": {
 						"type": "plain_text",
 						"text": "View Job"
