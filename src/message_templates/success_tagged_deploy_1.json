@@ -36,7 +36,7 @@
 			"elements": [
 				{
 					"type": "button",
-					"callback_id": "success_tagged_deploy_view",
+					"action_id": "success_tagged_deploy_view",
 					"text": {
 						"type": "plain_text",
 						"text": "View Job"
