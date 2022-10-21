@@ -34,8 +34,8 @@
 		{
 			"type": "actions",
 			"elements": [
-                {
-                    "type": "button",
+				{
+					"type": "button",
 					"callback_id": "success_tagged_deploy_view",
 					"text": {
 						"type": "plain_text",

@@ -44,7 +44,7 @@
 			"type": "actions",
 			"elements": [
                 {
-                    "type": "button",
+					"type": "button",
 					"callback_id": "basic_on_hold_view",
 					"text": {
 						"type": "plain_text",
