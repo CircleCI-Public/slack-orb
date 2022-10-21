@@ -58,6 +58,7 @@
 			"elements": [
 				{
 					"type": "button",
+					"action_id": "basic_success_view",
 					"text": {
 						"type": "plain_text",
 						"text": "View Job"

@@ -45,6 +45,7 @@
 			"elements": [
 				{
 					"type": "button",
+					"action_id": "basic_on_hold_view",
 					"text": {
 						"type": "plain_text",
 						"text": "View Workflow"
