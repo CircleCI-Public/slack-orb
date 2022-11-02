@@ -105,8 +105,8 @@ FilterBy() {
         fi
     done
     # If the invert_match parameter is set, invert the match.
-    if [ "$FLAG_MATCHES_FILTER" = "false" ] && [ "$SLACK_PARAM_INVERT_MATCH" -eq 0 ] ||
-       [ "$FLAG_MATCHES_FILTER" = "true" ] && [ "$SLACK_PARAM_INVERT_MATCH" -eq 1 ]
+    if { [ "$FLAG_MATCHES_FILTER" = "false" ] && [ "$SLACK_PARAM_INVERT_MATCH" -eq 0 ]; } || \
+        { [ "$FLAG_MATCHES_FILTER" = "true" ] && [ "$SLACK_PARAM_INVERT_MATCH" -eq 1 ]; }
     then
         # dont send message.
         echo "NO SLACK ALERT"

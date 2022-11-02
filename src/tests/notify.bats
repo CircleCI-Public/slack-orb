@@ -1,6 +1,7 @@
 setup() {
     source ./src/scripts/notify.sh
     export SLACK_PARAM_BRANCHPATTERN=$(cat $BATS_TEST_DIRNAME/sampleBranchFilters.txt)
+    SLACK_PARAM_INVERT_MATCH="0"
 }
 
 @test "1: Skip message on no event" {
@@ -110,7 +111,7 @@ setup() {
     SLACK_PARAM_INVERT_MATCH="1"
     run FilterBy "$SLACK_PARAM_BRANCHPATTERN" "$CIRCLE_BRANCH"
     echo "Error output debug: $output"
-    [ "$output" == "NO SLACK ALERT" ] # "pr-[0-9]+" should match but inverted: Error message expected.
+    [[ "$output" =~ "NO SLACK ALERT" ]] # "pr-[0-9]+" should match but inverted: Error message expected.
     [ "$status" -eq 0 ] # In any case, this should return a 0 exit as to not block a build/deployment.
 }
 
