@@ -175,10 +175,20 @@ SetupLogs() {
     fi
 }
 
+ExitIfWindows() {
+    os="$(uname -s | tr '[:upper:]' '[:lower:]')"
+    if printf '%s\n' "$os" | grep --quiet 'msys*\|cygwin*' ; then
+        printf '%s\n' "Windows is not supported by this orb."
+        printf '%s\n' "For more information, see: https://github.com/CircleCI-Public/slack-orb/wiki/FAQ."
+        exit 1
+    fi
+}
+
 # Will not run if sourced from another script.
 # This is done so this script may be tested.
 ORB_TEST_ENV="bats-core"
 if [ "${0#*"$ORB_TEST_ENV"}" = "$0" ]; then
+    ExitIfWindows
     . "/tmp/SLACK_JOB_STATUS"
     ShouldPost
     SetupEnvVars
