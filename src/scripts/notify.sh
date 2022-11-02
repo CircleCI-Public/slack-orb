@@ -92,6 +92,7 @@ InstallJq() {
 }
 
 FilterBy() {
+    set -x
     if [ -z "$1" ] || [ -z "$2" ]; then
       return
     fi
@@ -115,6 +116,7 @@ FilterBy() {
         echo "Current matching pattern: $1"
         exit 0
     fi
+    set +x
 }
 
 SetupEnvVars() {

@@ -50,6 +50,7 @@ setup() {
 }
 
 @test "6: FilterBy - match-all default" {
+    SLACK_PARAM_INVERT_MATCH="0"
     SLACK_PARAM_BRANCHPATTERN=".+"
     CIRCLE_BRANCH="xyz-123"
     run FilterBy "$SLACK_PARAM_BRANCHPATTERN" "$CIRCLE_BRANCH"
@@ -60,6 +61,7 @@ setup() {
 }
 
 @test "7: FilterBy - string" {
+    SLACK_PARAM_INVERT_MATCH="0"
     CIRCLE_BRANCH="master"
     run FilterBy "$SLACK_PARAM_BRANCHPATTERN" "$CIRCLE_BRANCH"
     echo "Error output debug: $output"
@@ -68,6 +70,7 @@ setup() {
 }
 
 @test "8: FilterBy - regex numbers" {
+    SLACK_PARAM_INVERT_MATCH="0"
     CIRCLE_BRANCH="pr-123"
     run FilterBy "$SLACK_PARAM_BRANCHPATTERN" "$CIRCLE_BRANCH"
     echo "Error output debug: $output"
@@ -76,6 +79,7 @@ setup() {
 }
 
 @test "9: FilterBy - non-match" {
+    SLACK_PARAM_INVERT_MATCH="0"
     CIRCLE_BRANCH="x"
     run FilterBy "$SLACK_PARAM_BRANCHPATTERN" "$CIRCLE_BRANCH"
     echo "Error output debug: $output"
@@ -84,6 +88,7 @@ setup() {
 }
 
 @test "10: FilterBy - no partial-match" {
+    SLACK_PARAM_INVERT_MATCH="0"
     CIRCLE_BRANCH="pr-"
     run FilterBy "$SLACK_PARAM_BRANCHPATTERN" "$CIRCLE_BRANCH"
     echo "Error output debug: $output"
@@ -92,6 +97,7 @@ setup() {
 }
 
 @test "11: FilterBy - SLACK_PARAM_BRANCHPATTERN is empty" {
+    SLACK_PARAM_INVERT_MATCH="0"
     unset SLACK_PARAM_BRANCHPATTERN
     CIRCLE_BRANCH="master"
     run FilterBy "$SLACK_PARAM_BRANCHPATTERN" "$CIRCLE_BRANCH"
@@ -100,6 +106,7 @@ setup() {
 }
 
 @test "12: FilterBy - CIRCLE_BRANCH is empty" {
+    SLACK_PARAM_INVERT_MATCH="0"
     run FilterBy "$SLACK_PARAM_BRANCHPATTERN" "$CIRCLE_BRANCH"
     echo "Error output debug: $output"
     [ "$status" -eq 0 ] # In any case, this should return a 0 exit as to not block a build/deployment.
