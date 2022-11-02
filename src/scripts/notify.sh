@@ -122,7 +122,7 @@ SetupEnvVars() {
     if [ -f "$BASH_ENV" ]; then
         echo "Exists. Sourcing into ENV"
         # shellcheck disable=SC1090
-        . $BASH_ENV
+        . "$BASH_ENV"
     else
         echo "Does Not Exist. Skipping file execution"
     fi
@@ -189,6 +189,7 @@ ExitIfWindows() {
 ORB_TEST_ENV="bats-core"
 if [ "${0#*"$ORB_TEST_ENV"}" = "$0" ]; then
     ExitIfWindows
+    # shellcheck source=/dev/null
     . "/tmp/SLACK_JOB_STATUS"
     ShouldPost
     SetupEnvVars
