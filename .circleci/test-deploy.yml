@@ -114,7 +114,7 @@ workflows:
             - orb-tools/review
             - orb-tools/pack
             - integration-test-templates
-          context: orb-publishing
+          context: orb-publisher
           filters:
             branches:
               ignore: /.*/
