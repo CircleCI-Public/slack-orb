@@ -2,6 +2,11 @@ version: 2.1
 orbs:
   slack: circleci/slack@dev:<<pipeline.git.revision>>
   orb-tools: circleci/orb-tools@11.4
+
+filters: &filters
+  tags:
+    only: /.*/
+
 jobs:
   integration-test-templates:
     parameters:
@@ -87,24 +92,16 @@ workflows:
     jobs:
       - integration-test-templates:
           context: SLACK_NOTIFICATIONS_TEST
-          filters:
-            tags:
-              only: /.*/
+          filters: *filters
           matrix:
             parameters:
               runner: [cimg, mac, alpine]
       - orb-tools/lint:
-          filters:
-            tags:
-              only: /.*/
+          filters: *filters
       - orb-tools/pack:
-          filters:
-            tags:
-              only: /.*/
+          filters: *filters
       - orb-tools/review:
-          filters:
-            tags:
-              only: /.*/
+          filters: *filters
       - orb-tools/publish:
           orb-name: circleci/slack
           vcs-type: << pipeline.project.type >>

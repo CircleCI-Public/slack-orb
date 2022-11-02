@@ -5,31 +5,25 @@ orbs:
   shellcheck: circleci/shellcheck@3.1
   bats: circleci/bats@1.0
 
+filters: &filters
+  tags:
+    only: /.*/
+
 workflows:
   lint-pack:
     jobs:
       - orb-tools/lint:
-          filters:
-            tags:
-              only: /.*/
+          filters: *filters
       - orb-tools/pack:
-          filters:
-            tags:
-              only: /.*/
+          filters: *filters
       - orb-tools/review:
-          filters:
-            tags:
-              only: /.*/
+          filters: *filters
       - shellcheck/check:
-          exclude: SC2148,SC2001,SC1091,SC2086,SC2116,SC2046,SC2005,SC2002
-          filters:
-            tags:
-              only: /.*/
+          shell: sh
+          filters: *filters
       - bats/run:
           path: ./src/tests
-          filters:
-            tags:
-              only: /.*/
+          filters: *filters
       - orb-tools/publish:
           orb-name: circleci/slack
           vcs-type: << pipeline.project.type >>
@@ -37,14 +31,10 @@ workflows:
             [orb-tools/lint, orb-tools/review, orb-tools/pack, shellcheck/check, bats/run]
           # Use a context to hold your publishing token.
           context: orb-publisher
-          filters:
-            tags:
-              only: /.*/
+          filters: *filters
       # Triggers the next workflow in the Orb Development Kit.
       - orb-tools/continue:
           pipeline-number: << pipeline.number >>
           vcs-type: << pipeline.project.type >>
           requires: [orb-tools/publish]
-          filters:
-            tags:
-              only: /.*/
+          filters: *filters
