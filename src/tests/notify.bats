@@ -104,3 +104,21 @@ setup() {
     echo "Error output debug: $output"
     [ "$status" -eq 0 ] # In any case, this should return a 0 exit as to not block a build/deployment.
 }
+
+@test "13: FilterBy - match and SLACK_PARAM_INVERT_MATCH is set" {
+    CIRCLE_BRANCH="pr-123"
+    SLACK_PARAM_INVERT_MATCH="1"
+    run FilterBy "$SLACK_PARAM_BRANCHPATTERN" "$CIRCLE_BRANCH"
+    echo "Error output debug: $output"
+    [ "$output" == "NO SLACK ALERT" ] # "pr-[0-9]+" should match but inverted: Error message expected.
+    [ "$status" -eq 0 ] # In any case, this should return a 0 exit as to not block a build/deployment.
+}
+
+@test "14: FilterBy - non-match and SLACK_PARAM_INVERT_MATCH is set" {
+    CIRCLE_BRANCH="foo"
+    SLACK_PARAM_INVERT_MATCH="1"
+    run FilterBy "$SLACK_PARAM_BRANCHPATTERN" "$CIRCLE_BRANCH"
+    echo "Error output debug: $output"
+    [ "$output" == "" ] # Nothing should match but inverted: No output error
+    [ "$status" -eq 0 ] # In any case, this should return a 0 exit as to not block a build/deployment.
+}

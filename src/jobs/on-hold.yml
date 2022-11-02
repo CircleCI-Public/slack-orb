@@ -41,7 +41,7 @@ parameters:
   debug:
       description: |
        View payload and response being sent to slack api.
-       Enable to view full payload being sent to slack and response being recieved from the API call.
+       Enable to view full payload being sent to slack and response being received from the API call.
       type: boolean
       default: false
   circleci_host:
