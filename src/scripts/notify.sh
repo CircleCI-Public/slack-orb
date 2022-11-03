@@ -25,9 +25,13 @@ BuildMessageBody() {
         T1=$(eval echo "$TEMPLATE" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed 's/`/\\`/g')
         T2=$(eval echo \""$T1"\")
     fi
+
+    # Replace each newline with literal "\n": https://stackoverflow.com/a/1252191
+    message_with_escaped_newline="$(printf '%s\n' "$T2" | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/\\n/g')"
+
     # Insert the default channel. THIS IS TEMPORARY
-    T2=$(echo "$T2" | jq ". + {\"channel\": \"$SLACK_DEFAULT_CHANNEL\"}")
-    SLACK_MSG_BODY=$T2
+    message_body=$(echo "$message_with_escaped_newline" | jq ". + {\"channel\": \"$SLACK_DEFAULT_CHANNEL\"}")
+    SLACK_MSG_BODY="$message_body"
 }
 
 PostToSlack() {
