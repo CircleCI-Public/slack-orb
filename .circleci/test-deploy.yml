@@ -86,6 +86,24 @@ jobs:
       - slack/notify:
           branch_pattern: "master"
           invert_match: true
+      - run:
+          name: Dynamically populate the mention and export the template as an environment variable
+          command: |
+            printf '%s\n' 'export MULTILINE_STRING=$(printf "%s\\n" "Line 1." "Line 2." "Line 3.")' >> "$BASH_ENV"
+      - slack/notify:
+          event: pass
+          custom: >
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "This message should show over multiple lines: $MULTILINE_STRING"
+                  }
+                }
+              ]
+            }
 
 workflows:
   test-deploy:
