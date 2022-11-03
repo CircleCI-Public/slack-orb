@@ -73,6 +73,10 @@ parameters:
        A CircleCI Host which used in a message template.
       type: string
       default: https://circleci.com
+  step_name:
+    type: string
+    default: Slack - Sending Notification
+    description: Specify a custom step name for this command, if desired
 steps:
   - run:
       when: on_fail
@@ -86,7 +90,7 @@ steps:
         echo 'export CCI_STATUS="pass"' > /tmp/SLACK_JOB_STATUS
   - run:
       when: always
-      name: Slack - Sending Notification
+      name: << parameters.step_name >>
       environment:
         SLACK_PARAM_EVENT: "<<parameters.event>>"
         SLACK_PARAM_TEMPLATE: "<<parameters.template>>"
