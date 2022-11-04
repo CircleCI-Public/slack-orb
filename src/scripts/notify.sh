@@ -216,7 +216,7 @@ SanitizeVars() {
  
     # Replace newlines with '\\n'.
     local sanitized_value
-    sanitized_value="$(printf '%s' "$value" | awk '{printf "%s\\n", $0}')"
+    sanitized_value="$(printf '%s' "$value" | awk 'NR > 1 { printf("\\n") } { printf("%s", $0) }')"
     
     # Write the sanitized value back to the original variable.
     # shellcheck disable=SC3045 # This is working on Alpine.
