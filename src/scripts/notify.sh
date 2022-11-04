@@ -195,17 +195,17 @@ SanitizeVars() {
   [ -z "$1" ] && { printf '%s\n' "Missing argument."; return 1; }
   local template="$1"
   
-  # Find all environment variables in the template wrapped in ${}.
+  # Find all environment variables in the template with the format $VAR or ${VAR}.
   # The "|| true" is to prevent bats from failing when no matches are found.
-  local variables_with_braces
-  variables_with_braces="$(printf '%s\n' "$template" | grep -o -E '\$\{?[a-zA-Z_0-9]*\}?' || true)"
-  [ -z "$variables_with_braces" ] && { printf '%s\n' "Nothing to sanitize."; return 0; }
-
-  # Extract the variable names from the braces.
   local variables
-  variables="$(printf '%s\n' "$variables_with_braces" | grep -o -E '[a-zA-Z0-9_]+')"
+  variables="$(printf '%s\n' "$template" | grep -o -E '\$\{?[a-zA-Z_0-9]*\}?' || true)"
+  [ -z "$variables" ] && { printf '%s\n' "Nothing to sanitize."; return 0; }
+
+  # Extract the variable names from the matches.
+  local variable_names
+  variable_names="$(printf '%s\n' "$variables" | grep -o -E '[a-zA-Z0-9_]+')"
   
-  for var in $variables; do
+  for var in $variable_names; do
     # The variable must be wrapped in double quotes before the evaluation.
     # Otherwise the newlines will be removed.
     local value
