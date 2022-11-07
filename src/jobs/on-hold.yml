@@ -49,6 +49,10 @@ parameters:
        CircleCI Host (used as the base for the Workflow URL)
       type: string
       default: https://circleci.com
+  step_name:
+    type: string
+    default: Slack - Sending Notification
+    description: Specify a custom step name for this command, if desired
 
 docker:
   - image: cimg/base:stable
@@ -65,4 +69,5 @@ steps:
       channel: <<parameters.channel>>
       debug: <<parameters.debug>>
       circleci_host: <<parameters.circleci_host>>
+      step_name: <<parameters.step_name>>
 
