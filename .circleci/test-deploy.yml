@@ -17,6 +17,7 @@ jobs:
     steps:
       - checkout
       - slack/notify:
+          step_name: "Custom template with group mention"
           event: always
           custom: |
             {
@@ -36,25 +37,30 @@ jobs:
                   }
                 }
               ]
-              }
+            }
       - run:
           name: Verify SLACK_JOB_STATUS is written
           command: |
             grep "pass" /tmp/SLACK_JOB_STATUS
       - slack/notify:
+          step_name: "Fail template with mentions"
           template: basic_fail_1
           mentions: "@orbs"
           event: always
       - slack/notify:
+          step_name: "Success template with mentions"
           template: basic_success_1
           event: always
       - slack/notify:
+          step_name: "Success tagged template"
           template: success_tagged_deploy_1
           event: always
       - slack/notify:
+          step_name: "Basic on hold template"
           template: basic_on_hold_1
           event: always
       - slack/notify:
+          step_name: "Custom template with env var in the message"
           event: pass
           custom: >
             {
@@ -69,6 +75,7 @@ jobs:
               ]
             }
       - slack/notify:
+          step_name: "Notify with debug set to true"
           debug: true
           template: basic_success_1
           event: always
@@ -79,11 +86,14 @@ jobs:
             echo 'export SLACK_PARAM_MENTIONS="$COMMIT_MESSAGE"' >> $BASH_ENV
             echo 'export MY_ORB_TEMPLATE=$(cat src/message_templates/basic_success_1.json)' >> $BASH_ENV
       - slack/notify:
+          step_name: "Dynamic template with environment variable"
           event: always
           template: MY_ORB_TEMPLATE
-      - slack/notify
+      - slack/notify:
+          step_name: "Notify without template parameter"
       # Should run for every branch but master
       - slack/notify:
+          step_name: "Invert match set to true on 'master' branch pattern"
           branch_pattern: "master"
           invert_match: true
       - run:
