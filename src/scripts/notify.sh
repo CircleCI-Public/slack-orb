@@ -177,7 +177,7 @@ SetupLogs() {
 
 ExitIfWindows() {
     os="$(uname -s | tr '[:upper:]' '[:lower:]')"
-    if printf '%s\n' "$os" | grep --quiet 'msys*\|cygwin*' ; then
+    if printf '%s\n' "$os" | grep -q 'msys*\|cygwin*' ; then
         printf '%s\n' "Windows is not supported by this orb."
         printf '%s\n' "For more information, see: https://github.com/CircleCI-Public/slack-orb/wiki/FAQ."
         exit 1
