@@ -115,6 +115,25 @@ jobs:
                 }
               ]
             }
+      - run:
+          name: Export variable with double quotes
+          command: |
+            printf '%s\n' 'export DOUBLE_QUOTES_STRING=$(printf "%s\\n" "Hello There! My name is \"Potato\"")' >> "$BASH_ENV"
+      - slack/notify:
+          step_name: "Notify with double-quoted string"
+          event: pass
+          custom: >
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "This message should show over multiple lines: $DOUBLE_QUOTES_STRING"
+                  }
+                }
+              ]
+            }
 
 workflows:
   test-deploy:
