@@ -123,3 +123,10 @@ setup() {
     [ "$output" == "" ] # Nothing should match but inverted: No output error
     [ "$status" -eq 0 ] # In any case, this should return a 0 exit as to not block a build/deployment.
 }
+
+@test "15: Sanitize - Escape newlines in environment variables" {
+    CIRCLE_JOB="$(printf "%s\\n" "Line 1." "Line 2." "Line 3.")"
+    SLACK_PARAM_CUSTOM=$(cat $BATS_TEST_DIRNAME/sampleCustomTemplate.json)
+    SanitizeVars "$SLACK_PARAM_CUSTOM"
+    [ "$CIRCLE_JOB" = "Line 1.\\nLine 2.\\nLine 3." ] # Newlines should be literal and escaped
+}

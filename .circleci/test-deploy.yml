@@ -96,6 +96,25 @@ jobs:
           step_name: "Invert match set to true on 'master' branch pattern"
           branch_pattern: "master"
           invert_match: true
+      - run:
+          name: Export variable with a multiline string
+          command: |
+            printf '%s\n' 'export MULTILINE_STRING=$(printf "%s\\n" "Line 1." "Line 2." "Line 3.")' >> "$BASH_ENV"
+      - slack/notify:
+          step_name: "Notify with multiline string"
+          event: pass
+          custom: >
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "This message should show over multiple lines: $MULTILINE_STRING"
+                  }
+                }
+              ]
+            }
 
 workflows:
   test-deploy:

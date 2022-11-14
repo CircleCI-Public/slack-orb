@@ -1,4 +1,6 @@
 #!/bin/sh
+# shellcheck disable=SC2016,SC3043
+
 JQ_PATH=/usr/local/bin/jq
 
 BuildMessageBody() {
@@ -7,10 +9,11 @@ BuildMessageBody() {
     #   if none is supplied, check for a pre-selected template value.
     #   If none, error.
     if [ -n "${SLACK_PARAM_CUSTOM:-}" ]; then
+        SanitizeVars "$SLACK_PARAM_CUSTOM" 
         ModifyCustomTemplate
         # shellcheck disable=SC2016
         CUSTOM_BODY_MODIFIED=$(echo "$CUSTOM_BODY_MODIFIED" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed 's/`/\\`/g')
-        T2=$(eval echo \""$CUSTOM_BODY_MODIFIED"\")
+        T2="$(eval printf '%s' \""$CUSTOM_BODY_MODIFIED"\")"
     else
         # shellcheck disable=SC2154
         if [ -n "${SLACK_PARAM_TEMPLATE:-}" ]; then TEMPLATE="\$$SLACK_PARAM_TEMPLATE"
@@ -20,14 +23,17 @@ BuildMessageBody() {
         fi
 
         [ -z "${SLACK_PARAM_TEMPLATE:-}" ] && echo "No message template was explicitly chosen. Based on the job status '$CCI_STATUS' the template '$TEMPLATE' will be used."
+        template_body="$(eval printf '%s' \""$TEMPLATE\"")"
+        SanitizeVars "$template_body"
 
         # shellcheck disable=SC2016
-        T1=$(eval echo "$TEMPLATE" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed 's/`/\\`/g')
-        T2=$(eval echo \""$T1"\")
+        T1="$(printf '%s' "$template_body" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed 's/`/\\`/g')"
+        T2="$(eval printf '%s' \""$T1"\")"
     fi
+   
     # Insert the default channel. THIS IS TEMPORARY
-    T2=$(echo "$T2" | jq ". + {\"channel\": \"$SLACK_DEFAULT_CHANNEL\"}")
-    SLACK_MSG_BODY=$T2
+    T2="$(printf '%s' "$T2" | jq ". + {\"channel\": \"$SLACK_DEFAULT_CHANNEL\"}")"
+    SLACK_MSG_BODY="$T2"
 }
 
 PostToSlack() {
@@ -182,6 +188,42 @@ ExitIfWindows() {
         printf '%s\n' "For more information, see: https://github.com/CircleCI-Public/slack-orb/wiki/FAQ."
         exit 1
     fi
+}
+
+# $1: Template with environment variables to be sanitized.
+SanitizeVars() {
+  [ -z "$1" ] && { printf '%s\n' "Missing argument."; return 1; }
+  local template="$1"
+  
+  # Find all environment variables in the template with the format $VAR or ${VAR}.
+  # The "|| true" is to prevent bats from failing when no matches are found.
+  local variables
+  variables="$(printf '%s\n' "$template" | grep -o -E '\$\{?[a-zA-Z_0-9]*\}?' || true)"
+  [ -z "$variables" ] && { printf '%s\n' "Nothing to sanitize."; return 0; }
+
+  # Extract the variable names from the matches.
+  local variable_names
+  variable_names="$(printf '%s\n' "$variables" | grep -o -E '[a-zA-Z0-9_]+')"
+  
+  for var in $variable_names; do
+    # The variable must be wrapped in double quotes before the evaluation.
+    # Otherwise the newlines will be removed.
+    local value
+    value="$(eval printf '%s' \"\$"$var\"")"
+    [ -z "$value" ] && { printf '%s\n' "$var is empty or doesn't exist. Skipping it..."; continue; }
+    
+    printf '%s\n' "Sanitizing $var..."
+ 
+    # Replace newlines with '\\n'.
+    local sanitized_value
+    sanitized_value="$(printf '%s' "$value" | awk 'NR > 1 { printf("\\n") } { printf("%s", $0) }')"
+    
+    # Write the sanitized value back to the original variable.
+    # shellcheck disable=SC3045 # This is working on Alpine.
+    printf -v "$var" "%s" "$sanitized_value"
+  done
+
+  return 0;
 }
 
 # Will not run if sourced from another script.
