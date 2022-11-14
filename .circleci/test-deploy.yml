@@ -129,7 +129,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "This message should show over multiple lines: $DOUBLE_QUOTES_STRING"
+                    "text": "This message should show a string between double quotes: $DOUBLE_QUOTES_STRING"
                   }
                 }
               ]
