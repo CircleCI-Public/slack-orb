@@ -2,7 +2,7 @@
 # shellcheck disable=SC2016,SC3043
 
 JQ_PATH=/usr/local/bin/jq
-set -x
+
 BuildMessageBody() {
     # Send message
     #   If sending message, default to custom template,
