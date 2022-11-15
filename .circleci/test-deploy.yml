@@ -137,7 +137,7 @@ jobs:
       - run:
           name: Export variable with stars
           command: |
-            printf '%s\n' 'export STAR_STRING=$(printf "%s\\n" "You got a \*")' >> "$BASH_ENV"
+            printf '%s\n' 'export STAR_STRING=$(printf "%s\\n" "You got a *")' >> "$BASH_ENV"
       - slack/notify:
           step_name: "Notify with double-quoted string"
           event: pass
