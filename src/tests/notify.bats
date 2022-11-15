@@ -137,3 +137,10 @@ setup() {
     SanitizeVars "$SLACK_PARAM_CUSTOM"
     [ "$CIRCLE_JOB" = "Hello \\\"world\\\"." ] # Double quotes should be escaped
 }
+
+@test "17: Sanitize - Escape stars in environment variables" {
+    CIRCLE_JOB="$(printf "%s\n" "Hello \*world\*.")"
+    SLACK_PARAM_CUSTOM=$(cat $BATS_TEST_DIRNAME/sampleCustomTemplate.json)
+    SanitizeVars "$SLACK_PARAM_CUSTOM"
+    [ "$CIRCLE_JOB" = "Hello \\\*world\\\*." ] # Stars should be escaped
+}
