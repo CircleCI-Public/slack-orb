@@ -134,25 +134,25 @@ jobs:
                 }
               ]
             }
-      - run:
-          name: Export variable with stars
-          command: |
-            printf '%s\n' 'export STAR_STRING=$(printf "%s\\n" "You got a *")' >> "$BASH_ENV"
-      - slack/notify:
-          step_name: "Notify with stars in string"
-          event: pass
-          custom: >
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "This message should show a star: $STAR_STRING"
-                  }
-                }
-              ]
-            }
+      # - run:
+      #     name: Export variable with stars
+      #     command: |
+      #       printf '%s\n' 'export STAR_STRING=$(printf "%s\\n" "You got a *")' >> "$BASH_ENV"
+      # - slack/notify:
+      #     step_name: "Notify with stars in string"
+      #     event: pass
+      #     custom: >
+      #       {
+      #         "blocks": [
+      #           {
+      #             "type": "section",
+      #             "text": {
+      #               "type": "mrkdwn",
+      #               "text": "This message should show a star: $STAR_STRING"
+      #             }
+      #           }
+      #         ]
+      #       }
 
 workflows:
   test-deploy:
