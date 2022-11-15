@@ -215,11 +215,12 @@ SanitizeVars() {
     printf '%s\n' "Sanitizing $var..."
  
     local sanitized_value
-
     # Replace newlines with '\\n'.
     sanitized_value="$(printf '%s' "$value" | awk 'NR > 1 { printf("\\n") } { printf("%s", $0) }')"
     # Replace double quotes with '\"'.
     sanitized_value="$(printf '%s' "$sanitized_value" | awk '{gsub(/\"/, "\\\""); print $0}')"
+    # Replace stars with '\*'.
+    sanitized_value="$(printf '%s' "$sanitized_value" | awk '{gsub(/\*/, "\\*"); print $0}')"
 
     # Write the sanitized value back to the original variable.
     # shellcheck disable=SC3045 # This is working on Alpine.
