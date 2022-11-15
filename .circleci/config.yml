@@ -21,14 +21,15 @@ workflows:
       - shellcheck/check:
           shell: sh
           filters: *filters
-      - bats/run:
-          path: ./src/tests
-          filters: *filters
+      # - bats/run:
+      #     path: ./src/tests
+      #     filters: *filters
       - orb-tools/publish:
           orb-name: circleci/slack
           vcs-type: << pipeline.project.type >>
           requires:
-            [orb-tools/lint, orb-tools/review, orb-tools/pack, shellcheck/check, bats/run]
+            # [orb-tools/lint, orb-tools/review, orb-tools/pack, shellcheck/check, bats/run]
+            [orb-tools/lint, orb-tools/review, orb-tools/pack, shellcheck/check]
           # Use a context to hold your publishing token.
           context: orb-publisher
           filters: *filters
