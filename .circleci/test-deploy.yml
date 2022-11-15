@@ -79,6 +79,7 @@ jobs:
           debug: true
           template: basic_success_1
           event: always
+          
       - run:
           name: Dynamically populate the mention and export the template as an environment variable
           command: |
