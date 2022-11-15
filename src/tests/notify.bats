@@ -130,3 +130,10 @@ setup() {
     SanitizeVars "$SLACK_PARAM_CUSTOM"
     [ "$CIRCLE_JOB" = "Line 1.\\nLine 2.\\nLine 3." ] # Newlines should be literal and escaped
 }
+
+@test "16: Sanitize - Escape double quotes in environment variables" {
+    CIRCLE_JOB="$(printf "%s\n" "Hello \"world\".")"
+    SLACK_PARAM_CUSTOM=$(cat $BATS_TEST_DIRNAME/sampleCustomTemplate.json)
+    SanitizeVars "$SLACK_PARAM_CUSTOM"
+    [ "$CIRCLE_JOB" = "Hello \\\"world\\\"." ] # Double quotes should be escaped
+}
