@@ -134,6 +134,26 @@ jobs:
                 }
               ]
             }
+      - run:
+          name: Export variable with backslashes
+          command: |
+            printf '%s\n' 'export BACKSLASHES_STRING="This is how a \ looks like"' >> "$BASH_ENV"
+      - slack/notify:
+          step_name: "Notify with backslashes string"
+          event: pass
+          debug: true
+          custom: >
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "This message should show a backslash: $BACKSLASHES_STRING"
+                  }
+                }
+              ]
+            }
 
 workflows:
   test-deploy:
