@@ -214,11 +214,12 @@ SanitizeVars() {
     
     printf '%s\n' "Sanitizing $var..."
  
-    local sanitized_value
-
-    # Replace newlines with '\\n'.
-    sanitized_value="$(printf '%s' "$value" | awk 'NR > 1 { printf("\\n") } { printf("%s", $0) }')"
-    # Replace double quotes with '\"'.
+    local sanitized_value="$value"
+    # Escape backslashes.
+    sanitized_value="$(printf '%s' "$sanitized_value" | awk '{gsub(/\\/, "&\\"); print $0}')"
+    # Escape newlines.
+    sanitized_value="$(printf '%s' "$sanitized_value" | awk 'NR > 1 { printf("\\n") } { printf("%s", $0) }')"
+    # Escape double quotes.
     sanitized_value="$(printf '%s' "$sanitized_value" | awk '{gsub(/\"/, "\\\""); print $0}')"
 
     # Write the sanitized value back to the original variable.

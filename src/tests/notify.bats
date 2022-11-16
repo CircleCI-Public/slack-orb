@@ -1,3 +1,5 @@
+#!/usr/bin/env bats
+
 setup() {
     source ./src/scripts/notify.sh
     export SLACK_PARAM_BRANCHPATTERN=$(cat $BATS_TEST_DIRNAME/sampleBranchFilters.txt)
@@ -126,14 +128,27 @@ setup() {
 
 @test "15: Sanitize - Escape newlines in environment variables" {
     CIRCLE_JOB="$(printf "%s\\n" "Line 1." "Line 2." "Line 3.")"
+    EXPECTED="Line 1.\\nLine 2.\\nLine 3."
     SLACK_PARAM_CUSTOM=$(cat $BATS_TEST_DIRNAME/sampleCustomTemplate.json)
     SanitizeVars "$SLACK_PARAM_CUSTOM"
-    [ "$CIRCLE_JOB" = "Line 1.\\nLine 2.\\nLine 3." ] # Newlines should be literal and escaped
+    printf '%s\n' "Expected: $EXPECTED" "Actual: $CIRCLE_JOB"
+    [ "$CIRCLE_JOB" = "$EXPECTED" ] # Newlines should be literal and escaped
 }
 
 @test "16: Sanitize - Escape double quotes in environment variables" {
     CIRCLE_JOB="$(printf "%s\n" "Hello \"world\".")"
+    EXPECTED="Hello \\\"world\\\"."
     SLACK_PARAM_CUSTOM=$(cat $BATS_TEST_DIRNAME/sampleCustomTemplate.json)
     SanitizeVars "$SLACK_PARAM_CUSTOM"
-    [ "$CIRCLE_JOB" = "Hello \\\"world\\\"." ] # Double quotes should be escaped
+    printf '%s\n' "Expected: $EXPECTED" "Actual: $CIRCLE_JOB"
+    [ "$CIRCLE_JOB" = "$EXPECTED" ] # Double quotes should be escaped
+}
+
+@test "17: Sanitize - Escape backslashes in environment variables" {
+    CIRCLE_JOB="$(printf "%s\n" "removed extra '\' from  notification template")"
+    EXPECTED="removed extra '\\\' from  notification template"
+    SLACK_PARAM_CUSTOM=$(cat $BATS_TEST_DIRNAME/sampleCustomTemplate.json)
+    SanitizeVars "$SLACK_PARAM_CUSTOM"
+    printf '%s\n' "Expected: $EXPECTED" "Actual: $CIRCLE_JOB"
+    [ "$CIRCLE_JOB" = "$EXPECTED" ] # Backslashes should be escaped
 }

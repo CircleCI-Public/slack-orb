@@ -82,7 +82,7 @@ jobs:
       - run:
           name: Dynamically populate the mention and export the template as an environment variable
           command: |
-            echo 'export COMMIT_MESSAGE="$(git log --format=oneline -n 1 $CIRCLE_SHA1)"' >> $BASH_ENV
+            echo 'export COMMIT_MESSAGE="This text comes from an environment variable"' >> $BASH_ENV
             echo 'export SLACK_PARAM_MENTIONS="$COMMIT_MESSAGE"' >> $BASH_ENV
             echo 'export MY_ORB_TEMPLATE=$(cat src/message_templates/basic_success_1.json)' >> $BASH_ENV
       - slack/notify:
@@ -130,6 +130,26 @@ jobs:
                   "text": {
                     "type": "mrkdwn",
                     "text": "This message should show a string between double quotes: $DOUBLE_QUOTES_STRING"
+                  }
+                }
+              ]
+            }
+      - run:
+          name: Export variable with backslashes
+          command: |
+            printf '%s\n' 'export BACKSLASHES_STRING="This is how a \ looks like"' >> "$BASH_ENV"
+      - slack/notify:
+          step_name: "Notify with backslashes string"
+          event: pass
+          debug: true
+          custom: >
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "This message should show a backslash: $BACKSLASHES_STRING"
                   }
                 }
               ]
