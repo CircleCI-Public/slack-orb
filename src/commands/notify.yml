@@ -103,9 +103,10 @@ steps:
         SLACK_PARAM_IGNORE_ERRORS: "<<parameters.ignore_errors>>"
         SLACK_PARAM_DEBUG: "<<parameters.debug>>"
         SLACK_PARAM_CIRCLECI_HOST: "<<parameters.circleci_host>>"
+        SLACK_SCRIPT_NOTIFY: "<<include(scripts/notify.sh)>>"
         # import pre-built templates using the orb-pack local script include.
         basic_fail_1: "<<include(message_templates/basic_fail_1.json)>>"
         success_tagged_deploy_1: "<<include(message_templates/success_tagged_deploy_1.json)>>"
         basic_on_hold_1: "<<include(message_templates/basic_on_hold_1.json)>>"
         basic_success_1: "<<include(message_templates/basic_success_1.json)>>"
-      command: <<include(scripts/notify.sh)>>
+      command: <<include(scripts/main.sh)>>
