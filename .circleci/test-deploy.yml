@@ -163,7 +163,7 @@ workflows:
           filters: *filters
           matrix:
             parameters:
-              runner: [cimg, mac, alpine]
+              runner: [cimg, mac, alpine, windows]
       - orb-tools/lint:
           filters: *filters
       - orb-tools/pack:
@@ -198,3 +198,8 @@ executors:
     # This image contains both CURL and JQ
     docker:
       - image: dwdraju/alpine-curl-jq
+  windows:
+    machine:
+      image: windows-server-2019-vs2019:current
+      resource_class: windows.medium
+      shell: bash.exe
