@@ -1,6 +1,8 @@
 #!/bin/sh
 # shellcheck disable=SC2016,SC3043
 
+# Import utils.
+eval "$SLACK_SCRIPT_UTILS"
 JQ_PATH=/usr/local/bin/jq
 
 BuildMessageBody() {
@@ -196,6 +198,9 @@ SanitizeVars() {
   local variable_names
   variable_names="$(printf '%s\n' "$variables" | grep -o -E '[a-zA-Z0-9_]+')"
 
+  # Find out what OS we're running on.
+  detect_os
+
   for var in $variable_names; do
     # The variable must be wrapped in double quotes before the evaluation.
     # Otherwise the newlines will be removed.
@@ -211,7 +216,11 @@ SanitizeVars() {
     # Escape newlines.
     sanitized_value="$(printf '%s' "$sanitized_value" | awk 'NR > 1 { printf("\\n") } { printf("%s", $0) }')"
     # Escape double quotes.
-    sanitized_value="$(printf '%s' "$sanitized_value" | awk '{gsub(/\"/, "\\\""); print $0}')"
+    if [ "$PLATFORM" = "windows" ]; then
+        sanitized_value="$(printf '%s' "$sanitized_value" | awk '{gsub(/"/, "\\\""); print $0}')"
+    else
+        sanitized_value="$(printf '%s' "$sanitized_value" | awk '{gsub(/\"/, "\\\""); print $0}')"
+    fi
 
     # Write the sanitized value back to the original variable.
     # shellcheck disable=SC3045 # This is working on Alpine.

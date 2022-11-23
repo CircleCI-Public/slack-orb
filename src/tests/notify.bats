@@ -2,6 +2,7 @@
 
 setup() {
     source ./src/scripts/notify.sh
+    source ./src/scripts/utils.sh
     export SLACK_PARAM_BRANCHPATTERN=$(cat $BATS_TEST_DIRNAME/sampleBranchFilters.txt)
     SLACK_PARAM_INVERT_MATCH="0"
 }
