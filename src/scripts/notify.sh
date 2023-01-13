@@ -196,7 +196,8 @@ SanitizeVars() {
 
   # Extract the variable names from the matches.
   local variable_names
-  variable_names="$(printf '%s\n' "$variables" | grep -o -E '[a-zA-Z0-9_]+')"
+  variable_names="$(printf '%s\n' "$variables" | grep -o -E '[a-zA-Z0-9_]+' || true)"
+  [ -z "$variable_names" ] && { printf '%s\n' "Nothing to sanitize."; return 0; }
 
   # Find out what OS we're running on.
   detect_os
