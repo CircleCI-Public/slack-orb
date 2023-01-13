@@ -166,7 +166,30 @@ jobs:
             printf '%s\n' "Hello There!" > /tmp/msg
       - slack/notify:
           debug: true
-          step_name: "Notify with custom message coming from sub-shell"
+          step_name: "Notify with custom message coming from sub-shell and template variable"
+          event: always
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Current Job: $CIRCLE_JOB"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "$(cat /tmp/msg)"
+                  }
+                }
+              ]
+            }
+      - slack/notify:
+          debug: true
+          step_name: "Notify with only custom message coming from sub-shell"
           event: always
           custom: |
             {
