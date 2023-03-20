@@ -232,10 +232,10 @@ workflows:
 executors:
   cimg:
     docker:
-      - image: cimg/base:stable
+      - image: cimg/base:current
   mac:
     macos:
-      xcode: 11.7.0
+      xcode: 14.0.0
   alpine:
     # This image contains both CURL and JQ
     docker:
