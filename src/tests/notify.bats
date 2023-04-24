@@ -3,8 +3,19 @@
 setup() {
     source ./src/scripts/notify.sh
     source ./src/scripts/utils.sh
-    export SLACK_PARAM_BRANCHPATTERN=$(cat $BATS_TEST_DIRNAME/sampleBranchFilters.txt)
-    SLACK_PARAM_INVERT_MATCH="0"
+
+    # Set default environment variables
+    export SLACK_PARAM_BRANCHPATTERN='master, pr-[0-9]+'
+    export SLACK_PARAM_CHANNEL='$SLACK_DEFAULT_CHANNEL'
+    export SLACK_PARAM_CIRCLECI_HOST='https://circleci.com'
+    export SLACK_PARAM_CUSTOM=''
+    export SLACK_PARAM_DEBUG='0'
+    export SLACK_PARAM_EVENT='always'
+    export SLACK_PARAM_IGNORE_ERRORS='1'
+    export SLACK_PARAM_INVERT_MATCH='0'
+    export SLACK_PARAM_MENTIONS=''
+    export SLACK_PARAM_TAGPATTERN='.+'
+    export SLACK_PARAM_TEMPLATE=''
 }
 
 @test "1: Skip message on no event" {
