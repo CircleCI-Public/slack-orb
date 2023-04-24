@@ -27,10 +27,7 @@ BuildMessageBody() {
         [ -z "${SLACK_PARAM_TEMPLATE:-}" ] && echo "No message template was explicitly chosen. Based on the job status '$CCI_STATUS' the template '$TEMPLATE' will be used."
         template_body="$(eval printf '%s' \""$TEMPLATE\"")"
         SanitizeVars "$template_body"
-
-        # shellcheck disable=SC2016
-        T1="$(printf '%s' "$template_body" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed 's/`/\\`/g')"
-        T2="$(eval printf '%s' \""$T1"\")"
+        T2="$(circleci env subst "$template_body")"
     fi
 
     # Insert the default channel. THIS IS TEMPORARY
@@ -206,7 +203,7 @@ SanitizeVars() {
     # The variable must be wrapped in double quotes before the evaluation.
     # Otherwise the newlines will be removed.
     local value
-    value="$(eval printf '%s' \"\$"$var\"")"
+    value="$(circleci env subst \$"$var")"
     [ -z "$value" ] && { printf '%s\n' "$var is empty or doesn't exist. Skipping it..."; continue; }
 
     printf '%s\n' "Sanitizing $var..."
