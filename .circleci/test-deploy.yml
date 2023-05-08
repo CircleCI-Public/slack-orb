@@ -206,11 +206,7 @@ workflows:
           matrix:
             parameters:
               runner: [cimg, mac, alpine, windows]
-      - orb-tools/lint:
-          filters: *filters
       - orb-tools/pack:
-          filters: *filters
-      - orb-tools/review:
           filters: *filters
       - orb-tools/publish:
           orb_name: circleci/slack
@@ -218,11 +214,7 @@ workflows:
           pub_type: production
           enable_pr_comment: true
           github_token: GHI_TOKEN
-          requires:
-            - orb-tools/lint
-            - orb-tools/review
-            - orb-tools/pack
-            - integration-test-templates
+          requires: [orb-tools/pack, integration-test-templates]
           context: orb-publisher
           filters:
             branches:
