@@ -207,7 +207,11 @@ workflows:
             parameters:
               runner: [cimg, mac, alpine, windows]
       - orb-tools/pack:
-          filters: *filters
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
       - orb-tools/publish:
           orb_name: circleci/slack
           vcs_type: << pipeline.project.type >>
