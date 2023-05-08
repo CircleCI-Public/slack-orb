@@ -1,7 +1,7 @@
 version: 2.1
 orbs:
-  slack: circleci/slack@dev:<<pipeline.git.revision>>
-  orb-tools: circleci/orb-tools@11.4
+  orb-tools: circleci/orb-tools@12.0
+  slack: {}
 
 filters: &filters
   tags:
@@ -213,11 +213,11 @@ workflows:
       - orb-tools/review:
           filters: *filters
       - orb-tools/publish:
-          orb-name: circleci/slack
-          vcs-type: << pipeline.project.type >>
-          pub-type: production
-          enable-pr-comment: true
-          github-token: GHI_TOKEN
+          orb_name: circleci/slack
+          vcs_type: << pipeline.project.type >>
+          pub_type: production
+          enable_pr_comment: true
+          github_token: GHI_TOKEN
           requires:
             - orb-tools/lint
             - orb-tools/review
