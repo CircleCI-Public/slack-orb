@@ -7,6 +7,12 @@ filters: &filters
   tags:
     only: /.*/
 
+release-filters: &release-filters
+  branches:
+    ignore: /.*/
+  tags:
+    only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
+
 jobs:
   integration-test-templates:
     parameters:
@@ -207,11 +213,7 @@ workflows:
             parameters:
               runner: [cimg, mac, alpine, windows]
       - orb-tools/pack:
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
+          filters: *release-filters
       - orb-tools/publish:
           orb_name: circleci/slack
           vcs_type: << pipeline.project.type >>
@@ -220,11 +222,7 @@ workflows:
           github_token: GHI_TOKEN
           requires: [orb-tools/pack, integration-test-templates]
           context: orb-publisher
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
+          filters: *release-filters
 executors:
   cimg:
     docker:
