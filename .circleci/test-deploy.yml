@@ -1,11 +1,17 @@
 version: 2.1
 orbs:
-  slack: circleci/slack@dev:<<pipeline.git.revision>>
-  orb-tools: circleci/orb-tools@11.4
+  orb-tools: circleci/orb-tools@12.0
+  slack: {}
 
 filters: &filters
   tags:
     only: /.*/
+
+release-filters: &release-filters
+  branches:
+    ignore: /.*/
+  tags:
+    only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
 
 jobs:
   integration-test-templates:
@@ -206,29 +212,17 @@ workflows:
           matrix:
             parameters:
               runner: [cimg, mac, alpine, windows]
-      - orb-tools/lint:
-          filters: *filters
       - orb-tools/pack:
-          filters: *filters
-      - orb-tools/review:
-          filters: *filters
+          filters: *release-filters
       - orb-tools/publish:
-          orb-name: circleci/slack
-          vcs-type: << pipeline.project.type >>
-          pub-type: production
-          enable-pr-comment: true
-          github-token: GHI_TOKEN
-          requires:
-            - orb-tools/lint
-            - orb-tools/review
-            - orb-tools/pack
-            - integration-test-templates
+          orb_name: circleci/slack
+          vcs_type: << pipeline.project.type >>
+          pub_type: production
+          enable_pr_comment: true
+          github_token: GHI_TOKEN
+          requires: [orb-tools/pack, integration-test-templates]
           context: orb-publisher
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
+          filters: *release-filters
 executors:
   cimg:
     docker:
