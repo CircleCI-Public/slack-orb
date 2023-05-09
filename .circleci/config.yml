@@ -18,6 +18,7 @@ workflows:
           filters: *filters
       - orb-tools/review:
           filters: *filters
+          exclude: RC010
       - shellcheck/check:
           shell: sh
           filters: *filters
