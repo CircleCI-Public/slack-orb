@@ -153,3 +153,14 @@ setup() {
     printf '%s\n' "Expected: $EXPECTED" "Actual: $CIRCLE_JOB"
     [ "$CIRCLE_JOB" = "$EXPECTED" ] # Backslashes should be escaped
 }
+
+@test "18: Sanitize - Remove carriage returns in environment variables" {
+    MESSAGE="$(cat $BATS_TEST_DIRNAME/sampleVariableWithCRLF.txt)"
+    SLACK_PARAM_CUSTOM='{"text": "${MESSAGE}"}'
+    SLACK_DEFAULT_CHANNEL="xyz"
+    BuildMessageBody
+
+    EXPECTED=$(echo "{ \"text\": \"Multiline Message 1\nMultiline Message 2\", \"channel\": \"$SLACK_DEFAULT_CHANNEL\" }" | jq)
+    printf '%s\n' "Expected: $EXPECTED" "Actual: $SLACK_MSG_BODY"
+    [ "$SLACK_MSG_BODY" = "$EXPECTED" ] # CRLF should be escaped
+}
