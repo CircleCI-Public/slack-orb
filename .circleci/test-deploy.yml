@@ -4,7 +4,7 @@ orbs:
   # Reference your orb's jobs and commands below as they will exist when built.
   orb-tools: circleci/orb-tools@12.0
   # The orb definition is intentionally not included here. It will be injected into the pipeline.
-  <orb-name>: {}
+  <orb-name>: stoplight/slack@0.0.1
 
 # Use this tag to ensure test jobs always run,
 # even though the downstream publish job will only run on release tags.
@@ -28,7 +28,7 @@ jobs:
     steps:
       - checkout
       # Run your orb's commands to validate them.
-      - slack@0.0.1/greet
+      - slack/greet
 
 workflows:
   test-deploy:
