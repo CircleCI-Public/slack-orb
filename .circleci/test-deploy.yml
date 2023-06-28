@@ -28,7 +28,7 @@ jobs:
     steps:
       - checkout
       # Run your orb's commands to validate them.
-      - <orb-name>/greet
+      - stoplight/slack/greet
 workflows:
   test-deploy:
     jobs:
@@ -40,7 +40,7 @@ workflows:
       - orb-tools/pack:
           filters: *release-filters
       - orb-tools/publish:
-          orb_name: <namespace>/<orb-name>
+          orb_name: stoplight/slack
           vcs_type: << pipeline.project.type >>
           pub_type: production
           # Ensure this job requires all test jobs and the pack job.
