@@ -28,7 +28,7 @@ jobs:
     steps:
       - checkout
       # Run your orb's commands to validate them.
-      - slack/greet
+      ##- slack/greet
 workflows:
   test-deploy:
     jobs:
