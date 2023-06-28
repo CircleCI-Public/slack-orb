@@ -1,7 +1,7 @@
 version: 2.1
 
 description: >
-  Stoplight slack orb
+  "Stoplight slack orb is used to notify users that their build has failed in the pipeline through their slack usernames.
 # What will your orb allow users to accomplish?
 # Descriptions should be short, simple, and informative.
 
