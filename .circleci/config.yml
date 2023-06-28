@@ -1,0 +1,28 @@
+version: 2.1
+setup: true
+orbs:
+  orb-tools: circleci/orb-tools@12.0
+  shellcheck: circleci/shellcheck@3.1
+
+filters: &filters
+  tags:
+    only: /.*/
+
+workflows:
+  lint-pack:
+    jobs:
+      - orb-tools/lint:
+          filters: *filters
+      - orb-tools/pack:
+          filters: *filters
+      - orb-tools/review:
+          filters: *filters
+      - shellcheck/check:
+          filters: *filters
+      # Triggers the next workflow in the Orb Development Kit.
+      - orb-tools/continue:
+          pipeline_number: << pipeline.number >>
+          vcs_type: << pipeline.project.type >>
+          orb_name: <orb-name>
+          requires: [orb-tools/lint, orb-tools/pack, orb-tools/review, shellcheck/check]
+          filters: *filters

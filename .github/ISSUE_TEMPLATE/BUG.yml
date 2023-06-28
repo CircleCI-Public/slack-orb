@@ -1,0 +1,41 @@
+name: "\U0001F41E  Bug Report"
+description: Report any identified bugs.
+title: 'Bug: '
+labels: [bug]
+# assignees: ''
+body:
+  - type: checkboxes
+    attributes:
+      label: "Is there an existing issue for this?"
+      description: "Please search [here](https://github.com/<organization>/<project-name>/issues?q=is%3Aissue) to see if an issue already exists for the bug you encountered"
+      options:
+      - label: "I have searched the existing issues"
+        required: true
+
+  - type: input
+    attributes:
+      label: "Orb version"
+      description: |
+        Which version of `<namespace>/<orb-name>` are you using?
+      placeholder: "1.0.0"
+
+  - type: textarea
+    validations:
+      required: true
+    attributes:
+      label: "Current behavior"
+      description: "How does the issue manifest?"
+
+  - type: textarea
+    validations:
+      required: true
+    attributes:
+      label: "Minimum reproduction config"
+      description: "Enter a URL to a failed build or write a config example to reproduce the issue"
+      placeholder: "https://app.circleci.com/..."
+
+  - type: textarea
+    attributes:
+      label: "Other"
+      description: |
+        Anything else you want to share?

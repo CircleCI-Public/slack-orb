@@ -1,0 +1,34 @@
+name: "\U0001F4A1 Feature Request"
+description: Have an idea for a new feature? Begin by submitting a Feature Request
+title: 'Request: '
+labels: [enhancement]
+# assignees: ''
+body:
+  - type: checkboxes
+    attributes:
+      label: "Is there an existing issue that is already proposing this?"
+      description: "Please search [here](https://github.com/CircleCI-Public/circleci-config-sdk-ts/issues?q=is%3Aissue) to see if an issue already exists for the feature you are requesting"
+      options:
+      - label: "I have searched the existing issues"
+        required: true
+
+  - type: textarea
+    validations:
+      required: true
+    attributes:
+      label: "Describe the problem imposed by not having this feature"
+      description: "Please describe the use-case you are attempting to implement, and the current limitations you are facing."
+
+  - type: textarea
+    validations:
+      required: true
+    attributes:
+      label: "Describe the solution you'd like"
+      description: "A clear and concise description of what you want to happen. Add any considered drawbacks"
+
+
+  - type: textarea
+    attributes:
+      label: "Other"
+      description: |
+        Anything else you want to share?

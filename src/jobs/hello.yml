@@ -1,0 +1,14 @@
+description: >
+  Sample description
+# What will this job do?
+
+executor: default
+
+parameters:
+  to:
+    type: string
+    default: "World"
+    description: "Hello to whom?"
+steps:
+  - greet:
+      to: << parameters.to >>
