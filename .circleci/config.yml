@@ -43,7 +43,7 @@ orbs:
   node: circleci/node@4.0.0
   sonarcloud: sonarsource/sonarcloud@1.0.3
   nx: nrwl/nx@1.4.0
-  slack: stoplight/slack-orb@0.0.1
+  slack: stoplight/slack-orb-stoplight@0.0.1
 
 defaults:
   # comment
