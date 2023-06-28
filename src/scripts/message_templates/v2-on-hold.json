@@ -1,0 +1,58 @@
+{
+  "text": "CircleCI job on hold, waiting for approval.",
+  "blocks": [
+    {
+      "type": "header",
+      "text": {
+        "type": "plain_text",
+        "text": "ON HOLD - Awaiting Approval :raised_hand:",
+        "emoji": true
+      }
+    },
+    {
+      "type": "section",
+      "fields": [
+        {
+          "type": "mrkdwn",
+          "text": "*Branch*: ${CIRCLE_BRANCH}"
+        },
+        {
+          "type": "mrkdwn",
+          "text": "*Job*: ${CIRCLE_JOB}"
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "fields": [
+        {
+          "type": "mrkdwn",
+          "text": "*Commit*: ${CURRENT_COMMIT_TEXT}"
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "fields": [
+        {
+          "type": "mrkdwn",
+          "text": "*Mentions*: ${SLACK_PARAM_MENTIONS}"
+        }
+      ]
+    },
+    {
+      "type": "actions",
+      "elements": [
+        {
+          "type": "button",
+          "text": {
+            "type": "plain_text",
+            "text": "View Workflow"
+          },
+          "url": "https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}"
+        }
+      ]
+    }
+  ]
+}
+

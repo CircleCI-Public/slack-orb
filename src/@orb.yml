@@ -1,9 +1,452 @@
 version: 2.1
 
-description: >
-  Implement event-based notifications across all of your CI/CD pipelines. Utilizing built-in message templates or Slack's visual Block-Kit builder, create and customize notifications specific to your organization's needs.
-  Supports Linux x86_64, MacOS, Arm64 V8, and Windows.
+src:
+    commands:
+        notify:
+            description: |
+                Notify a Slack channel with a custom message.
+                The environment variables SLACK_ACCESS_TOKEN and SLACK_DEFAULT_CHANNEL must be set for this orb to work.
+                For instructions on how to set them, follow the setup guide available in the wiki: https://github.com/CircleCI-Public/slack-orb/wiki/Setup.
+            parameters:
+                branch_pattern:
+                    default: .+
+                    description: |
+                        A comma separated list of regex matchable branch names. Notifications will only be sent if sent from a job from these branches. By default ".+" will be used to match all branches. Pattern must match the full string, no partial matches.
+                    type: string
+                channel:
+                    default: $SLACK_DEFAULT_CHANNEL
+                    description: |
+                        Select which channel in which to post to. Channel name or ID will work. You may include a comma separated list of channels if you wish to post to multiple channels at once. Set the "SLACK_DEFAULT_CHANNEL" environment variable for the default channel.
+                    type: string
+                circleci_host:
+                    default: https://circleci.com
+                    description: |
+                        A CircleCI Host which used in a message template.
+                    type: string
+                custom:
+                    default: ""
+                    description: |
+                        Enter a custom message template.
 
-display:
-  home_url: https://github.com/CircleCI-Public/slack-orb/wiki
-  source_url: https://github.com/CircleCI-Public/slack-orb
+                        1. Create your message template using the Block Kit Builder: https://app.slack.com/block-kit-builder/.
+                        2. Insert any desired environment variables.
+                        3. Paste value here.
+                    type: string
+                debug:
+                    default: false
+                    description: |
+                        Enable to view full payload being sent to Slack and response being received from the API call.
+                        Redacted content can be viewed by re-running the job with SSH and accessing the log files referenced in the job output.
+                        When run in a persistent build environment such as CircleCI Runner, these debug log files may remain in the system's temporary filesystem indefinitely and accumulate over time.
+                    type: boolean
+                event:
+                    default: always
+                    description: |
+                        In what event should this message send? Options: ["fail", "pass", "always"]
+                    enum:
+                        - fail
+                        - pass
+                        - always
+                    type: enum
+                ignore_errors:
+                    default: true
+                    description: |
+                        Ignore errors posting to Slack.
+                        Disable to catch initial setup errors. Re-enable to prevent Slack errors from affecting your pipeline.
+                    type: boolean
+                invert_match:
+                    default: false
+                    description: |
+                        Invert the branch and tag patterns.
+                        If set to true, notifications will only be sent if sent from a job from branches and tags that do not match the patterns.
+                    type: boolean
+                mentions:
+                    default: ""
+                    description: |
+                        Exports to the "$SLACK_PARAM_MENTIONS" environment variable for use in templates.
+                        Mention users via the @ symbol: "@USER"
+                        If the username contains a space, the Slack ID must be used with angled brackets: "<@U8XXXXXXX>"
+                    type: string
+                step_name:
+                    default: Slack - Sending Notification
+                    description: Specify a custom step name for this command, if desired
+                    type: string
+                tag_pattern:
+                    default: .+
+                    description: |
+                        A comma separated list of regex matchable tag names. Notifications will only be sent if sent from a job from these branches. By default ".+" will be used to match all tags. Pattern must match the full string, no partial matches.
+                    type: string
+                template:
+                    default: ""
+                    description: |
+                        Select which template to use for the notification by its name. The name must be available as an environment variable.
+                        The built-in templates can be found and previewed at: https://github.com/CircleCI-Public/slack-orb/wiki#templates.
+                        Alternatively, you can create and use your own dynamic templates: https://github.com/CircleCI-Public/slack-orb/wiki/Dynamic-Templates.
+                        If left empty and no custom template is provided, the template will be automatically selected based on the job status.
+                    type: string
+                user_mapping_file:
+                    default: ""
+                    description: |
+                        This file is contains Slack users and their coresponding Github usernames.
+                    type: string
+            steps:
+                - run:
+                    command: |
+                        echo 'export CCI_STATUS="fail"' > /tmp/SLACK_JOB_STATUS
+                    name: Slack - Detecting Job Status (FAIL)
+                    when: on_fail
+                - run:
+                    command: |
+                        echo 'export CCI_STATUS="pass"' > /tmp/SLACK_JOB_STATUS
+                    name: Slack - Detecting Job Status (PASS)
+                    when: on_success
+                - run:
+                    command: <<include(scripts/main.sh)>>
+                    environment:
+                        SLACK_PARAM_BRANCHPATTERN: <<parameters.branch_pattern>>
+                        SLACK_PARAM_CHANNEL: <<parameters.channel>>
+                        SLACK_PARAM_CIRCLECI_HOST: <<parameters.circleci_host>>
+                        SLACK_PARAM_CUSTOM: <<parameters.custom>>
+                        SLACK_PARAM_DEBUG: <<parameters.debug>>
+                        SLACK_PARAM_EVENT: <<parameters.event>>
+                        SLACK_PARAM_IGNORE_ERRORS: <<parameters.ignore_errors>>
+                        SLACK_PARAM_INVERT_MATCH: <<parameters.invert_match>>
+                        SLACK_PARAM_MENTIONS: <<parameters.mentions>>
+                        SLACK_PARAM_TAGPATTERN: <<parameters.tag_pattern>>
+                        SLACK_PARAM_TEMPLATE: <<parameters.template>>
+                        SLACK_SCRIPT_NOTIFY: <<include(scripts/notify.sh)>>
+                        SLACK_SCRIPT_UTILS: <<include(scripts/utils.sh)>>
+                        SLACK_USER_MAPPING_FILE: <<parameter.user_mapping_file>>
+                        basic-success: <<include(message_templates/basic-success.json)>>
+                        failed-v2-deploy: <<include(message_templates/failed-v2-deploy.json)>>
+                        rollback-failure: <<include(message_templates/rollback-failure.json)>>
+                        rollback-success: <<include(message_templates/rollback-success.json)>>
+                        successful-release: <<include(message_templates/successful-release.json)>>
+                        tagged-deploy-success: <<include(message_templates/tagged-deploy-success.json)>>
+                        v2-on-hold: <<include(message_templates/v2-on-hold.json)>>
+                    name: << parameters.step_name >>
+                    when: always
+    description: |
+        Implement event-based notifications across all of your CI/CD pipelines. Utilizing built-in message templates or Slack's visual Block-Kit builder, create and customize notifications specific to your organization's needs. Supports Linux x86_64, MacOS, Arm64 V8, and Windows.
+    display:
+        home_url: https://github.com/CircleCI-Public/slack-orb/wiki
+        source_url: https://github.com/CircleCI-Public/slack-orb
+    examples:
+        custom_notification:
+            description: |
+                Send a custom notification using Slack's Block Kit Builder.
+                Create the payload code and paste it in your notify command's custom parameter.
+                Detailed instructions in the GitHub readme.
+                https://app.slack.com/block-kit-builder
+            usage:
+                jobs:
+                    notify:
+                        docker:
+                            - image: cimg/base:stable
+                        steps:
+                            - slack/notify:
+                                custom: |
+                                    {
+                                      "blocks": [
+                                        {
+                                          "type": "section",
+                                          "fields": [
+                                            {
+                                              "type": "plain_text",
+                                              "text": "*This is a text notification*",
+                                              "emoji": true
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                event: always
+                orbs:
+                    slack: circleci/slack@4.1
+                version: 2.1
+                workflows:
+                    send-notification:
+                        jobs:
+                            - notify:
+                                context: slack-secrets
+        full_deployment_sample:
+            description: |
+                A full test and deploy sample configuration.
+                Test your app on every commit. On tagged commits, place the workflow on-hold after testing, pending manual approval for deployment.
+                Receive a Slack notification when the workflow is placed on hold, and a notification whether the deployment fails or deploys successfully.
+            usage:
+                jobs:
+                    deploy:
+                        docker:
+                            - image: cimg/base:stable
+                        steps:
+                            - run: echo "deploy my app"
+                            - slack/notify:
+                                event: fail
+                                mentions: '@EngineeringTeam'
+                                template: basic_fail_1
+                            - slack/notify:
+                                event: pass
+                                template: success_tagged_deploy_1
+                    test:
+                        docker:
+                            - image: cimg/base:stable
+                        steps:
+                            - run: echo "test my app"
+                orbs:
+                    slack: circleci/slack@4.1
+                version: 2.1
+                workflows:
+                    test-and-deploy:
+                        jobs:
+                            - test
+                            - slack/on-hold:
+                                context: slack-secrets
+                                filters:
+                                    tags:
+                                        only: /^v.*/
+                                requires:
+                                    - test
+                            - pause_workflow:
+                                filters:
+                                    tags:
+                                        only: /^v.*/
+                                requires:
+                                    - test
+                                    - slack/on-hold
+                                type: approval
+                            - deploy:
+                                filters:
+                                    tags:
+                                        only: /^v.*/
+                                requires:
+                                    - pause_workflow
+        notify_on_fail_with_template:
+            description: |
+                Send a slack notification when a job fails. This example uses a pre-included template. Custom templates can also be used.
+                The channel parameter can be used to alert a specific Slack channel.
+                Ensure the "slack/notify" command is the last command in a job to accurately capture the status.
+            usage:
+                jobs:
+                    deploy:
+                        executor:
+                            name: node/default
+                        steps:
+                            - checkout
+                            - node/install-packages
+                            - run:
+                                command: npm run deploy
+                            - slack/notify:
+                                channel: ABCXYZ
+                                event: fail
+                                template: basic_fail_1
+                orbs:
+                    node: circleci/node:4.1
+                    slack: circleci/slack@4.1
+                version: 2.1
+                workflows:
+                    deploy_and_notify:
+                        jobs:
+                            - deploy:
+                                context: slack-secrets
+        notify_two_channels:
+            description: |
+                Send a Slack notification to two channels simultaneously.
+                By default, if no channel parameter is set, the $SLACK_DEFAULT_CHANNEL value will be used (must be set).
+                A custom channel, or comma-separated list of channels can be supplied via the "channel" parameter.
+
+                It is recommended to use the "channel ID" for the value(s).
+                View the wiki: https://github.com/CircleCI-Public/slack-orb/wiki/How-to-set-Slack-channel
+            usage:
+                jobs:
+                    deploy:
+                        executor:
+                            name: node/default
+                        steps:
+                            - slack/notify:
+                                channel: ABCXYZ, ZXCVBN
+                                custom: |
+                                    {
+                                      "blocks": [
+                                        {
+                                          "type": "section",
+                                          "fields": [
+                                            {
+                                              "type": "plain_text",
+                                              "text": "*This is a text notification*",
+                                              "emoji": true
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                event: always
+                orbs:
+                    node: circleci/node:4.1
+                    slack: circleci/slack@4.1
+                version: 2.1
+                workflows:
+                    deploy_and_notify:
+                        jobs:
+                            - deploy:
+                                context: slack-secrets
+        on_hold_notification:
+            description: |
+                Pause a Workflow for manual approval and send a Slack notification with a link to the Workflow.
+            usage:
+                orbs:
+                    slack: circleci/slack@4.1
+                version: 2.1
+                workflows:
+                    on-hold-example:
+                        jobs:
+                            - my_test_job
+                            - slack/on-hold:
+                                context: slack-secrets
+                                requires:
+                                    - my_test_job
+                            - pause_workflow:
+                                requires:
+                                    - my_test_job
+                                    - slack/on-hold
+                                type: approval
+                            - my_deploy_job:
+                                requires:
+                                    - pause_workflow
+        only_notify_on_branch:
+            description: |
+                Use the "branch_pattern" parameter to limit notifications to specified branches. Useful when a job is executed on multiple branches but you only wish to be notified on a subset of branches. For example: If your "build" job runs on every branch, but you wish to only be notified when a failure occurs on the "main" branch, your config may look like this.
+            usage:
+                jobs:
+                    build:
+                        machine: true
+                        steps:
+                            - run: some build command
+                            - slack/notify:
+                                branch_pattern: main
+                                event: fail
+                                template: basic_fail_1
+                            - slack/notify:
+                                branch_pattern: production
+                                event: fail
+                                mentions: <@U8XXXXXXX>, @UserName
+                                template: basic_fail_1
+                orbs:
+                    slack: circleci/slack@4.1
+                version: 2.1
+                workflows:
+                    deploy_and_notify:
+                        jobs:
+                            - build:
+                                context: slack-secrets
+                            - deploy:
+                                filters:
+                                    branches:
+                                        only:
+                                            - production
+                                requires:
+                                    - build
+        successful_tagged_deployment:
+            description: |
+                Use one of our pre-included templates for sending a success notification when a tagged deployment passes.
+                Enter a Channel ID in the channel parameter to specify which slack channel to ping.
+                Ensure the "slack/notify" command is the last command in a job to accurately capture the status.
+            usage:
+                jobs:
+                    deploy:
+                        executor:
+                            name: node/default
+                        steps:
+                            - checkout
+                            - node/install-packages
+                            - run:
+                                command: npm run deploy
+                            - slack/notify:
+                                channel: ABCXYZ
+                                event: pass
+                                template: success_tagged_deploy_1
+                orbs:
+                    node: circleci/node:4.1
+                    slack: circleci/slack@4.1
+                version: 2.1
+                workflows:
+                    deploy_and_notify:
+                        jobs:
+                            - deploy:
+                                context:
+                                    - slack-secrets
+    jobs:
+        on-hold:
+            description: |
+                Insert this job in-line with your standard CircleCI on-hold notification jobs to simulataniously send a Slack notification containing a link to the paused Workflow.
+            docker:
+                - image: cimg/base:stable
+            parameters:
+                branch_pattern:
+                    default: .+
+                    description: |
+                        A comma separated list of regex matchable branch names. Notifications will only be sent if sent from a job from these branches. By default ".+" will be used to match all branches. Pattern must match the full string, no partial matches.
+                    type: string
+                channel:
+                    default: $SLACK_DEFAULT_CHANNEL
+                    description: |
+                        Select which channel in which to post to. Channel name or ID will work. You may include a comma separated list of channels if you wish to post to multiple channels at once. Set the "SLACK_DEFAULT_CHANNEL" environment variable for the default channel.
+                    type: string
+                circleci_host:
+                    default: https://circleci.com
+                    description: |
+                        CircleCI Host (used as the base for the Workflow URL)
+                    type: string
+                custom:
+                    default: ""
+                    description: |
+                        (optional) Enter a custom message template.
+
+                        1. Create your message template using the Block Kit Builder: https://app.slack.com/block-kit-builder/.
+                        2. Insert any desired environment variables.
+                        3. Paste value here.
+                    type: string
+                debug:
+                    default: false
+                    description: |
+                        View payload and response being sent to slack api.
+                        Enable to view full payload being sent to slack and response being received from the API call.
+                    type: boolean
+                invert_match:
+                    default: false
+                    description: |
+                        Invert the branch and tag patterns.
+                        If set to true, notifications will only be sent if sent from a job from branches and tags that do not match the patterns.
+                    type: boolean
+                mentions:
+                    default: ""
+                    description: |
+                        Exports to the "$SLACK_PARAM_MENTIONS" environment variable for use in templates.
+                        Mention users via the @ symbol: "@USER"
+                        If the username contains a space, the Slack ID must be used with angled brackets: "<@U8XXXXXXX>"
+                    type: string
+                step_name:
+                    default: Slack - Sending Notification
+                    description: Specify a custom step name for this command, if desired
+                    type: string
+                template:
+                    default: basic_on_hold_1
+                    description: (optional) By default this job will send the standard "basic_on_hold_1" template. In order to use a custom template you must also set this value to an empty string.
+                    type: string
+            resource_class: small
+            steps:
+                - notify:
+                    branch_pattern: <<parameters.branch_pattern>>
+                    channel: <<parameters.channel>>
+                    circleci_host: <<parameters.circleci_host>>
+                    custom: <<parameters.custom>>
+                    debug: <<parameters.debug>>
+                    event: always
+                    invert_match: <<parameters.invert_match>>
+                    mentions: <<parameters.mentions>>
+                    step_name: <<parameters.step_name>>
+                    template: <<parameters.template>>
+    message_templates: {}
+    scripts: {}
+    tests: {}
+    version: 2.1

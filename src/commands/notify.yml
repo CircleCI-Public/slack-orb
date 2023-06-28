@@ -12,6 +12,11 @@ parameters:
       If left empty and no custom template is provided, the template will be automatically selected based on the job status.
     type: string
     default: ""
+  user_mapping_file:
+    description: |
+      This file is contains Slack users and their coresponding Github usernames.
+    type: string
+    default: ""
   custom:
     description: |
       Enter a custom message template.
@@ -92,6 +97,7 @@ steps:
       when: always
       name: << parameters.step_name >>
       environment:
+        SLACK_USER_MAPPING_FILE: "<<parameter.user_mapping_file>>" 
         SLACK_PARAM_EVENT: "<<parameters.event>>"
         SLACK_PARAM_TEMPLATE: "<<parameters.template>>"
         SLACK_PARAM_CUSTOM: "<<parameters.custom>>"
@@ -106,8 +112,11 @@ steps:
         SLACK_SCRIPT_NOTIFY: "<<include(scripts/notify.sh)>>"
         SLACK_SCRIPT_UTILS: "<<include(scripts/utils.sh)>>"
         # import pre-built templates using the orb-pack local script include.
-        basic_fail_1: "<<include(message_templates/basic_fail_1.json)>>"
-        success_tagged_deploy_1: "<<include(message_templates/success_tagged_deploy_1.json)>>"
-        basic_on_hold_1: "<<include(message_templates/basic_on_hold_1.json)>>"
-        basic_success_1: "<<include(message_templates/basic_success_1.json)>>"
+        basic-success: "<<include(message_templates/basic-success.json)>>"
+        failed-v2-deploy: "<<include(message_templates/failed-v2-deploy.json)>>"
+        rollback-failure: "<<include(message_templates/rollback-failure.json)>>"
+        rollback-success: "<<include(message_templates/rollback-success.json)>>"
+        successful-release: "<<include(message_templates/successful-release.json)>>"
+        tagged-deploy-success: "<<include(message_templates/tagged-deploy-success.json)>>"
+        v2-on-hold: "<<include(message_templates/v2-on-hold.json)>>"
       command: <<include(scripts/main.sh)>>
