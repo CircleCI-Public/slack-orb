@@ -12,7 +12,7 @@ replaceGithubUsers(){
 
 
 
-        for ((i=0; i<$count; i++)); do
+        for ((i=0; i<$count; i=$i+1)); do
             github=$(jq -r '.users['"$i"'].github' "$SLACK_USER_MAPPING_FILE")
             slack=$(jq -r '.users['"$i"'].slack' "$SLACK_USER_MAPPING_FILE")
             message=$(echo "$message" | sed -e "s/$github/<@$slack>/g" )
@@ -28,9 +28,10 @@ BuildMessageBody() {
     #   if none is supplied, check for a pre-selected template value.
     #   If none, error.
 
-    CHANGE_LOG_TEXT=$(git log --pretty=format:"- %s (%an)%n\n" HEAD...production-v2 | sed "s/\'//g" | sed "s/\"//g" | sed 's/(#\([0-9]\{1,\}\))/[<https\:\/\/github.com\/stoplightio\/platform-internal\/pull\/\1|#\1>]/g' | head -c3000)
-    CURRENT_COMMIT_TEXT=$(git log --pretty=format:"<https://github.com/stoplightio/platform-internal/commit/%h|%h> - %s (%an)" HEAD...HEAD^1 | sed 's/\"/\\\"/g')
+    export CHANGE_LOG_TEXT=$(git log --pretty=format:"- %s (%an)%n\n" HEAD...production-v2 | sed "s/\'//g" | sed "s/\"//g" | sed 's/(#\([0-9]\{1,\}\))/[<https\:\/\/github.com\/stoplightio\/platform-internal\/pull\/\1|#\1>]/g' | head -c3000)
+    export CURRENT_COMMIT_TEXT=$(git log --pretty=format:"<https://github.com/stoplightio/platform-internal/commit/%h|%h> - %s (%an)" HEAD...HEAD^1 | sed 's/\"/\\\"/g')
     echo "got current commit text"
+    
 
     if [ -n "${SLACK_PARAM_CUSTOM:-}" ]; then
         SanitizeVars "$SLACK_PARAM_CUSTOM"
