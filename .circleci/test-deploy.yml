@@ -29,12 +29,29 @@ jobs:
       - checkout
       # Run your orb's commands to validate them.
       - slack/greet
+      - slack/notify
+
+  test_failure:
+    executor: node-gcp-build
+    resource_class: small
+    steps:
+      - run:
+          name: test_failure
+          command: exit 1
+      - slack-orb/notify:
+          channel: slack-notify
+          user_mapping_file: .circleci/slackid-gh-user-mapping.json
+          branch_pattern: test-stoplight-orb
+          event: fail
+          template: rollback_failure
 
 workflows:
   test-deploy:
     jobs:
       # Make sure to include "filters: *filters" in every test job you want to run as part of your deployment.
       # Test your orb's commands in a custom job and test your orb's jobs directly as a part of this workflow.
+      - test_failure:
+          filters: *filters
       - command-test:
           filters: *filters
       # The orb must be re-packed for publishing, and saved to the workspace.
@@ -50,3 +67,5 @@ workflows:
             - command-test
           context: <publishing-context>
           filters: *release-filters
+
+      
