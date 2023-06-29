@@ -1,0 +1,30 @@
+
+description: |
+  Send a slack notification when a job fails. This example uses a pre-included template. Custom templates can also be used.
+  The channel parameter can be used to alert a specific Slack channel.
+  Ensure the "slack/notify" command is the last command in a job to accurately capture the status.
+usage:
+  version: 2.1
+  orbs:
+    slack: circleci/slack@4.1
+    node: circleci/node:4.1
+  jobs:
+    deploy:
+      executor:
+        name: node/default
+      steps:
+        - checkout
+        - node/install-packages
+        - run:
+            command: npm run deploy
+        # If any of the above steps in this job (such as the deployment) have failed, this Slack notification will send.
+        - slack/notify:
+            event: fail
+            template: basic_fail_1
+            channel: ABCXYZ
+  workflows:
+    deploy_and_notify:
+      jobs:
+        - deploy:
+            # Secure your Slack OAuth access token behind a restricted context
+            context: slack-secrets

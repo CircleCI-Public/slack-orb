@@ -1,0 +1,64 @@
+description: |
+  A full test and deploy sample configuration.
+  Test your app on every commit. On tagged commits, place the workflow on-hold after testing, pending manual approval for deployment.
+  Receive a Slack notification when the workflow is placed on hold, and a notification whether the deployment fails or deploys successfully.
+usage:
+  version: 2.1
+  orbs:
+    slack: circleci/slack@4.1
+  jobs:
+    # This "test" job will run on every commit (as per our workflow)
+    # We are ok with no notifications sent for this job.
+    test:
+      docker:
+        - image: cimg/base:stable
+      steps:
+        - run: echo "test my app"
+    # This "deploy" job will only run on a tagged commit (as per our workflow)
+    # We want to be alerted both if this job fails, and when it succeeds.
+    deploy:
+      docker:
+        - image: cimg/base:stable
+      steps:
+        - run: echo "deploy my app"
+        # In the event the deployment has failed, alert the engineering team
+        - slack/notify:
+            event: fail
+            template: basic_fail_1
+            mentions: "@EngineeringTeam"
+        # When there is a successful deployment, send a notification with a different template.
+        - slack/notify:
+            event: pass
+            template: success_tagged_deploy_1
+  workflows:
+    test-and-deploy:
+      jobs:
+        # We want the test job to run on all commits, so we will list it with no filters.
+        - test
+        # When we are on a tagged commit (example "v1.0.0"), we want to also place the workflow on-hold, pending manual approval for deployment.
+        # We will also make use of the Slack orb's "on-hold" job to notify us to this on-hold workflow, making it easy to respond.
+        # Add a context containing your Slack OAuth token and optionally, default slack channel
+        - slack/on-hold:
+            context: slack-secrets
+            requires:
+              - test
+            filters:
+              tags:
+                only: /^v.*/
+        # Jobs with the type of "approval" act as place holders to pause the workflow, the job name does not matter.
+        # Wait for both the test job, and the notification to send before pausing.
+        - pause_workflow:
+            type: approval
+            requires:
+              - test
+              - slack/on-hold
+            filters:
+              tags:
+                only: /^v.*/
+        # The deploy job will continue once the workflow has been manually approved.
+        - deploy:
+            requires:
+              - pause_workflow
+            filters:
+              tags:
+                only: /^v.*/

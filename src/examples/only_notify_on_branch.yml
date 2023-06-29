@@ -1,0 +1,36 @@
+description: >
+  Use the "branch_pattern" parameter to limit notifications to specified branches.
+  Useful when a job is executed on multiple branches but you only wish to be notified on a subset of branches.
+  For example: If your "build" job runs on every branch, but you wish to only be notified when a failure occurs on the "main" branch, your config may look like this.
+usage:
+  version: 2.1
+  orbs:
+    slack: circleci/slack@4.1
+  jobs:
+    build:
+      machine: true
+      steps:
+        - run: some build command
+        - slack/notify:
+            branch_pattern: main # A comma separated list of regex matchable branch names. Notifications will only be sent if sent from a job from these branches. By default ".+" will be used to match all branches.
+            event: fail
+            template: basic_fail_1
+        - slack/notify:
+            branch_pattern: production # A second alert to ping certain folks to failures on this branch.
+            event: fail
+            template: basic_fail_1
+            mentions: "<@U8XXXXXXX>, @UserName"
+  workflows:
+    deploy_and_notify:
+      jobs:
+        - build:
+            context: slack-secrets
+        # This deploy job uses the native CircleCI workflow filters to specify that the entire job will not execute unless on the specified filtered branch.
+        # This Workflow level filter is independent from the Slack orb, and controls if the entire job is executed, as opposed to just the command in the orb.
+        - deploy:
+            requires:
+              - build
+            filters:
+              branches:
+                only:
+                  - production

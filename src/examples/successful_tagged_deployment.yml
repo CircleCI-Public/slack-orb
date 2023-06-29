@@ -1,0 +1,28 @@
+description: |
+  Use one of our pre-included templates for sending a success notification when a tagged deployment passes.
+  Enter a Channel ID in the channel parameter to specify which slack channel to ping.
+  Ensure the "slack/notify" command is the last command in a job to accurately capture the status.
+usage:
+  version: 2.1
+  orbs:
+    slack: circleci/slack@4.1
+    node: circleci/node:4.1
+  jobs:
+    deploy:
+      executor:
+        name: node/default
+      steps:
+        - checkout
+        - node/install-packages
+        - run:
+            command: npm run deploy
+        - slack/notify:
+            event: pass
+            template: success_tagged_deploy_1
+            channel: ABCXYZ
+  workflows:
+    deploy_and_notify:
+      jobs:
+        - deploy:
+            context:
+              - slack-secrets

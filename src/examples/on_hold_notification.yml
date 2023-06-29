@@ -1,0 +1,26 @@
+description: |
+  Pause a Workflow for manual approval and send a Slack notification with a link to the Workflow.
+usage:
+  version: 2.1
+  orbs:
+    slack: circleci/slack@4.1
+  workflows:
+    on-hold-example:
+      jobs:
+        - my_test_job
+        # Send a slack notfication alerting the workflow will now be placed on-hold after this notification.
+        - slack/on-hold:
+            context: slack-secrets
+            requires:
+              - my_test_job
+        # Jobs with the type of "approval" act as place holders to pause the workflow
+        # Wait for both the first job, and the notification to send before actually pausing.
+        - pause_workflow:
+            type: approval
+            requires:
+              - my_test_job
+              - slack/on-hold
+        # This job will continue once the workflow has been manually approved.
+        - my_deploy_job:
+            requires:
+              - pause_workflow

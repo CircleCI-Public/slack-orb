@@ -1,0 +1,11 @@
+{
+	"blocks": [
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Sample link using environment variable in markdown <${TESTLINKURL}|LINK >"
+			}
+		}
+	]
+}

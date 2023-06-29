@@ -1,0 +1,41 @@
+description: |
+  Send a Slack notification to two channels simultaneously.
+  By default, if no channel parameter is set, the $SLACK_DEFAULT_CHANNEL value will be used (must be set).
+  A custom channel, or comma-separated list of channels can be supplied via the "channel" parameter.
+
+  It is recommended to use the "channel ID" for the value(s).
+  View the wiki: https://github.com/CircleCI-Public/slack-orb/wiki/How-to-set-Slack-channel
+usage:
+  version: 2.1
+  orbs:
+    slack: circleci/slack@4.1
+    node: circleci/node:4.1
+  jobs:
+    deploy:
+      executor:
+        name: node/default
+      steps:
+        - slack/notify:
+            event: always
+            channel: ABCXYZ, ZXCVBN
+            custom: |
+              {
+                "blocks": [
+                  {
+                    "type": "section",
+                    "fields": [
+                      {
+                        "type": "plain_text",
+                        "text": "*This is a text notification*",
+                        "emoji": true
+                      }
+                    ]
+                  }
+                ]
+              }
+  workflows:
+    deploy_and_notify:
+      jobs:
+        - deploy:
+            # Secure your Slack OAuth access token behind a restricted context
+            context: slack-secrets

@@ -1,0 +1,73 @@
+description: |
+  Insert this job in-line with your standard CircleCI on-hold notification jobs to simulataniously send a Slack notification containing a link to the paused Workflow.
+
+parameters:
+  branch_pattern:
+    description: |
+      A comma separated list of regex matchable branch names. Notifications will only be sent if sent from a job from these branches. By default ".+" will be used to match all branches. Pattern must match the full string, no partial matches.
+    type: string
+    default: ".+"
+  invert_match:
+    description: |
+      Invert the branch and tag patterns.
+      If set to true, notifications will only be sent if sent from a job from branches and tags that do not match the patterns.
+    type: boolean
+    default: false
+  mentions:
+    description: |
+      Exports to the "$SLACK_PARAM_MENTIONS" environment variable for use in templates.
+      Mention users via the @ symbol: "@USER"
+      If the username contains a space, the Slack ID must be used with angled brackets: "<@U8XXXXXXX>"
+    type: string
+    default: ""
+  template:
+    description: '(optional) By default this job will send the standard "basic_on_hold_1" template. In order to use a custom template you must also set this value to an empty string.'
+    type: string
+    default: "basic_on_hold_1"
+  custom:
+    description: |
+      (optional) Enter a custom message template.
+
+      1. Create your message template using the Block Kit Builder: https://app.slack.com/block-kit-builder/.
+      2. Insert any desired environment variables.
+      3. Paste value here.
+    type: string
+    default: ""
+  channel:
+      description: |
+        Select which channel in which to post to. Channel name or ID will work. You may include a comma separated list of channels if you wish to post to multiple channels at once. Set the "SLACK_DEFAULT_CHANNEL" environment variable for the default channel.
+      type: string
+      default: $SLACK_DEFAULT_CHANNEL
+  debug:
+      description: |
+       View payload and response being sent to slack api.
+       Enable to view full payload being sent to slack and response being received from the API call.
+      type: boolean
+      default: false
+  circleci_host:
+      description: |
+       CircleCI Host (used as the base for the Workflow URL)
+      type: string
+      default: https://circleci.com
+  step_name:
+    type: string
+    default: Slack - Sending Notification
+    description: Specify a custom step name for this command, if desired
+
+docker:
+  - image: cimg/base:stable
+resource_class: small
+
+steps:
+  - notify:
+      event: always
+      template: <<parameters.template>>
+      branch_pattern: <<parameters.branch_pattern>>
+      invert_match: <<parameters.invert_match>>
+      custom: <<parameters.custom>>
+      mentions: <<parameters.mentions>>
+      channel: <<parameters.channel>>
+      debug: <<parameters.debug>>
+      circleci_host: <<parameters.circleci_host>>
+      step_name: <<parameters.step_name>>
+

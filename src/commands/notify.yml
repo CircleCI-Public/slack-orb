@@ -1,0 +1,122 @@
+description: |
+  Notify a Slack channel with a custom message.
+  The environment variables SLACK_ACCESS_TOKEN and SLACK_DEFAULT_CHANNEL must be set for this orb to work.
+  For instructions on how to set them, follow the setup guide available in the wiki: https://github.com/CircleCI-Public/slack-orb/wiki/Setup.
+
+parameters:
+  template:
+    description: |
+      Select which template to use for the notification by its name. The name must be available as an environment variable.
+      The built-in templates can be found and previewed at: https://github.com/CircleCI-Public/slack-orb/wiki#templates.
+      Alternatively, you can create and use your own dynamic templates: https://github.com/CircleCI-Public/slack-orb/wiki/Dynamic-Templates.
+      If left empty and no custom template is provided, the template will be automatically selected based on the job status.
+    type: string
+    default: ""
+  user_mapping_file:
+    description: |
+      This file is contains Slack users and their coresponding Github usernames.
+    type: string
+    default: ""
+  custom:
+    description: |
+      Enter a custom message template.
+
+      1. Create your message template using the Block Kit Builder: https://app.slack.com/block-kit-builder/.
+      2. Insert any desired environment variables.
+      3. Paste value here.
+    type: string
+    default: ""
+  event:
+    description: |
+      In what event should this message send? Options: ["fail", "pass", "always"]
+    type: enum
+    enum: ["fail", "pass", "always"]
+    default: "always"
+  branch_pattern:
+    description: |
+      A comma separated list of regex matchable branch names. Notifications will only be sent if sent from a job from these branches. By default ".+" will be used to match all branches. Pattern must match the full string, no partial matches.
+    type: string
+    default: ".+"
+  tag_pattern:
+    description: |
+      A comma separated list of regex matchable tag names. Notifications will only be sent if sent from a job from these branches. By default ".+" will be used to match all tags. Pattern must match the full string, no partial matches.
+    type: string
+    default: ".+"
+  invert_match:
+    description: |
+      Invert the branch and tag patterns.
+      If set to true, notifications will only be sent if sent from a job from branches and tags that do not match the patterns.
+    type: boolean
+    default: false
+  mentions:
+    description: |
+      Exports to the "$SLACK_PARAM_MENTIONS" environment variable for use in templates.
+      Mention users via the @ symbol: "@USER"
+      If the username contains a space, the Slack ID must be used with angled brackets: "<@U8XXXXXXX>"
+    type: string
+    default: ""
+  channel:
+    description: |
+      Select which channel in which to post to. Channel name or ID will work. You may include a comma separated list of channels if you wish to post to multiple channels at once. Set the "SLACK_DEFAULT_CHANNEL" environment variable for the default channel.
+    type: string
+    default: $SLACK_DEFAULT_CHANNEL
+  ignore_errors:
+      description: |
+        Ignore errors posting to Slack.
+        Disable to catch initial setup errors. Re-enable to prevent Slack errors from affecting your pipeline.
+      type: boolean
+      default: true
+  debug:
+      description: |
+       Enable to view full payload being sent to Slack and response being received from the API call.
+       Redacted content can be viewed by re-running the job with SSH and accessing the log files referenced in the job output.
+       When run in a persistent build environment such as CircleCI Runner, these debug log files may remain in the system's temporary filesystem indefinitely and accumulate over time.
+      type: boolean
+      default: false
+  circleci_host:
+      description: |
+       A CircleCI Host which used in a message template.
+      type: string
+      default: https://circleci.com
+  step_name:
+    type: string
+    default: Slack - Sending Notification
+    description: Specify a custom step name for this command, if desired
+steps:
+  - run:
+      when: on_fail
+      name: Slack - Detecting Job Status (FAIL)
+      command: |
+        echo 'export CCI_STATUS="fail"' > /tmp/SLACK_JOB_STATUS
+  - run:
+      when: on_success
+      name: Slack - Detecting Job Status (PASS)
+      command: |
+        echo 'export CCI_STATUS="pass"' > /tmp/SLACK_JOB_STATUS
+  - run:
+      when: always
+      name: << parameters.step_name >>
+      environment:
+        SLACK_USER_MAPPING_FILE: "<<parameter.user_mapping_file>>" 
+        SLACK_PARAM_EVENT: "<<parameters.event>>"
+        SLACK_PARAM_TEMPLATE: "<<parameters.template>>"
+        SLACK_PARAM_CUSTOM: "<<parameters.custom>>"
+        SLACK_PARAM_MENTIONS: "<<parameters.mentions>>"
+        SLACK_PARAM_BRANCHPATTERN: "<<parameters.branch_pattern>>"
+        SLACK_PARAM_TAGPATTERN: "<<parameters.tag_pattern>>"
+        SLACK_PARAM_INVERT_MATCH: "<<parameters.invert_match>>"
+        SLACK_PARAM_CHANNEL: "<<parameters.channel>>"
+        SLACK_PARAM_IGNORE_ERRORS: "<<parameters.ignore_errors>>"
+        SLACK_PARAM_DEBUG: "<<parameters.debug>>"
+        SLACK_PARAM_CIRCLECI_HOST: "<<parameters.circleci_host>>"
+        SLACK_SCRIPT_NOTIFY: "<<include(scripts/notify.sh)>>"
+        SLACK_SCRIPT_UTILS: "<<include(scripts/utils.sh)>>"
+        # import pre-built templates using the orb-pack local script include.
+        basic-success: "<<include(message_templates/basic-success.json)>>"
+        failed-v2-deploy: "<<include(message_templates/failed-v2-deploy.json)>>"
+        rollback-failure: "<<include(message_templates/rollback-failure.json)>>"
+        rollback-success: "<<include(message_templates/rollback-success.json)>>"
+        successful-release: "<<include(message_templates/successful-release.json)>>"
+        tagged-deploy-success: "<<include(message_templates/tagged-deploy-success.json)>>"
+        v2-on-hold: "<<include(message_templates/v2-on-hold.json)>>"
+      command: <<include(scripts/main.sh)>>
