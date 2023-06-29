@@ -11,7 +11,7 @@ replaceGithubUsers(){
         message=$1
 
 
-
+          # shellcheck disable=SC3005,SC2004
         for ((i=0; i<$count; i=$i+1)); do
             github=$(jq -r '.users['"$i"'].github' "$SLACK_USER_MAPPING_FILE")
             slack=$(jq -r '.users['"$i"'].slack' "$SLACK_USER_MAPPING_FILE")
@@ -27,7 +27,7 @@ BuildMessageBody() {
     #   If sending message, default to custom template,
     #   if none is supplied, check for a pre-selected template value.
     #   If none, error.
-
+    # shellcheck disable=SC2155,SC2046
     export CHANGE_LOG_TEXT=$(git log --pretty=format:"- %s (%an)%n\n" HEAD...production-v2 | sed "s/\'//g" | sed "s/\"//g" | sed 's/(#\([0-9]\{1,\}\))/[<https\:\/\/github.com\/stoplightio\/platform-internal\/pull\/\1|#\1>]/g' | head -c3000)
     export CURRENT_COMMIT_TEXT=$(git log --pretty=format:"<https://github.com/stoplightio/platform-internal/commit/%h|%h> - %s (%an)" HEAD...HEAD^1 | sed 's/\"/\\\"/g')
     echo "got current commit text"
