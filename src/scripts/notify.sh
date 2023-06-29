@@ -7,18 +7,17 @@ JQ_PATH=/usr/local/bin/jq
 
 replaceGithubUsers(){
     if [ -n "${SLACK_USER_MAPPING_FILE:-}" ]; then
-        count=`jq '.users | length' $SLACK_USER_MAPPING_FILE`
+        count=$(jq '.users | length' "$SLACK_USER_MAPPING_FILE")
         message=$1
 
 
 
         for ((i=0; i<$count; i++)); do
-            github=`jq -r '.users['$i'].github' $SLACK_USER_MAPPING_FILE`
-            slack=`jq -r '.users['$i'].slack' $SLACK_USER_MAPPING_FILE`
-            message=$(echo $message | sed -e "s/$github/<@$slack>/g" )
-        done
+            github=$(jq -r '.users['"$i"'].github' "$SLACK_USER_MAPPING_FILE")
+            slack=$(jq -r '.users['"$i"'].slack' "$SLACK_USER_MAPPING_FILE")
+            message=$(echo "$message" | sed -e "s/$github/<@$slack>/g" )
 
-        echo $message
+        echo "$message"
 
     fi
 }
