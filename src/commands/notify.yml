@@ -97,7 +97,7 @@ steps:
       when: always
       name: << parameters.step_name >>
       environment:
-        SLACK_USER_MAPPING_FILE: "<<parameters.user_mapping_file>>" 
+        SLACK_USER_MAPPING_FILE: "<<parameters.user_mapping_file>>"
         SLACK_PARAM_EVENT: "<<parameters.event>>"
         SLACK_PARAM_TEMPLATE: "<<parameters.template>>"
         SLACK_PARAM_CUSTOM: "<<parameters.custom>>"
