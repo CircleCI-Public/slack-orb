@@ -5,7 +5,13 @@ orbs:
   orb-tools: circleci/orb-tools@12.0
   # The orb definition is intentionally not included here. It will be injected into the pipeline.
   slack: {}
-
+executors:
+  node-gcp-build:
+    docker:
+      - image: quay.io/stoplight/node-gcp-build:16.14.2-cloudflare
+        auth:
+          username: stoplight+newcircleci
+          password: $QUAY_PASSWORD
 # Use this tag to ensure test jobs always run,
 # even though the downstream publish job will only run on release tags.
 filters: &filters
@@ -40,7 +46,7 @@ jobs:
       - slack/notify:
           channel: slack-notify
           user_mapping_file: .circleci/slackid-gh-user-mapping.json
-          branch_pattern: test-stoplight-orb
+          branch_pattern: june-slack-orb
           event: fail
           template: rollback_failure
 
