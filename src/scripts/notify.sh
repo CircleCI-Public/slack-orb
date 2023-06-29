@@ -16,7 +16,7 @@ replaceGithubUsers(){
             github=$(jq -r '.users['"$i"'].github' "$SLACK_USER_MAPPING_FILE")
             slack=$(jq -r '.users['"$i"'].slack' "$SLACK_USER_MAPPING_FILE")
             message=$(echo "$message" | sed -e "s/$github/<@$slack>/g" )
-
+        done
         echo "$message"
 
     fi
