@@ -230,7 +230,7 @@ SanitizeVars() {
   for var in $variable_names; do
     # The variable must be wrapped in double quotes before the evaluation.
     # Otherwise the newlines will be removed.
-    echo $var
+    echo "$var"
     local value
     value="$(eval printf '%s' \"\$"$var\"")"
     [ -z "$value" ] && { printf '%s\n' "$var is empty or doesn't exist. Skipping it..."; continue; }
