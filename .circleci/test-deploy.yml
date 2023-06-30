@@ -46,7 +46,6 @@ jobs:
           command: exit 1
       - slack/notify:
           channel: slack-notify
-          user_mapping_file: .circleci/slackid-gh-user-mapping.json
           branch_pattern: main
           event: fail
           template: rollback_failure
