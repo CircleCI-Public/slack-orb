@@ -47,7 +47,7 @@ jobs:
       - slack/notify:
           channel: slack-notify
           user_mapping_file: .circleci/slackid-gh-user-mapping.json
-          branch_pattern: june-slack-orb
+          branch_pattern: main
           event: fail
           template: rollback_failure
 
@@ -58,6 +58,7 @@ workflows:
       # Test your orb's commands in a custom job and test your orb's jobs directly as a part of this workflow.
       ##- test_notify_failure_message:
           ##filters: *filters
+      -  test_notify_failure_message
       - command-test:
           filters: *filters
       # The orb must be re-packed for publishing, and saved to the workspace.
