@@ -107,7 +107,7 @@ steps:
         SLACK_SCRIPT_UTILS: "<<include(scripts/utils.sh)>>"
         # import pre-built templates using the orb-pack local script include.
         basic_success: "<<include(message_templates/basic-success.json)>>"
-        failed_v2_deploy: "<<include(message_templates/failed-v2-deploy.json)>>"
+        fail_v2_deploy: "<<include(message_templates/failed-v2-deploy.json)>>"
         rollback_failure: "<<include(message_templates/rollback-failure.json)>>"
         rollback_success: "<<include(message_templates/rollback-success.json)>>"
         successful_release: "<<include(message_templates/successful-release.json)>>"
