@@ -4,6 +4,7 @@
 # Import utils.
 eval "$SLACK_SCRIPT_UTILS"
 JQ_PATH=/usr/local/bin/jq
+set -x
 
 replaceGithubUsers(){
     if [ -n "${SLACK_USER_MAPPING_FILE:-}" ]; then
