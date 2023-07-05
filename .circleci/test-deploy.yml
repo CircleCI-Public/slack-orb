@@ -47,7 +47,7 @@ jobs:
       - slack/notify:
           channel: slack-notify
           branch_pattern: main
-          event: fail
+          event: always
           template: rollback_failure
 
 workflows:
