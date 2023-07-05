@@ -32,6 +32,15 @@
       ]
     },
     {
+      "type": "section",
+      "fields": [
+        {
+          "type": "mrkdwn",
+          "text": "Mentions: ${CIRCLE_USERNAME}"
+        }
+      ]
+    },
+    {
       "type": "actions",
       "elements": [
         {
