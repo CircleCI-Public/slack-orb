@@ -38,7 +38,6 @@ BuildMessageBody() {
     if [ -n "${SLACK_PARAM_CUSTOM:-}" ]; then
         SanitizeVars "$SLACK_PARAM_CUSTOM"
         ModifyCustomTemplate
-        # shellcheck disable=SC2016
         CUSTOM_BODY_MODIFIED=$(echo "$CUSTOM_BODY_MODIFIED" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed 's/`/\\`/g')
         T2="$(eval printf '%s' \""$CUSTOM_BODY_MODIFIED"\")"
     else
