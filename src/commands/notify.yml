@@ -106,11 +106,11 @@ steps:
         SLACK_SCRIPT_NOTIFY: "<<include(scripts/notify.sh)>>"
         SLACK_SCRIPT_UTILS: "<<include(scripts/utils.sh)>>"
         # import pre-built templates using the orb-pack local script include.
-        basic-success: "<<include(message_templates/basic-success.json)>>"
-        failed-v2-deploy: "<<include(message_templates/failed-v2-deploy.json)>>"
-        rollback-failure: "<<include(message_templates/rollback-failure.json)>>"
-        rollback-success: "<<include(message_templates/rollback-success.json)>>"
-        successful-release: "<<include(message_templates/successful-release.json)>>"
-        tagged-deploy-success: "<<include(message_templates/tagged-deploy-success.json)>>"
-        v2-on-hold: "<<include(message_templates/v2-on-hold.json)>>"
+        basic_success: "<<include(message_templates/basic-success.json)>>"
+        failed_v2_deploy: "<<include(message_templates/failed-v2-deploy.json)>>"
+        rollback_failure: "<<include(message_templates/rollback-failure.json)>>"
+        rollback_success: "<<include(message_templates/rollback-success.json)>>"
+        successful_release: "<<include(message_templates/successful-release.json)>>"
+        tagged_deploy_success: "<<include(message_templates/tagged-deploy-success.json)>>"
+        v2_on_hold: "<<include(message_templates/v2-on-hold.json)>>"
       command: <<include(scripts/main.sh)>>
