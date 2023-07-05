@@ -45,10 +45,10 @@ jobs:
           name: test_failure
           command: exit 1
       - slack/notify:
-          channel: slack-notify
+          channel: slack_notify
           branch_pattern: main
           event: always
-          template: basic-success
+          template: basic_success
 
 workflows:
   test-deploy:
