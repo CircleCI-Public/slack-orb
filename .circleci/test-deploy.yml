@@ -46,7 +46,7 @@ jobs:
           command: exit 1
       - slack/notify:
           channel: slack-notify
-          branch_pattern: main
+          branch_pattern: june-slack-job
           event: always
           template: basic_success
 
