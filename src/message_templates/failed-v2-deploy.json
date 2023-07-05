@@ -14,11 +14,11 @@
       "fields": [
         {
           "type": "mrkdwn",
-          "text": "*Branch*: ${CIRCLE_BRANCH}"
+          "text": "Branch: ${CIRCLE_BRANCH}"
         },
         {
           "type": "mrkdwn",
-          "text": "*Job*: ${CIRCLE_JOB}"
+          "text": "Job: ${CIRCLE_JOB}"
         }
       ]
     },
@@ -27,7 +27,7 @@
       "fields": [
         {
           "type": "mrkdwn",
-          "text": "*Commit*: ${CURRENT_COMMIT_TEXT}"
+          "text": "Commit: ${CURRENT_COMMIT_TEXT}"
         }
       ]
     },
@@ -36,7 +36,7 @@
       "fields": [
         {
           "type": "mrkdwn",
-          "text": "*Mentions*: ${SLACK_PARAM_MENTIONS}"
+          "text": "Mentions: ${SLACK_PARAM_MENTIONS}"
         }
       ]
     },
@@ -52,7 +52,13 @@
           "url": "${CIRCLE_BUILD_URL}"
         }
       ]
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "$CIRCLE_USERNAME triggered pipeline. Please check."
+      }
     }
   ]
 }
-
