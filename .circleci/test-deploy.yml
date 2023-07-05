@@ -33,7 +33,7 @@ jobs:
       - image: cimg/base:current
     steps:
       - checkout
-      # Run your orb's commands to validate them.
+      # Run your orb's commands to validate them
       - slack/greet
 
   test_notify_failure_message:
