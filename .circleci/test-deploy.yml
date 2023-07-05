@@ -48,7 +48,7 @@ jobs:
           channel: slack-notify
           branch_pattern: main
           event: always
-          template: rollback_failure
+          template: basic-success
 
 workflows:
   test-deploy:
