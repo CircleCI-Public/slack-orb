@@ -61,6 +61,7 @@ BuildMessageBody() {
     T2="$(printf '%s' "$T2" | jq ". + {\"channel\": \"$SLACK_DEFAULT_CHANNEL\"}")"
     SLACK_MSG_BODY="$T2"
     SLACK_MSG_BODY=$(replaceGithubUsers "$SLACK_MSG_BODY")
+    echo $SLACK_MSG_BODY
 }
 
 PostToSlack() {
