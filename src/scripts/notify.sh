@@ -7,9 +7,10 @@ JQ_PATH=/usr/local/bin/jq
 set -x
 
 replaceGithubUsers(){
+    message=$1
     if [ -n "${SLACK_USER_MAPPING_FILE:-}" ]; then
         count=$(jq '.users | length' "$SLACK_USER_MAPPING_FILE")
-        message=$1
+       
 
 
           # shellcheck disable=SC3005,SC2004
@@ -18,9 +19,10 @@ replaceGithubUsers(){
             slack=$(jq -r '.users['"$i"'].slack' "$SLACK_USER_MAPPING_FILE")
             message=$(echo "$message" | sed -e "s/$github/<@$slack>/g" )
         done
-        echo "$message"
+        
 
     fi
+    echo "$message"
 }
 
 BuildMessageBody() {
