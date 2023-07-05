@@ -53,17 +53,7 @@ jobs:
           channel: slack-notify
           branch_pattern: june-slack-job
           event: always
-          template: success_release
-      - slack/notify:
-          channel: slack-notify
-          branch_pattern: june-slack-job
-          event: always
           template: fail_v2_deploy
-      - slack/notify:
-          channel: slack-notify
-          branch_pattern: june-slack-job
-          event: pass
-          template: rollback_success
 
 workflows:
   test-deploy:
