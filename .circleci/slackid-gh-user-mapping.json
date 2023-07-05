@@ -1,102 +1,127 @@
 {
     "users": [
       {
-        "github": "Aaron Jones",
+        "full_name": "Aaron Jones",
+        "github": "Amjcraft",
         "slack": "aaron"
       },
       {
-        "github": "Billie Hilton",
+        "full_name": "Billie Hilton",
+        "github": "billiegoose",
         "slack": "will.hilton"
       },
       {
-        "github": "Brenda Rearden",
+        "full_name": "Brenda Rearden",
+        "github": "billiegoose",
         "slack": "brenda.rearden"
       },
       {
-        "github": "Chelsea Hohmann",
+        "full_name": "Chelsea Hohmann",
+        "github": "chohmann",
         "slack": "chelsea"
       },
       {
-        "github": "Chris Lanzo",
+        "full_name": "Chris Lanzo",
+        "github": "cjlanzo",
         "slack": "chris.lanzo"
       },
       {
-        "github": "Curtis Matthews",
+        "full_name": "Curtis Matthews",
+        "github": "matthewsac",
         "slack": "curtis.matthews"
       },
       {
-        "github": "Daniel A. White",
+        "full_name": "Daniel A. White",
+        "github": "daniel-white",
         "slack": "daniel.white"
       },
       {
-        "github": "Derek Thompson",
+        "full_name": "Derek Thompson",
+        "github": "dotslashderek",
         "slack": "derek.thompson"
       },
       {
-        "github": "Ed Vinyard",
+        "full_name": "Ed Vinyard",
+        "github": "EdVinyard",
         "slack": "ed"
       },
       {
-        "github": "Feras AlSaffar",
+        "full_name": "Feras AlSaffar",
+        "github": "falsaffa",
         "slack": "feras"
       },
       {
-        "github": "Jakub Jankowski",
+        "full_name": "Jakub Jankowski",
+        "github": "mallachari",
         "slack": "jakubj"
       },
       {
-        "github": "Jakub Rożek",
+        "full_name": "Jakub Rożek",
+        "github": "P0lip",
         "slack": "jakub"
       },
       {
-        "github": "Kayla Chun",
+        "full_name": "Kayla Chun",
+        "github": "kaylachun",
         "slack": "kayla.chun"
       },
       {
-        "github": "Kevin Soviero",
+        "full_name": "Kevin Soviero",
+        "github": "ksoviero-stoplight",
         "slack": "kevin"
       },
       {
-        "github": "Luke Baker",
+        "full_name": "Luke Baker",
+        "github": "lbaker-stoplight",
         "slack": "luke.baker"
       },
       {
-        "github": "Matt Voget",
+        "full_name": "Matt Voget",
+        "github": "matty-v",
         "slack": "matt"
       },
       {
-        "github": "Matthew Murphy",
+        "full_name": "Matthew Murphy",
+        "github": "matthewmurphy",
         "slack": "matthew.murphy"
       },
       {
-        "github": "Michael Martinez",
+        "full_name": "Michael Martinez",
+        "github": "mmarti21",
         "slack": "michael.martinez"
       },
       {
-        "github": "Michał Miąskowski",
+        "full_name": "Michał Miąskowski",
+        "github": "mmiask",
         "slack": "michael"
       },
       {
-        "github": "Trey Turner",
+        "full_name": "Trey Turner",
+        "github": "treyturner",
         "slack": "trey.turner"
       },
       {
-        "github": "Vazha Omanashvili",
+        "full_name": "Vazha Omanashvili",
+        "github": "rainum",
         "slack": "vazha"
       },
       {
-        "github": "Chad Johnson",
+        "full_name": "Chad Johnson",
+        "github": "chadjohnson21",
         "slack": "chad.johnson"
       },
       {
+        "full_name": "lanemc",
         "github": "lanemc",
         "slack": "lane.cunningham"
       },
       {
+        "full_name": "paulatulis",
         "github": "paulatulis",
         "slack": "paula"
       },
       {
+        "full_name": "raleigh04",
         "github": "raleigh04",
         "slack": "raleigh"
       }
