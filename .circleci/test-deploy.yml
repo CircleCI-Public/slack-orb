@@ -49,7 +49,6 @@ jobs:
           branch_pattern: june-slack-job
           event: always
           template: basic_success
-          context: slack-secrets
 
 workflows:
   test-deploy:
