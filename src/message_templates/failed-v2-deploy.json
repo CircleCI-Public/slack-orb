@@ -32,15 +32,6 @@
       ]
     },
     {
-      "type": "section",
-      "fields": [
-        {
-          "type": "mrkdwn",
-          "text": "Mentions: ${SLACK_PARAM_MENTIONS}"
-        }
-      ]
-    },
-    {
       "type": "actions",
       "elements": [
         {
