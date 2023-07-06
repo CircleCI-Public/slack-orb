@@ -110,7 +110,7 @@ steps:
         failed_v2_deploy: "<<include(message_templates/failed-v2-deploy.json)>>"
         rollback_failure: "<<include(message_templates/rollback-failure.json)>>"
         rollback_success: "<<include(message_templates/rollback-success.json)>>"
-        successful_release: "<<include(message_templates/successful-release.json)>>"
+        success_release: "<<include(message_templates/successful-release.json)>>"
         tagged_deploy_success: "<<include(message_templates/tagged-deploy-success.json)>>"
         v2_on_hold: "<<include(message_templates/v2-on-hold.json)>>"
       command: <<include(scripts/main.sh)>>
