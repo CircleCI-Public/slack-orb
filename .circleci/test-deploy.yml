@@ -46,12 +46,12 @@ jobs:
           command: exit 1
       - slack/notify:
           channel: slack-notify
-          branch_pattern: june-slack-job
+          branch_pattern: update-orb
           event: always
           template: rollback_failure
       - slack/notify:
           channel: slack-notify
-          branch_pattern: june-slack-job
+          branch_pattern: update-orb
           event: always
           template: failed_v2_deploy
 
