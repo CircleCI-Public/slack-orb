@@ -35,7 +35,7 @@
         },
         {
           "type": "mrkdwn",
-          "text": "*Author*:\\n $CIRCLE_USERNAME"
+          "text": "$CIRCLE_USERNAME triggered pipeline. Please check."
         }
       ]
     },

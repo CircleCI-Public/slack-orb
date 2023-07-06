@@ -7,9 +7,10 @@ JQ_PATH=/usr/local/bin/jq
 set -x
 
 replaceGithubUsers(){
+    message=$1
     if [ -n "${SLACK_USER_MAPPING_FILE:-}" ]; then
         count=$(jq '.users | length' "$SLACK_USER_MAPPING_FILE")
-        message=$1
+       
 
 
           # shellcheck disable=SC3005,SC2004
@@ -18,9 +19,10 @@ replaceGithubUsers(){
             slack=$(jq -r '.users['"$i"'].slack' "$SLACK_USER_MAPPING_FILE")
             message=$(echo "$message" | sed -e "s/$github/<@$slack>/g" )
         done
-        echo "$message"
+        
 
     fi
+    echo "$message"
 }
 
 BuildMessageBody() {
@@ -29,9 +31,9 @@ BuildMessageBody() {
     #   if none is supplied, check for a pre-selected template value.
     #   If none, error.
     # shellcheck disable=SC2155,SC2046
-    export CHANGE_LOG_TEXT=$(git log --pretty=format:"- %s (%an)%n\n" HEAD...production-v2 | sed "s/\'//g" | sed "s/\"//g" | sed 's/(#\([0-9]\{1,\}\))/[<https\:\/\/github.com\/stoplightio\/platform-internal\/pull\/\1|#\1>]/g' | head -c3000)
+    export CHANGE_LOG_TEXT=$(git log --pretty=format:"- %s ($CIRCLE_USERNAME)%n\n" HEAD...production-v2 | sed "s/\'//g" | sed "s/\"//g" | sed 's/(#\([0-9]\{1,\}\))/[<https\:\/\/github.com\/stoplightio\/platform-internal\/pull\/\1|#\1>]/g' | head -c3000)
     # shellcheck disable=SC2155,SC2046
-    export CURRENT_COMMIT_TEXT=$(git log --pretty=format:"<https://github.com/stoplightio/platform-internal/commit/%h|%h> - %s (%an)" HEAD...HEAD^1 | sed 's/\"/\\\"/g')
+    export CURRENT_COMMIT_TEXT=$(git log --pretty=format:"<https://github.com/stoplightio/platform-internal/commit/%h|%h> - %s ($CIRCLE_USERNAME)" HEAD...HEAD^1 | sed 's/\"/\\\"/g')
     echo "got current commit text"
     
 
@@ -61,6 +63,7 @@ BuildMessageBody() {
     T2="$(printf '%s' "$T2" | jq ". + {\"channel\": \"$SLACK_DEFAULT_CHANNEL\"}")"
     SLACK_MSG_BODY="$T2"
     SLACK_MSG_BODY=$(replaceGithubUsers "$SLACK_MSG_BODY")
+    echo "$SLACK_MSG_BODY"
 }
 
 PostToSlack() {

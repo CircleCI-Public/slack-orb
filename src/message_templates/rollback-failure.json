@@ -20,6 +20,13 @@
         "type": "mrkdwn",
         "text": "Attempted to rollback to << pipeline.parameters.rollback-target >>"
       }
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "$CIRCLE_USERNAME triggered pipeline. Please check."
+      }
     }
   ]
 }
