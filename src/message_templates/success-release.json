@@ -18,7 +18,7 @@
       "type": "section",
       "text": {
         "type": "mrkdwn",
-        "text": "*CHANGELOG*\n$(cat $CHANGE_LOG_TEXT)"
+        "text": "*CHANGELOG*\n${CHANGE_LOG_TEXT}"
       }
     }
   ]
