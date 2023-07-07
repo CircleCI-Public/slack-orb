@@ -36,7 +36,7 @@
       "fields": [
         {
           "type": "mrkdwn",
-          "text": "Mentions: ${SLACK_PARAM_MENTIONS}"
+          "text": "Mentions: ${CIRCLE_USERNAME}"
         }
       ]
     },
@@ -52,13 +52,6 @@
           "url": "${CIRCLE_BUILD_URL}"
         }
       ]
-    },
-    {
-      "type": "section",
-      "text": {
-        "type": "mrkdwn",
-        "text": "$CIRCLE_USERNAME triggered pipeline. Please check."
-      }
     }
   ]
 }
