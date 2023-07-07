@@ -23,10 +23,12 @@
     },
     {
       "type": "section",
-      "text": {
-        "type": "mrkdwn",
-        "text": "$CIRCLE_USERNAME triggered pipeline. Please check."
-      }
+      "fields": [
+        {
+          "type": "mrkdwn",
+          "text": "Mentions: ${CIRCLE_USERNAME}"
+        }
+      ]
     }
   ]
 }

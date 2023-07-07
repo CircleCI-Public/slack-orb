@@ -52,13 +52,6 @@
           "url": "${CIRCLE_BUILD_URL}"
         }
       ]
-    },
-    {
-      "type": "section",
-      "text": {
-        "type": "mrkdwn",
-        "text": "$CIRCLE_USERNAME triggered pipeline. Please check."
-      }
     }
   ]
 }
