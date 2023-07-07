@@ -41,14 +41,16 @@ jobs:
     resource_class: small
     steps:
       - checkout
-      - run:
-          name: test_failure
-          command: exit 1
       - slack/notify:
           channel: slack-notify
           branch_pattern: update-orb
           event: always
           template: rollback_failure
+      - slack/notify:
+          channel: slack-notify
+          branch_pattern: update-orb
+          event: always
+          template: success_release
       - slack/notify:
           channel: slack-notify
           branch_pattern: update-orb
