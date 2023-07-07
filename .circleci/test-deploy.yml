@@ -52,7 +52,7 @@ jobs:
       - slack/notify:
           channel: slack-notify
           event: always
-          template: failed_v2_deploy
+          template: fail_v2_deploy
 
 workflows:
   test-deploy:
