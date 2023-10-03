@@ -8,6 +8,8 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/joho/godotenv"
 )
 
 func FileExists(filename string) bool {
@@ -89,8 +91,18 @@ func main() {
 	invertMatch, _ := strconv.ParseBool(invertMatchStr)
 
 	if !IsPostConditionMet(branchMatches, tagMatches, invertMatch) {
-		fmt.Println("Neither the branch nor the tag matches the pattern set in the parameters.")
+		fmt.Println("The post condition is not met. Neither the branch nor the tag matches the pattern or the match is inverted.")
 		fmt.Println("Exiting without posting to Slack...")
 		os.Exit(0)
+	}
+
+	// Load the environment variables from the configuration file
+	bashEnv := os.Getenv("BASH_ENV")
+	if FileExists(bashEnv) {
+		if err := godotenv.Load(bashEnv); err != nil {
+			fmt.Println("Error loading BASH_ENV file:", err)
+			fmt.Println("Please check the BASH_ENV variable and try again.")
+			os.Exit(1)
+		}
 	}
 }
