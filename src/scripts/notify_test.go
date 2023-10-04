@@ -1,6 +1,11 @@
 package main
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+
+	"github.com/buger/jsonparser"
+)
 
 func TestIsEventMatchingStatus(t *testing.T) {
 	tests := []struct {
@@ -81,6 +86,39 @@ func TestIsPostConditionMet(t *testing.T) {
 		result := IsPostConditionMet(test.branchMatches, test.tagMatches, test.invertMatch)
 		if result != test.result {
 			t.Errorf("For branchMatches: %v, tagMatches: %v, invertMatch: %v - expected %v, got %v", test.branchMatches, test.tagMatches, test.invertMatch, test.result, result)
+		}
+	}
+}
+
+func TestProcessKeyVal(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected map[string]interface{}
+		err      bool
+	}{
+		{
+			input: `{"action_id": "This is \"my\" invalid property", "text": {"text": "View Job", "type": "plain_text"}, "type": "button", "url": "https://circleci.com/gh/EricRibeiro/slack-orb-go/1"}`,
+			expected: map[string]interface{}{
+				"action_id": "This is \\\"my\\\" invalid property",
+				"text": map[string]interface{}{
+					"text": "View Job",
+					"type": "plain_text",
+				},
+				"type": "button",
+				"url":  "https://circleci.com/gh/EricRibeiro/slack-orb-go/1",
+			},
+			err: false,
+		},
+		// You can add more test cases if needed
+	}
+
+	for _, test := range tests {
+		result, err := processKeyVal(nil, []byte(test.input), jsonparser.Object, 0)
+		if (err != nil) != test.err {
+			t.Errorf("Unexpected error: got %v, want %v", err, test.err)
+		}
+		if !reflect.DeepEqual(result, test.expected) {
+			t.Errorf("Unexpected result: got %v, want %v", result, test.expected)
 		}
 	}
 }
