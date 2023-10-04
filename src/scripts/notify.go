@@ -1,14 +1,18 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"regexp"
 	"strconv"
 	"strings"
 
+	"github.com/a8m/envsubst"
+	"github.com/buger/jsonparser"
 	"github.com/joho/godotenv"
 )
 
@@ -48,6 +52,62 @@ func IsPostConditionMet(branchMatches bool, tagMatches bool, invertMatch bool) b
 	return (branchMatches || tagMatches) != invertMatch
 }
 
+func jsonEscape(i string) string {
+	b, err := json.Marshal(i)
+	if err != nil {
+		panic(err)
+	}
+	s := string(b)
+	return s[1 : len(s)-1]
+}
+
+func processKeyVal(key []byte, value []byte, dataType jsonparser.ValueType, offset int) (interface{}, error) {
+	switch dataType {
+	case jsonparser.Object:
+		// Recursively process nested objects
+		resultObj := make(map[string]interface{})
+		jsonparser.ObjectEach(value, func(k []byte, v []byte, dataType jsonparser.ValueType, offset int) error {
+			processedVal, err := processKeyVal(k, v, dataType, offset)
+			if err != nil {
+				return err
+			}
+			resultObj[string(k)] = processedVal
+			return nil
+		})
+		return resultObj, nil
+
+	case jsonparser.Array:
+		// Process array elements
+		var resultArr []interface{}
+		jsonparser.ArrayEach(value, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
+			if err != nil {
+				log.Fatal(err)
+			}
+			processedVal, err := processKeyVal(nil, value, dataType, offset)
+			if err != nil {
+				log.Fatal(err)
+			}
+			resultArr = append(resultArr, processedVal)
+		})
+		return resultArr, nil
+
+	case jsonparser.String:
+		// Process and escape the string value
+		str, _ := envsubst.String(jsonEscape(string(value)))
+		return str, nil
+
+	default:
+		// Other JSON types (Number, Boolean, Null)
+		var result interface{}
+		err := json.Unmarshal(value, &result)
+		if err != nil {
+			return nil, err
+		}
+		return result, nil
+	}
+}
+
+
 func main() {
 	// Fetch environment variables
 	branchPatternStr := os.Getenv("SLACK_PARAM_BRANCHPATTERN")
@@ -59,13 +119,13 @@ func main() {
 	tagPatternStr := os.Getenv("SLACK_PARAM_TAGPATTERN")
 
 	// Expand environment variables
-	branchPatternStr = os.ExpandEnv(branchPatternStr)
-	invertMatchStr = os.ExpandEnv(invertMatchStr)
-	jobBranch = os.ExpandEnv(jobBranch)
-	jobStatus = os.ExpandEnv(jobStatus)
-	jobTag = os.ExpandEnv(jobTag)
-	messageSendEvent = os.ExpandEnv(messageSendEvent)
-	tagPatternStr = os.ExpandEnv(tagPatternStr)
+	branchPatternStr, _ = envsubst.String(branchPatternStr)
+	invertMatchStr, _ = envsubst.String(invertMatchStr)
+	jobBranch, _ = envsubst.String(jobBranch)
+	jobStatus, _ = envsubst.String(jobStatus)
+	jobTag, _ = envsubst.String(jobTag)
+	messageSendEvent, _ = envsubst.String(messageSendEvent)
+	tagPatternStr, _ = envsubst.String(tagPatternStr)
 
 	// Exit if the job status does not match the message send event and the message send event is not set to "always"
 	if !IsEventMatchingStatus(messageSendEvent, jobStatus) {
@@ -109,22 +169,25 @@ func main() {
 
 	// Build the message body
 	customMessageBodyStr := os.Getenv("SLACK_PARAM_CUSTOM")
-	customMessageBody := os.ExpandEnv(customMessageBodyStr)
+	customMessageBody, _ := envsubst.String(customMessageBodyStr)
+	messageBody := ""
 
 	if customMessageBody != "" {
-		fmt.Println("Sending custom message to Slack...")
+		messageBody = customMessageBody
 	} else {
 		templateNameStr := os.Getenv("SLACK_PARAM_TEMPLATE")
-		templateName := os.ExpandEnv(templateNameStr)
-		template := os.Getenv(templateName)
-		if template == "" {
-			fmt.Println("Error loading the template:", templateName)
-			fmt.Println("Please check the template name and try again.")
-			os.Exit(1)
-		}
-
-		fmt.Println("Expanding the template...")
-		expandedTemplate := os.ExpandEnv(template)
-		fmt.Println("Template:", expandedTemplate)
+		templateName, _ := envsubst.String(templateNameStr)
+		messageBody = os.Getenv(templateName)
 	}
+
+	processedData, err := processKeyVal(nil, []byte(messageBody), jsonparser.Object, 0)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	result, err := json.MarshalIndent(processedData, "", "  ")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(string(result))
 }
