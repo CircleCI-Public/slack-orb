@@ -52,15 +52,6 @@ func IsPostConditionMet(branchMatches bool, tagMatches bool, invertMatch bool) b
 	return (branchMatches || tagMatches) != invertMatch
 }
 
-func jsonEscape(i string) string {
-	b, err := json.Marshal(i)
-	if err != nil {
-		panic(err)
-	}
-	s := string(b)
-	return s[1 : len(s)-1]
-}
-
 func processKeyVal(key []byte, value []byte, dataType jsonparser.ValueType, offset int) (interface{}, error) {
 	switch dataType {
 	case jsonparser.Object:
@@ -93,8 +84,8 @@ func processKeyVal(key []byte, value []byte, dataType jsonparser.ValueType, offs
 
 	case jsonparser.String:
 		// Process and escape the string value
-		str, _ := envsubst.String(jsonEscape(string(value)))
-		return str, nil
+		expandedString, err := envsubst.String(string(value))
+		return expandedString, err
 
 	default:
 		// Other JSON types (Number, Boolean, Null)
@@ -106,7 +97,6 @@ func processKeyVal(key []byte, value []byte, dataType jsonparser.ValueType, offs
 		return result, nil
 	}
 }
-
 
 func main() {
 	// Fetch environment variables
@@ -138,15 +128,11 @@ func main() {
 	// Parse the environment variables to proper types
 	branchMatches, branchMatchesErr := IsPatternMatchingString(branchPatternStr, jobBranch)
 	if branchMatchesErr != nil {
-		fmt.Println("Error parsing the branch pattern:", branchMatchesErr)
-		fmt.Println("Please check the branch pattern in the parameters and try again.")
-		os.Exit(1)
+		log.Fatal("Error parsing the branch pattern:", branchMatchesErr)
 	}
 	tagMatches, tagMatchesErr := IsPatternMatchingString(tagPatternStr, jobTag)
 	if tagMatchesErr != nil {
-		fmt.Println("Error parsing the tag pattern:", tagMatchesErr)
-		fmt.Println("Please check the tag pattern in the parameters and try again.")
-		os.Exit(1)
+		log.Fatal("Error parsing the tag pattern:", tagMatchesErr)
 	}
 	invertMatch, _ := strconv.ParseBool(invertMatchStr)
 
@@ -161,9 +147,7 @@ func main() {
 	if FileExists(bashEnv) {
 		fmt.Println("Loading BASH_ENV into the environment...")
 		if err := godotenv.Load(bashEnv); err != nil {
-			fmt.Println("Error loading BASH_ENV file:", err)
-			fmt.Println("Please check the BASH_ENV variable and try again.")
-			os.Exit(1)
+			log.Fatal("Error loading BASH_ENV file:", err)
 		}
 	}
 
@@ -180,14 +164,24 @@ func main() {
 		messageBody = os.Getenv(templateName)
 	}
 
+	// Run message body through processKeyVal
 	processedData, err := processKeyVal(nil, []byte(messageBody), jsonparser.Object, 0)
+	if err != nil {
+		log.Fatal(err)
+	}	
+	result, err := json.Marshal(processedData)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	result, err := json.MarshalIndent(processedData, "", "  ")
+	fmt.Println(string(result))
+
+	// Don't run message body through processKeyVal
+	unprocessedData, _ := envsubst.String(messageBody)
+	result, err = json.Marshal(unprocessedData)
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	fmt.Println(string(result))
 }
