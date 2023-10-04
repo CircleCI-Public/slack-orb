@@ -1,0 +1,3 @@
+POTATO="batata"
+export MY_BASH_ENV_VAR="I'm a bash env var"
+export GIT_SHA1="$CIRCLE_SHA1"

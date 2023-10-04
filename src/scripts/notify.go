@@ -99,10 +99,32 @@ func main() {
 	// Load the environment variables from the configuration file
 	bashEnv := os.Getenv("BASH_ENV")
 	if FileExists(bashEnv) {
+		fmt.Println("Loading BASH_ENV into the environment...")
 		if err := godotenv.Load(bashEnv); err != nil {
 			fmt.Println("Error loading BASH_ENV file:", err)
 			fmt.Println("Please check the BASH_ENV variable and try again.")
 			os.Exit(1)
 		}
+	}
+
+	// Build the message body
+	customMessageBodyStr := os.Getenv("SLACK_PARAM_CUSTOM")
+	customMessageBody := os.ExpandEnv(customMessageBodyStr)
+
+	if customMessageBody != "" {
+		fmt.Println("Sending custom message to Slack...")
+	} else {
+		templateNameStr := os.Getenv("SLACK_PARAM_TEMPLATE")
+		templateName := os.ExpandEnv(templateNameStr)
+		template := os.Getenv(templateName)
+		if template == "" {
+			fmt.Println("Error loading the template:", templateName)
+			fmt.Println("Please check the template name and try again.")
+			os.Exit(1)
+		}
+
+		fmt.Println("Expanding the template...")
+		expandedTemplate := os.ExpandEnv(template)
+		fmt.Println("Template:", expandedTemplate)
 	}
 }
