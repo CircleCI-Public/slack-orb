@@ -6,10 +6,8 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
 	"regexp"
 	"strconv"
-	"strings"
 
 	"github.com/a8m/envsubst"
 	"github.com/joho/godotenv"
@@ -21,18 +19,6 @@ func FileExists(filename string) bool {
 		return false
 	}
 	return !info.IsDir()
-}
-
-func ExecCommand(name string, arg ...string) (string, error) {
-	cmd := exec.Command(name, arg...)
-	out, err := cmd.Output()
-	if err != nil {
-		if exitError, ok := err.(*exec.ExitError); ok {
-			return "", fmt.Errorf("command exited with error: %w\nstderr: %s", exitError, string(exitError.Stderr))
-		}
-		return "", fmt.Errorf("failed to run command: %w", err)
-	}
-	return strings.TrimSuffix(string(out), "\n"), nil
 }
 
 func IsPatternMatchingString(patternStr string, matchString string) (bool, error) {
@@ -89,6 +75,36 @@ func ExpandAndMarshalJSON(messageBody string) (string, error) {
 	return string(result), nil
 }
 
+func getTemplateNameFromStatus(jobStatus string) (string, error) {
+	switch jobStatus {
+	case "success":
+		return "basic_success_1", nil
+	case "fail":
+		return "basic_fail_1", nil
+	default:
+		return "", fmt.Errorf("the job status: %q is unexpected", jobStatus)
+	}
+}
+
+func determineTemplate(inlineTemplate, jobStatus, envVarContainingTemplate string) (string, error) {
+	if inlineTemplate != "" {
+		return inlineTemplate, nil
+	}
+
+	if envVarContainingTemplate == "" {
+		var err error
+		envVarContainingTemplate, err = getTemplateNameFromStatus(jobStatus)
+		if err != nil {
+			return "", err
+		}
+	}
+	template := os.Getenv(envVarContainingTemplate)
+	if template == "" {
+		return "", fmt.Errorf("the template %q is empty", template)
+	}
+	return template, nil
+}
+
 func main() {
 	// Fetch environment variables
 	branchPatternStr := os.Getenv("SLACK_PARAM_BRANCHPATTERN")
@@ -143,21 +159,21 @@ func main() {
 	}
 
 	// Build the message body
-	customMessageBodyStr := os.Getenv("SLACK_PARAM_CUSTOM")
-	customMessageBody, _ := envsubst.String(customMessageBodyStr)
-	messageBody := ""
-
-	if customMessageBody != "" {
-		messageBody = customMessageBody
-	} else {
-		templateNameStr := os.Getenv("SLACK_PARAM_TEMPLATE")
-		templateName, _ := envsubst.String(templateNameStr)
-		messageBody = os.Getenv(templateName)
+	inlineTemplateStr := os.Getenv("SLACK_PARAM_CUSTOM")
+	inlineTemplate, _ := envsubst.String(inlineTemplateStr)
+	envVarContainingTemplateStr := os.Getenv("SLACK_PARAM_TEMPLATE")
+	envVarContainingTemplate, _ := envsubst.String(envVarContainingTemplateStr)
+	template, err := determineTemplate(inlineTemplate, jobStatus, envVarContainingTemplate)
+	if err != nil {
+		log.Fatalf("%v", err)
+	}
+	if template == "" {
+		log.Fatalf("the template %q is empty. Exiting without posting to Slack...", template)
 	}
 
-	result, err := ExpandAndMarshalJSON(messageBody)
+	templateWithExpandedVars, err := ExpandAndMarshalJSON(template)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(result)
+	fmt.Println(templateWithExpandedVars)
 }
