@@ -1,10 +1,10 @@
 package main
 
 import (
+	"encoding/json"
+	"os"
 	"reflect"
 	"testing"
-
-	"github.com/buger/jsonparser"
 )
 
 func TestIsEventMatchingStatus(t *testing.T) {
@@ -90,35 +90,156 @@ func TestIsPostConditionMet(t *testing.T) {
 	}
 }
 
-func TestProcessKeyVal(t *testing.T) {
+func TestExpandEnvVarsInInterface(t *testing.T) {
 	tests := []struct {
-		input    string
-		expected map[string]interface{}
-		err      bool
+		input    interface{}
+		envVars  map[string]string
+		expected interface{}
 	}{
 		{
-			input: `{"action_id": "This is \"my\" invalid property", "text": {"text": "View Job", "type": "plain_text"}, "type": "button", "url": "https://circleci.com/gh/EricRibeiro/slack-orb-go/1"}`,
-			expected: map[string]interface{}{
-				"action_id": "This is \\\"my\\\" invalid property",
-				"text": map[string]interface{}{
-					"text": "View Job",
-					"type": "plain_text",
-				},
-				"type": "button",
-				"url":  "https://circleci.com/gh/EricRibeiro/slack-orb-go/1",
-			},
-			err: false,
+			input:    "Hello ${WORLD}",
+			envVars:  map[string]string{"WORLD": "Earth"},
+			expected: "Hello Earth",
 		},
-		// You can add more test cases if needed
+		{
+			input: map[string]interface{}{
+				"key": "value ${VAR}",
+			},
+			envVars: map[string]string{"VAR": "123"},
+			expected: map[string]interface{}{
+				"key": "value 123",
+			},
+		},
+		{
+			input: map[string]interface{}{
+				"nested": map[string]interface{}{
+					"key": "value ${NESTED_VAR}",
+				},
+			},
+			envVars: map[string]string{"NESTED_VAR": "456"},
+			expected: map[string]interface{}{
+				"nested": map[string]interface{}{
+					"key": "value 456",
+				},
+			},
+		},
 	}
 
 	for _, test := range tests {
-		result, err := processKeyVal(nil, []byte(test.input), jsonparser.Object, 0)
-		if (err != nil) != test.err {
-			t.Errorf("Unexpected error: got %v, want %v", err, test.err)
+		// Set environment variables
+		for key, value := range test.envVars {
+			os.Setenv(key, value)
 		}
+
+		result := expandEnvVarsInInterface(test.input)
+
+		// Reset environment variables
+		for key := range test.envVars {
+			os.Unsetenv(key)
+		}
+
 		if !reflect.DeepEqual(result, test.expected) {
-			t.Errorf("Unexpected result: got %v, want %v", result, test.expected)
+			t.Errorf("For input: %+v, expected %+v, got %+v", test.input, test.expected, result)
+		}
+	}
+}
+
+func TestExpandAndMarshalJSON(t *testing.T) {
+	tests := []struct {
+		messageBody string
+		envVars     map[string]string
+		expected    string
+		hasError    bool
+	}{
+		{
+			messageBody: `invalid json`,
+			envVars:     map[string]string{"SOME_ENV": "expandedValue"},
+			expected:    "",
+			hasError:    true,
+		},
+		{
+			messageBody: ``,
+			envVars:     map[string]string{},
+			expected:    ``,
+			hasError:    false,
+		},
+		{
+			messageBody: `{"key": "value", "number": 123, "array": [1, 2, 3], "bool": true}`,
+			envVars:     map[string]string{},
+			expected:    `{"key": "value", "number": 123, "array": [1, 2, 3], "bool": true}`,
+			hasError:    false,
+		},
+		{
+			messageBody: `{"key": "Hello ${WORLD}"}`,
+			envVars:     map[string]string{"WORLD": "Earth"},
+			expected:    `{"key": "Hello Earth"}`,
+			hasError:    false,
+		},
+		{
+			messageBody: `{"nested": {"key": "value ${NESTED_VAR}"}}`,
+			envVars:     map[string]string{"NESTED_VAR": "456"},
+			expected:    `{"nested": {"key": "value 456"}}`,
+			hasError:    false,
+		},
+		{
+			messageBody: `{"nestedDoubleQuotes": {"key": "${STRING_WITH_DOUBLE_QUOTES}"}}`,
+			envVars:     map[string]string{"STRING_WITH_DOUBLE_QUOTES": `Do you prefer "tomato" or "potato"?`},
+			expected:    `{"nestedDoubleQuotes": {"key": "Do you prefer \"tomato\" or \"potato\"?"}}`,
+			hasError:    false,
+		},
+	}
+
+	for _, test := range tests {
+		// Set environment variables
+		for key, value := range test.envVars {
+			os.Setenv(key, value)
+		}
+
+		resultStr, err := ExpandAndMarshalJSON(test.messageBody)
+
+		// Reset environment variables
+		for key := range test.envVars {
+			os.Unsetenv(key)
+		}
+
+		if test.hasError {
+			if err == nil {
+				t.Errorf("Expected an error for messageBody: %s", test.messageBody)
+			}
+			continue
+		}
+		if err != nil {
+			t.Errorf("Unexpected error for messageBody: %s, error: %v", test.messageBody, err)
+			continue
+		}
+
+		// Parse the result string into a map
+		var resultMap map[string]interface{}
+		if resultStr != "" {
+			err = json.Unmarshal([]byte(resultStr), &resultMap)
+			if err != nil {
+				t.Errorf("Failed to unmarshal result: %v", err)
+				continue
+			}
+		} else {
+			resultMap = nil
+		}
+
+		// Parse the expected string into a map
+		var expectedMap map[string]interface{}
+		if test.expected != "" {
+			err = json.Unmarshal([]byte(test.expected), &expectedMap)
+			if err != nil {
+				t.Errorf("Failed to unmarshal expected result: %v", err)
+				continue
+			}
+		} else {
+			expectedMap = nil
+		}
+
+		// Compare the parsed structures
+		if !reflect.DeepEqual(resultMap, expectedMap) {
+			t.Errorf("For messageBody: %s, expected %+v, got %+v", test.messageBody, expectedMap, resultMap)
 		}
 	}
 }

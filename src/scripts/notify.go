@@ -12,7 +12,6 @@ import (
 	"strings"
 
 	"github.com/a8m/envsubst"
-	"github.com/buger/jsonparser"
 	"github.com/joho/godotenv"
 )
 
@@ -52,50 +51,42 @@ func IsPostConditionMet(branchMatches bool, tagMatches bool, invertMatch bool) b
 	return (branchMatches || tagMatches) != invertMatch
 }
 
-func processKeyVal(key []byte, value []byte, dataType jsonparser.ValueType, offset int) (interface{}, error) {
-	switch dataType {
-	case jsonparser.Object:
-		// Recursively process nested objects
-		resultObj := make(map[string]interface{})
-		jsonparser.ObjectEach(value, func(k []byte, v []byte, dataType jsonparser.ValueType, offset int) error {
-			processedVal, err := processKeyVal(k, v, dataType, offset)
-			if err != nil {
-				return err
-			}
-			resultObj[string(k)] = processedVal
-			return nil
-		})
-		return resultObj, nil
-
-	case jsonparser.Array:
-		// Process array elements
-		var resultArr []interface{}
-		jsonparser.ArrayEach(value, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
-			if err != nil {
-				log.Fatal(err)
-			}
-			processedVal, err := processKeyVal(nil, value, dataType, offset)
-			if err != nil {
-				log.Fatal(err)
-			}
-			resultArr = append(resultArr, processedVal)
-		})
-		return resultArr, nil
-
-	case jsonparser.String:
-		// Process and escape the string value
-		expandedString, err := envsubst.String(string(value))
-		return expandedString, err
-
-	default:
-		// Other JSON types (Number, Boolean, Null)
-		var result interface{}
-		err := json.Unmarshal(value, &result)
-		if err != nil {
-			return nil, err
+func expandEnvVarsInInterface(value interface{}) interface{} {
+	switch v := value.(type) {
+	case string:
+		expandedValue, _ := envsubst.String(v)
+		return expandedValue
+	case map[string]interface{}:
+		for key, innerValue := range v {
+			v[key] = expandEnvVarsInInterface(innerValue)
 		}
-		return result, nil
+	case []interface{}:
+		for i, innerValue := range v {
+			v[i] = expandEnvVarsInInterface(innerValue)
+		}
 	}
+	return value
+}
+
+func ExpandAndMarshalJSON(messageBody string) (string, error) {
+	if messageBody == "" {
+		return "", nil
+	}
+
+	var jsonTemplate map[string]interface{}
+	err := json.Unmarshal([]byte(messageBody), &jsonTemplate)
+	if err != nil {
+		return "", err
+	}
+
+	expandedTemplate := expandEnvVarsInInterface(jsonTemplate).(map[string]interface{})
+
+	result, err := json.Marshal(expandedTemplate)
+	if err != nil {
+		return "", err
+	}
+
+	return string(result), nil
 }
 
 func main() {
@@ -164,24 +155,9 @@ func main() {
 		messageBody = os.Getenv(templateName)
 	}
 
-	// Run message body through processKeyVal
-	processedData, err := processKeyVal(nil, []byte(messageBody), jsonparser.Object, 0)
-	if err != nil {
-		log.Fatal(err)
-	}	
-	result, err := json.Marshal(processedData)
+	result, err := ExpandAndMarshalJSON(messageBody)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	fmt.Println(string(result))
-
-	// Don't run message body through processKeyVal
-	unprocessedData, _ := envsubst.String(messageBody)
-	result, err = json.Marshal(unprocessedData)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println(string(result))
+	fmt.Println(result)
 }

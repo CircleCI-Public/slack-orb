@@ -36,14 +36,6 @@
 				{
 					"type": "mrkdwn",
 					"text": "*Author*: $CIRCLE_USERNAME"
-				},
-				{
-					"type": "mrkdwn",
-					"text": "*Bash Env Variable*: $MY_BASH_ENV_VAR"
-				},
-				{
-					"type": "mrkdwn",
-					"text": "*Commit Message*: $DOUBLE_QUOTES_STRING"
 				}
 			],
 			"accessory": {
