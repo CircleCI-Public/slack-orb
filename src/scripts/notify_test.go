@@ -144,7 +144,7 @@ func TestExpandEnvVarsInInterface(t *testing.T) {
 	}
 }
 
-func TestExpandAndMarshalJSON(t *testing.T) {
+func TestApplyFunctionToJSON(t *testing.T) {
 	tests := []struct {
 		messageBody string
 		envVars     map[string]string
@@ -195,7 +195,7 @@ func TestExpandAndMarshalJSON(t *testing.T) {
 			os.Setenv(key, value)
 		}
 
-		resultStr, err := ExpandAndMarshalJSON(test.messageBody)
+		resultStr, err := ApplyFunctionToJSON(test.messageBody, expandEnvVarsInInterface)
 
 		// Reset environment variables
 		for key := range test.envVars {

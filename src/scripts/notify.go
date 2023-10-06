@@ -54,7 +54,7 @@ func expandEnvVarsInInterface(value interface{}) interface{} {
 	return value
 }
 
-func ExpandAndMarshalJSON(messageBody string) (string, error) {
+func ApplyFunctionToJSON(messageBody string, modifier func(interface{}) interface{}) (string, error) {
 	if messageBody == "" {
 		return "", nil
 	}
@@ -65,9 +65,9 @@ func ExpandAndMarshalJSON(messageBody string) (string, error) {
 		return "", err
 	}
 
-	expandedTemplate := expandEnvVarsInInterface(jsonTemplate).(map[string]interface{})
+	modifiedTemplate := modifier(jsonTemplate).(map[string]interface{})
 
-	result, err := json.Marshal(expandedTemplate)
+	result, err := json.Marshal(modifiedTemplate)
 	if err != nil {
 		return "", err
 	}
@@ -171,7 +171,7 @@ func main() {
 		log.Fatalf("the template %q is empty. Exiting without posting to Slack...", template)
 	}
 
-	templateWithExpandedVars, err := ExpandAndMarshalJSON(template)
+	templateWithExpandedVars, err := ApplyFunctionToJSON(template, expandEnvVarsInInterface)
 	if err != nil {
 		log.Fatal(err)
 	}
