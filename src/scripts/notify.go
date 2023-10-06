@@ -5,13 +5,50 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 
+	"github.com/EricRibeiro/slack-orb-go/src/scripts/httputils"
 	"github.com/EricRibeiro/slack-orb-go/src/scripts/ioutils"
 	"github.com/EricRibeiro/slack-orb-go/src/scripts/jsonutils"
 	"github.com/EricRibeiro/slack-orb-go/src/scripts/stringutils"
+
 	"github.com/a8m/envsubst"
 	"github.com/joho/godotenv"
 )
+
+func PostToSlack(slackChannels string, slackMessageTemplate string, slackAccessToken string, debug bool, ignoreErrors bool) {
+	// Split channels into slice
+	channels := strings.Split(slackChannels, ",")
+	for _, channel := range channels {
+		templateWithChannel, err := jsonutils.ApplyFunctionToJSON(slackMessageTemplate, jsonutils.AddRootProperty("channel", channel))
+		if err != nil {
+			log.Fatalf("%v", err)
+		}
+
+		headers := map[string]string{
+			"Content-Type":  "application/json",
+			"Authorization": "Bearer " + slackAccessToken,
+		}
+		slackSentResponse, err := httputils.SendHTTPRequest("POST", "https://slack.com/api/chat.postMessage", templateWithChannel, headers)
+		if err != nil {
+			log.Fatalf("Error posting to Slack: %v", err)
+		}
+
+		slackErrorMsg, err := jsonutils.ApplyFunctionToJSON(slackSentResponse, jsonutils.ExtractRootProperty("error"))
+		if err != nil {
+			log.Fatalf("Error extracting error message: %v", err)
+		}
+
+		if slackErrorMsg != "" {
+			fmt.Println("Slack API returned an error message:")
+			fmt.Println(slackErrorMsg)
+			fmt.Println("\n\nView the Setup Guide: https://github.com/CircleCI-Public/slack-orb/wiki/Setup")
+			if !ignoreErrors {
+				os.Exit(1)
+			}
+		}
+	}
+}
 
 func main() {
 	// Load the environment variables from the configuration file
@@ -99,5 +136,13 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(templateWithExpandedVars)
+
+	// Add a "channel" property with a nested "myChannel" property
+	modifiedJSON, err := jsonutils.ApplyFunctionToJSON(templateWithExpandedVars, jsonutils.AddRootProperty("channel", "my_channel"))
+	if err != nil {
+		log.Fatalf("%v", err)
+	}
+
+	fmt.Println(modifiedJSON)
+
 }
