@@ -10,19 +10,19 @@ import (
 func TestIsEventMatchingStatus(t *testing.T) {
 	tests := []struct {
 		jobStatus        string
-		messageSendEvent string
+		eventToSendMessage string
 		result           bool
 	}{
-		{jobStatus: "pass", messageSendEvent: "always", result: true},
-		{jobStatus: "pass", messageSendEvent: "pass", result: true},
-		{jobStatus: "pass", messageSendEvent: "fail", result: false},
-		{jobStatus: "fail", messageSendEvent: "always", result: true},
-		{jobStatus: "fail", messageSendEvent: "pass", result: false},
-		{jobStatus: "fail", messageSendEvent: "fail", result: true},
+		{jobStatus: "pass", eventToSendMessage: "always", result: true},
+		{jobStatus: "pass", eventToSendMessage: "pass", result: true},
+		{jobStatus: "pass", eventToSendMessage: "fail", result: false},
+		{jobStatus: "fail", eventToSendMessage: "always", result: true},
+		{jobStatus: "fail", eventToSendMessage: "pass", result: false},
+		{jobStatus: "fail", eventToSendMessage: "fail", result: true},
 	}
 
 	for _, test := range tests {
-		result := IsEventMatchingStatus(test.messageSendEvent, test.jobStatus)
+		result := IsEventMatchingStatus(test.eventToSendMessage, test.jobStatus)
 		if result != test.result {
 			t.Errorf("Expected %v, got %v", test.result, result)
 		}
@@ -244,7 +244,7 @@ func TestApplyFunctionToJSON(t *testing.T) {
 	}
 }
 
-func TestGetTemplateNameFromStatus(t *testing.T) {
+func TestInferTemplateEnvVarFromStatus(t *testing.T) {
 	tests := []struct {
 		jobStatus string
 		expected  string
@@ -259,7 +259,7 @@ func TestGetTemplateNameFromStatus(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		result, err := getTemplateNameFromStatus(test.jobStatus)
+		result, err := inferTemplateEnvVarFromStatus(test.jobStatus)
 		if test.hasError {
 			if err == nil {
 				t.Errorf("Expected an error for jobStatus: %s", test.jobStatus)

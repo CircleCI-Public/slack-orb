@@ -29,8 +29,8 @@ func IsPatternMatchingString(patternStr string, matchString string) (bool, error
 	return pattern.MatchString(matchString), nil
 }
 
-func IsEventMatchingStatus(messageSendEvent string, jobStatus string) bool {
-	return jobStatus == messageSendEvent || messageSendEvent == "always"
+func IsEventMatchingStatus(eventToSendMessage string, jobStatus string) bool {
+	return jobStatus == eventToSendMessage || eventToSendMessage == "always"
 }
 
 func IsPostConditionMet(branchMatches bool, tagMatches bool, invertMatch bool) bool {
@@ -75,7 +75,7 @@ func ApplyFunctionToJSON(messageBody string, modifier func(interface{}) interfac
 	return string(result), nil
 }
 
-func getTemplateNameFromStatus(jobStatus string) (string, error) {
+func inferTemplateEnvVarFromStatus(jobStatus string) (string, error) {
 	switch jobStatus {
 	case "success":
 		return "basic_success_1", nil
@@ -93,7 +93,7 @@ func determineTemplate(inlineTemplate, jobStatus, envVarContainingTemplate strin
 
 	if envVarContainingTemplate == "" {
 		var err error
-		envVarContainingTemplate, err = getTemplateNameFromStatus(jobStatus)
+		envVarContainingTemplate, err = inferTemplateEnvVarFromStatus(jobStatus)
 		if err != nil {
 			return "", err
 		}
@@ -106,50 +106,8 @@ func determineTemplate(inlineTemplate, jobStatus, envVarContainingTemplate strin
 }
 
 func main() {
-	// Fetch environment variables
-	branchPatternStr := os.Getenv("SLACK_PARAM_BRANCHPATTERN")
-	invertMatchStr := os.Getenv("SLACK_PARAM_INVERT_MATCH")
-	jobBranch := os.Getenv("CIRCLE_BRANCH")
-	jobStatus := os.Getenv("CCI_STATUS")
-	jobTag := os.Getenv("CIRCLE_TAG")
-	messageSendEvent := os.Getenv("SLACK_PARAM_EVENT")
-	tagPatternStr := os.Getenv("SLACK_PARAM_TAGPATTERN")
-
-	// Expand environment variables
-	branchPatternStr, _ = envsubst.String(branchPatternStr)
-	invertMatchStr, _ = envsubst.String(invertMatchStr)
-	jobBranch, _ = envsubst.String(jobBranch)
-	jobStatus, _ = envsubst.String(jobStatus)
-	jobTag, _ = envsubst.String(jobTag)
-	messageSendEvent, _ = envsubst.String(messageSendEvent)
-	tagPatternStr, _ = envsubst.String(tagPatternStr)
-
-	// Exit if the job status does not match the message send event and the message send event is not set to "always"
-	if !IsEventMatchingStatus(messageSendEvent, jobStatus) {
-		message := fmt.Sprintf("The job status %q does not match the status set to send alerts %q.", jobStatus, messageSendEvent)
-		fmt.Println(message)
-		fmt.Println("Exiting without posting to Slack...")
-		os.Exit(0)
-	}
-
-	// Parse the environment variables to proper types
-	branchMatches, branchMatchesErr := IsPatternMatchingString(branchPatternStr, jobBranch)
-	if branchMatchesErr != nil {
-		log.Fatal("Error parsing the branch pattern:", branchMatchesErr)
-	}
-	tagMatches, tagMatchesErr := IsPatternMatchingString(tagPatternStr, jobTag)
-	if tagMatchesErr != nil {
-		log.Fatal("Error parsing the tag pattern:", tagMatchesErr)
-	}
-	invertMatch, _ := strconv.ParseBool(invertMatchStr)
-
-	if !IsPostConditionMet(branchMatches, tagMatches, invertMatch) {
-		fmt.Println("The post condition is not met. Neither the branch nor the tag matches the pattern or the match is inverted.")
-		fmt.Println("Exiting without posting to Slack...")
-		os.Exit(0)
-	}
-
 	// Load the environment variables from the configuration file
+	// This has to be done before anything else to ensure that the environment variables modified by the configuration file are available
 	bashEnv := os.Getenv("BASH_ENV")
 	if FileExists(bashEnv) {
 		fmt.Println("Loading BASH_ENV into the environment...")
@@ -158,11 +116,67 @@ func main() {
 		}
 	}
 
+	// Fetch environment variables
+	accessToken := os.Getenv("SLACK_ACCESS_TOKEN")
+	branchPattern := os.Getenv("SLACK_PARAM_BRANCHPATTERN")
+	channels := os.Getenv("SLACK_PARAM_CHANNEL")
+	envVarContainingTemplate := os.Getenv("SLACK_PARAM_TEMPLATE")
+	inlineTemplate := os.Getenv("SLACK_PARAM_CUSTOM")
+	invertMatchStr := os.Getenv("SLACK_PARAM_INVERT_MATCH")
+	jobBranch := os.Getenv("CIRCLE_BRANCH")
+	jobStatus := os.Getenv("CCI_STATUS")
+	jobTag := os.Getenv("CIRCLE_TAG")
+	eventToSendMessage := os.Getenv("SLACK_PARAM_EVENT")
+	tagPattern := os.Getenv("SLACK_PARAM_TAGPATTERN")
+
+	// Expand environment variables
+	accessToken, _ = envsubst.String(accessToken)
+	branchPattern, _ = envsubst.String(branchPattern)
+	channels, _ = envsubst.String(channels)
+	envVarContainingTemplate, _ = envsubst.String(envVarContainingTemplate)
+	inlineTemplate, _ = envsubst.String(inlineTemplate)
+	invertMatchStr, _ = envsubst.String(invertMatchStr)
+	eventToSendMessage, _ = envsubst.String(eventToSendMessage)
+	tagPattern, _ = envsubst.String(tagPattern)
+
+	// Exit if required environment variables are not set
+	if accessToken == "" {
+		log.Fatalf(
+			"In order to use the Slack Orb (v4 +), an OAuth token must be present via the SLACK_ACCESS_TOKEN environment variable." +
+				"\nFollow the setup guide available in the wiki: https://github.com/CircleCI-Public/slack-orb/wiki/Setup.",
+		)
+	}
+	if channels == "" {
+		log.Fatalf(
+			`No channel was provided. Please provide one or more channels using the "SLACK_PARAM_CHANNEL" environment variable or the "channel" parameter.`,
+		)
+	}
+
+	// Exit if the job status does not match the message send event and the message send event is not set to "always"
+	if !IsEventMatchingStatus(eventToSendMessage, jobStatus) {
+		message := fmt.Sprintf("The job status %q does not match the status set to send alerts %q.", jobStatus, eventToSendMessage)
+		fmt.Println(message)
+		fmt.Println("Exiting without posting to Slack...")
+		os.Exit(0)
+	}
+
+	// Check if the branch and tag match their respective patterns and parse the invert match parameter
+	branchMatches, err := IsPatternMatchingString(branchPattern, jobBranch)
+	if err != nil {
+		log.Fatal("Error parsing the branch pattern:", err)
+	}
+	tagMatches, err := IsPatternMatchingString(tagPattern, jobTag)
+	if err != nil {
+		log.Fatal("Error parsing the tag pattern:", err)
+	}
+	invertMatch, _ := strconv.ParseBool(invertMatchStr)
+	if !IsPostConditionMet(branchMatches, tagMatches, invertMatch) {
+		fmt.Println("The post condition is not met. Neither the branch nor the tag matches the pattern or the match is inverted.")
+		fmt.Println("Exiting without posting to Slack...")
+		os.Exit(0)
+	}
+
 	// Build the message body
-	inlineTemplateStr := os.Getenv("SLACK_PARAM_CUSTOM")
-	inlineTemplate, _ := envsubst.String(inlineTemplateStr)
-	envVarContainingTemplateStr := os.Getenv("SLACK_PARAM_TEMPLATE")
-	envVarContainingTemplate, _ := envsubst.String(envVarContainingTemplateStr)
 	template, err := determineTemplate(inlineTemplate, jobStatus, envVarContainingTemplate)
 	if err != nil {
 		log.Fatalf("%v", err)
