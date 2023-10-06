@@ -5,13 +5,16 @@ import (
 	"os"
 	"reflect"
 	"testing"
+
+	"github.com/EricRibeiro/slack-orb-go/src/scripts/jsonutils"
+	"github.com/EricRibeiro/slack-orb-go/src/scripts/stringutils"
 )
 
 func TestIsEventMatchingStatus(t *testing.T) {
 	tests := []struct {
-		jobStatus        string
+		jobStatus          string
 		eventToSendMessage string
-		result           bool
+		result             bool
 	}{
 		{jobStatus: "pass", eventToSendMessage: "always", result: true},
 		{jobStatus: "pass", eventToSendMessage: "pass", result: true},
@@ -22,7 +25,7 @@ func TestIsEventMatchingStatus(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		result := IsEventMatchingStatus(test.eventToSendMessage, test.jobStatus)
+		result := stringutils.IsEventMatchingStatus(test.eventToSendMessage, test.jobStatus)
 		if result != test.result {
 			t.Errorf("Expected %v, got %v", test.result, result)
 		}
@@ -55,7 +58,7 @@ func TestIsPatternMatchingString(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		result, err := IsPatternMatchingString(test.patternStr, test.matchString)
+		result, err := stringutils.IsPatternMatchingString(test.patternStr, test.matchString)
 		if err != nil {
 			t.Errorf("For pattern %q and matchString %q, unexpected error: %v", test.patternStr, test.matchString, err)
 		}
@@ -83,7 +86,7 @@ func TestIsPostConditionMet(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		result := IsPostConditionMet(test.branchMatches, test.tagMatches, test.invertMatch)
+		result := stringutils.IsPostConditionMet(test.branchMatches, test.tagMatches, test.invertMatch)
 		if result != test.result {
 			t.Errorf("For branchMatches: %v, tagMatches: %v, invertMatch: %v - expected %v, got %v", test.branchMatches, test.tagMatches, test.invertMatch, test.result, result)
 		}
@@ -131,7 +134,7 @@ func TestExpandEnvVarsInInterface(t *testing.T) {
 			os.Setenv(key, value)
 		}
 
-		result := expandEnvVarsInInterface(test.input)
+		result := jsonutils.ExpandEnvVarsInInterface(test.input)
 
 		// Reset environment variables
 		for key := range test.envVars {
@@ -195,7 +198,7 @@ func TestApplyFunctionToJSON(t *testing.T) {
 			os.Setenv(key, value)
 		}
 
-		resultStr, err := ApplyFunctionToJSON(test.messageBody, expandEnvVarsInInterface)
+		resultStr, err := jsonutils.ApplyFunctionToJSON(test.messageBody, jsonutils.ExpandEnvVarsInInterface)
 
 		// Reset environment variables
 		for key := range test.envVars {
@@ -259,7 +262,7 @@ func TestInferTemplateEnvVarFromStatus(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		result, err := inferTemplateEnvVarFromStatus(test.jobStatus)
+		result, err := jsonutils.InferTemplateEnvVarFromStatus(test.jobStatus)
 		if test.hasError {
 			if err == nil {
 				t.Errorf("Expected an error for jobStatus: %s", test.jobStatus)
@@ -305,7 +308,7 @@ func TestDetermineMessageBody(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		result, err := determineTemplate(test.inlineTemplate, test.jobStatus, test.envVarContainingTemplate)
+		result, err := jsonutils.DetermineTemplate(test.inlineTemplate, test.jobStatus, test.envVarContainingTemplate)
 		if test.hasError {
 			if err == nil {
 				t.Errorf("Expected an error but got %s", result)
