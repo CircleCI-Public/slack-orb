@@ -10,4 +10,4 @@ export DOUBLE_QUOTES_STRING=$(printf "%s\\n" "Hello There! My name is \"Potato\"
 export MULTILINE_STRING=$(printf "%s\\n" "Line 1." "Line 2." "Line 3.")
 export $(grep -v '^#' .env | xargs)
 
-go run ./src/scripts/notify.go
+go run ./src/scripts/main.go
