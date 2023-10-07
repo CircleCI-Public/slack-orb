@@ -328,3 +328,131 @@ func TestDetermineMessageBody(t *testing.T) {
 	os.Unsetenv("basic_success_1")
 	os.Unsetenv("basic_fail_1")
 }
+
+func TestAddRootProperty(t *testing.T) {
+	tests := []struct {
+		messageBody string
+		propertyKey string
+		propertyVal interface{}
+		expected    string
+		hasError    bool
+	}{
+		{
+			messageBody: `{"name": "John"}`,
+			propertyKey: "city",
+			propertyVal: "New York",
+			expected:    `{"name": "John", "city": "New York"}`,
+			hasError:    false,
+		},
+		{
+			messageBody: `invalid json`,
+			propertyKey: "city",
+			propertyVal: "New York",
+			expected:    "",
+			hasError:    true,
+		},
+		{
+			messageBody: `{}`,
+			propertyKey: "city",
+			propertyVal: "New York",
+			expected:    `{"city": "New York"}`,
+			hasError:    false,
+		},
+	}
+
+	for _, test := range tests {
+		resultStr, err := jsonutils.ApplyFunctionToJSON(test.messageBody, jsonutils.AddRootProperty(test.propertyKey, test.propertyVal))
+
+		if test.hasError {
+			if err == nil {
+				t.Errorf("Expected an error for messageBody: %s", test.messageBody)
+			}
+			continue
+		}
+		if err != nil {
+			t.Errorf("Unexpected error for messageBody: %s, error: %v", test.messageBody, err)
+			continue
+		}
+
+		// Parse the result string into a map
+		var resultMap map[string]interface{}
+		err = json.Unmarshal([]byte(resultStr), &resultMap)
+		if err != nil {
+			t.Errorf("Failed to unmarshal result: %v", err)
+			continue
+		}
+
+		// Parse the expected string into a map
+		var expectedMap map[string]interface{}
+		err = json.Unmarshal([]byte(test.expected), &expectedMap)
+		if err != nil {
+			t.Errorf("Failed to unmarshal expected result: %v", err)
+			continue
+		}
+
+		// Compare the parsed structures
+		if !reflect.DeepEqual(resultMap, expectedMap) {
+			t.Errorf("For messageBody: %s, expected %+v, got %+v", test.messageBody, expectedMap, resultMap)
+		}
+	}
+}
+
+func TestExtractRootProperty(t *testing.T) {
+	tests := []struct {
+		messageBody string
+		propertyKey string
+		expected    interface{}
+		hasError    bool
+	}{
+		{
+			messageBody: `{"name": "John", "city": "New York", "age": 30, "isStudent": false}`,
+			propertyKey: "city",
+			expected:    "New York",
+			hasError:    false,
+		},
+		{
+			messageBody: `{"name": "John", "city": "New York", "age": 30, "isStudent": false}`,
+			propertyKey: "age",
+			expected:    "30",
+			hasError:    false,
+		},
+		{
+			messageBody: `{"name": "John", "city": "New York", "age": 30, "isStudent": false}`,
+			propertyKey: "isStudent",
+			expected:    "false",
+			hasError:    false,
+		},
+		{
+			messageBody: `invalid json`,
+			propertyKey: "city",
+			expected:    "",
+			hasError:    true,
+		},
+		{
+			messageBody: `{}`,
+			propertyKey: "city",
+			expected:    "",
+			hasError:    false,
+		},
+	}
+
+	for _, test := range tests {
+		result, err := jsonutils.ApplyFunctionToJSON(test.messageBody, jsonutils.ExtractRootProperty(test.propertyKey))
+
+		if test.hasError {
+			if err == nil {
+				t.Errorf("Expected an error for messageBody: %s", test.messageBody)
+			}
+			continue
+		}
+		if err != nil {
+			t.Errorf("Unexpected error for messageBody: %s, error: %v", test.messageBody, err)
+			continue
+		}
+
+		// Compare the results
+		if result != test.expected {
+			t.Errorf("For messageBody: %s, expected %v, got %v", test.messageBody, test.expected, result)
+		}
+	}
+}

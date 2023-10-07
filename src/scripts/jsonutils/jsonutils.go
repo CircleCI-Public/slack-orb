@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/a8m/envsubst"
 )
@@ -36,14 +37,24 @@ func ApplyFunctionToJSON(messageBody string, modifier func(interface{}) interfac
 		return "", err
 	}
 
-	modifiedTemplate := modifier(jsonTemplate).(map[string]interface{})
+	modifiedTemplate := modifier(jsonTemplate)
 
-	result, err := json.Marshal(modifiedTemplate)
-	if err != nil {
-		return "", err
+	switch v := modifiedTemplate.(type) {
+	case map[string]interface{}:
+		result, err := json.Marshal(v)
+		if err != nil {
+			return "", err
+		}
+		return string(result), nil
+	case string:
+		return v, nil
+	case float64: // JSON numbers are decoded into float64 in Go
+		return strconv.FormatFloat(v, 'f', -1, 64), nil
+	case bool:
+		return strconv.FormatBool(v), nil
+	default:
+		return "", fmt.Errorf("unexpected type %T", v)
 	}
-
-	return string(result), nil
 }
 
 func InferTemplateEnvVarFromStatus(jobStatus string) (string, error) {
@@ -74,4 +85,34 @@ func DetermineTemplate(inlineTemplate, jobStatus, envVarContainingTemplate strin
 		return "", fmt.Errorf("the template %q is empty", template)
 	}
 	return template, nil
+}
+
+func ExtractRootProperty(propertyName string) func(interface{}) interface{} {
+	return func(data interface{}) interface{} {
+		jsonMap, ok := data.(map[string]interface{})
+		if !ok {
+			return data
+		}
+
+		propertyValue, exists := jsonMap[propertyName]
+		if exists {
+			return propertyValue
+		}
+		return ""
+	}
+}
+
+func AddRootProperty(propertyName string, propertyValue interface{}) func(interface{}) interface{} {
+	return func(data interface{}) interface{} {
+		jsonMap, ok := data.(map[string]interface{})
+		if !ok {
+			// If the type assertion fails, just return the original data
+			return data
+		}
+
+		// Add the property
+		jsonMap[propertyName] = propertyValue
+
+		return jsonMap
+	}
 }
