@@ -75,49 +75,74 @@ fi
 repo_org="$CIRCLE_PROJECT_USERNAME"
 repo_name="$CIRCLE_PROJECT_REPONAME"
 
-if ! determine_http_client; then
-  printf '%s\n' "cURL or wget is required to download the Slack binary."
-  printf '%s\n' "Please install cURL or wget and try again."
-  exit 1
+# If the organization is EricRibeiro, then we are building the Slack binary
+# Therefore we will manually build and execute the binary for testing purposes
+# Otherwise, we will download the binary from GitHub
+if [ "$repo_org" = "EricRibeiro" ]; then
+  printf '%s\n' "Building $repo_name binary..."
+  if ! go build -o "$repo_name" ./src/scripts/main.go; then
+    printf '%s\n' "Failed to build $repo_name binary."
+    exit 1
+  fi
+
+  printf '%s\n' "Making $repo_name binary executable..."
+  if ! chmod +x "$repo_name"; then
+    printf '%s\n' "Failed to make $repo_name binary executable."
+    exit 1
+  fi
+
+  printf '%s\n' "Executing $repo_name binary..."
+  if ! ./"$repo_name"; then
+    printf '%s\n' "Failed to execute $repo_name binary or it exited with a non-zero exit code."
+  fi
+
+  printf '%s\n' "Removing $repo_name binary..."
+  rm -rf "$repo_name"
+else
+  if ! determine_http_client; then
+    printf '%s\n' "cURL or wget is required to download the Slack binary."
+    printf '%s\n' "Please install cURL or wget and try again."
+    exit 1
+  fi
+  printf '%s\n' "HTTP client: $HTTP_CLIENT."
+
+  if ! detect_os; then
+    printf '%s\n' "Unsupported operating system: $(uname -s)."
+    exit 1
+  fi
+  printf '%s\n' "Operating system: $PLATFORM."
+
+  if ! detect_arch; then
+    printf '%s\n' "Unsupported architecture: $(uname -m)."
+    exit 1
+  fi
+  printf '%s\n' "Architecture: $ARCH."
+
+  if ! determine_release_latest_version "$repo_org" "$repo_name" "$HTTP_CLIENT"; then
+    printf '%s\n' "Failed to determine latest version."
+    exit 1
+  fi
+  printf '%s\n' "Release's latest version: $LATEST_VERSION."
+
+  # TODO: Make the version configurable via command parameter
+  repo_url="https://github.com/$repo_org/$repo_name/releases/download/$LATEST_VERSION/$repo_name-$PLATFORM-$ARCH"
+  printf '%s\n' "Release URL: $repo_url."
+
+  # TODO: Check the md5sum of the downloaded binary
+  binary_download_dir="$(mktemp -d -t "$repo_name".XXXXXXXXXX)"
+  binary="$binary_download_dir/$repo_name"
+  if ! download_binary "$binary" "$repo_url" "$HTTP_CLIENT"; then
+    printf '%s\n' "Failed to download $repo_name binary from GitHub."
+    exit 1
+  fi
+
+  printf '%s\n' "Downloaded $repo_name binary to $binary_download_dir"
+  chmod +x "$binary"
+
+  if ! $binary; then
+    printf '%s\n' "Failed to execute $repo_name binary or it exited with a non-zero exit code."
+  fi
+
+  printf '%s\n' "Removing $binary_download_dir..."
+  rm -rf "$binary_download_dir"
 fi
-printf '%s\n' "HTTP client: $HTTP_CLIENT."
-
-if ! detect_os; then
-  printf '%s\n' "Unsupported operating system: $(uname -s)."
-  exit 1
-fi
-printf '%s\n' "Operating system: $PLATFORM."
-
-if ! detect_arch; then
-  printf '%s\n' "Unsupported architecture: $(uname -m)."
-  exit 1
-fi
-printf '%s\n' "Architecture: $ARCH."
-
-if ! determine_release_latest_version "$repo_org" "$repo_name" "$HTTP_CLIENT"; then
-  printf '%s\n' "Failed to determine latest version."
-  exit 1
-fi
-printf '%s\n' "Release's latest version: $LATEST_VERSION."
-
-# TODO: Make the version configurable via command parameter
-repo_url="https://github.com/$repo_org/$repo_name/releases/download/$LATEST_VERSION/$repo_name-$PLATFORM-$ARCH"
-printf '%s\n' "Release URL: $repo_url."
-
-# TODO: Check the md5sum of the downloaded binary
-binary_download_dir="$(mktemp -d -t "$repo_name".XXXXXXXXXX)"
-binary="$binary_download_dir/$repo_name"
-if ! download_binary "$binary" "$repo_url" "$HTTP_CLIENT"; then
-  printf '%s\n' "Failed to download $repo_name binary from GitHub."
-  exit 1
-fi
-
-printf '%s\n' "Downloaded $repo_name binary to $binary_download_dir"
-chmod +x "$binary"
-
-if ! $binary; then
-  printf '%s\n' "Failed to execute $repo_name binary or it exited with a non-zero exit code."
-fi
-
-printf '%s\n' "Removing $binary_download_dir..."
-rm -rf "$binary_download_dir"
