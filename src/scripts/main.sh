@@ -138,11 +138,13 @@ else
 
   printf '%s\n' "Downloaded $repo_name binary to $binary_download_dir"
   chmod +x "$binary"
-
-  if ! $binary; then
+  $binary
+  exit_code=$?
+  if [ $exit_code -ne 0 ]; then
     printf '%s\n' "Failed to execute $repo_name binary or it exited with a non-zero exit code."
   fi
 
   printf '%s\n' "Removing $binary_download_dir..."
   rm -rf "$binary_download_dir"
+  exit $exit_code
 fi
