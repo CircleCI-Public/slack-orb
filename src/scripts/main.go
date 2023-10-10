@@ -61,6 +61,15 @@ func main() {
 		}
 	}
 
+	// Load the job status from the configuration file
+	jobStatusFile := "/tmp/SLACK_JOB_STATUS"
+	if ioutils.FileExists(jobStatusFile) {
+		fmt.Println("Loading SLACK_JOB_STATUS into the environment...")
+		if err := godotenv.Load(jobStatusFile); err != nil {
+			log.Fatal("Error loading SLACK_JOB_STATUS file:", err)
+		}
+	}
+
 	// Fetch environment variables
 	accessToken := os.Getenv("SLACK_ACCESS_TOKEN")
 	branchPattern := os.Getenv("SLACK_PARAM_BRANCHPATTERN")
