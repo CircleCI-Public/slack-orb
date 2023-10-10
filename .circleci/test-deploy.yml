@@ -241,4 +241,4 @@ executors:
       shell: bash.exe
   go:
     docker:
-      - image: cimg/go:current
+      - image: cimg/go:1.21.2
