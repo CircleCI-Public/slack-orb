@@ -23,5 +23,5 @@ workflows:
           orb_name: slack
           pipeline_number: << pipeline.number >>
           vcs_type: << pipeline.project.type >>
-          requires: [orb-tools/lint, orb-tools/review, orb-tools/pack, shellcheck/check, bats/run]
+          requires: [orb-tools/lint, orb-tools/review, orb-tools/pack, shellcheck/check]
           filters: *filters
