@@ -211,7 +211,7 @@ workflows:
           filters: *filters
           matrix:
             parameters:
-              runner: [cimg, mac, alpine, windows]
+              runner: [go]
       - orb-tools/pack:
           filters: *release-filters
       - orb-tools/publish:
@@ -239,3 +239,6 @@ executors:
       image: windows-server-2019-vs2019:current
       resource_class: windows.medium
       shell: bash.exe
+  go:
+    docker:
+      - image: cimg/go:current

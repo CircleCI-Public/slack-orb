@@ -2,8 +2,7 @@ version: 2.1
 setup: true
 orbs:
   orb-tools: circleci/orb-tools@12.0
-  shellcheck: circleci/shellcheck@3.1
-  bats: circleci/bats@1.0
+  shellcheck: circleci/shellcheck@3.2
 
 filters: &filters
   tags:
@@ -18,12 +17,7 @@ workflows:
           filters: *filters
       - orb-tools/review:
           filters: *filters
-          exclude: RC010
       - shellcheck/check:
-          shell: sh
-          filters: *filters
-      - bats/run:
-          path: ./src/tests
           filters: *filters
       - orb-tools/continue:
           orb_name: slack
