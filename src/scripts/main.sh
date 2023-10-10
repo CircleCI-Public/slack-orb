@@ -75,10 +75,10 @@ fi
 repo_org="$CIRCLE_PROJECT_USERNAME"
 repo_name="$CIRCLE_PROJECT_REPONAME"
 
-# If the organization is EricRibeiro, then we are building the Slack binary
+# If the tag is empty, then we are building the Slack binary
 # Therefore we will manually build and execute the binary for testing purposes
 # Otherwise, we will download the binary from GitHub
-if [ "$repo_org" = "EricRibeiro" ]; then
+if [ -z "$CIRCLE_TAG" ]; then
   printf '%s\n' "Building $repo_name binary..."
   if ! go build -o "$repo_name" ./src/scripts/main.go; then
     printf '%s\n' "Failed to build $repo_name binary."
