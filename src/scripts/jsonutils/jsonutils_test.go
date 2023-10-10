@@ -148,7 +148,7 @@ func TestInferTemplateEnvVarFromStatus(t *testing.T) {
 		hasError  bool
 	}{
 		// for the job status "success" the template name "basic_success_1" is returned
-		{"success", "basic_success_1", false},
+		{"pass", "basic_success_1", false},
 		// for the job status "fail" the template name "basic_fail_1" is returned
 		{"fail", "basic_fail_1", false},
 		// error because the job status is invalid.

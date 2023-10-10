@@ -59,7 +59,7 @@ func ApplyFunctionToJSON(messageBody string, modifier func(interface{}) interfac
 
 func InferTemplateEnvVarFromStatus(jobStatus string) (string, error) {
 	switch jobStatus {
-	case "success":
+	case "pass":
 		return "basic_success_1", nil
 	case "fail":
 		return "basic_fail_1", nil

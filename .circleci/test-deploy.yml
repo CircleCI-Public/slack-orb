@@ -92,7 +92,7 @@ jobs:
           developer_mode: true
           debug: true
           step_name: "Custom template with env var in the message"
-          event: pass
+          event: always
           custom: >
             {
               "blocks": [
@@ -128,6 +128,7 @@ jobs:
           step_name: "Invert match set to true on 'master' branch pattern"
           branch_pattern: "master"
           invert_match: true
+          event: always
       - run:
           name: Export variable with a multiline string
           command: |
@@ -136,7 +137,7 @@ jobs:
           developer_mode: true
           debug: true
           step_name: "Notify with multiline string"
-          event: pass
+          event: always
           custom: >
             {
               "blocks": [
@@ -157,7 +158,7 @@ jobs:
           developer_mode: true
           debug: true
           step_name: "Notify with double-quoted string"
-          event: pass
+          event: always
           custom: >
             {
               "blocks": [
@@ -178,7 +179,7 @@ jobs:
           developer_mode: true
           debug: true
           step_name: "Notify with backslashes string"
-          event: pass
+          event: always
           custom: >
             {
               "blocks": [
