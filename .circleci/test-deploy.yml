@@ -63,6 +63,7 @@ jobs:
           name: Verify SLACK_JOB_STATUS is written
           command: |
             grep "pass" /tmp/SLACK_JOB_STATUS
+          when: always
       - slack/notify:
           developer_mode: true
           debug: true
@@ -111,6 +112,7 @@ jobs:
             echo 'export COMMIT_MESSAGE="This text comes from an environment variable"' >> $BASH_ENV
             echo 'export SLACK_PARAM_MENTIONS="$COMMIT_MESSAGE"' >> $BASH_ENV
             echo 'export MY_ORB_TEMPLATE=$(cat src/message_templates/basic_success_1.json)' >> $BASH_ENV
+          when: always
       - slack/notify:
           developer_mode: true
           debug: true
@@ -133,6 +135,7 @@ jobs:
           name: Export variable with a multiline string
           command: |
             printf '%s\n' 'export MULTILINE_STRING=$(printf "%s\\n" "Line 1." "Line 2." "Line 3.")' >> "$BASH_ENV"
+          when: always
       - slack/notify:
           developer_mode: true
           debug: true
@@ -154,6 +157,7 @@ jobs:
           name: Export variable with double quotes
           command: |
             printf '%s\n' 'export DOUBLE_QUOTES_STRING=$(printf "%s\\n" "Hello There! My name is \"Potato\"")' >> "$BASH_ENV"
+          when: always
       - slack/notify:
           developer_mode: true
           debug: true
@@ -175,6 +179,7 @@ jobs:
           name: Export variable with backslashes
           command: |
             printf '%s\n' 'export BACKSLASHES_STRING="This is how a \ looks like"' >> "$BASH_ENV"
+          when: always
       - slack/notify:
           developer_mode: true
           debug: true
@@ -196,6 +201,7 @@ jobs:
           name: Export value to file
           command: |
             printf '%s\n' "Hello There!" > /tmp/msg
+          when: always
       - slack/notify:
           developer_mode: true
           debug: true
