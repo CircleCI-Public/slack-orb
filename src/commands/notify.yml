@@ -77,6 +77,12 @@ parameters:
     type: string
     default: Slack - Sending Notification
     description: Specify a custom step name for this command, if desired
+  developer_mode:
+    type: boolean
+    default: false
+    description: |
+      Enable developer mode to skip the release process and use the local files instead.
+      This is useful for testing changes to the orb before releasing them.
 steps:
   - run:
       when: on_fail
@@ -103,6 +109,7 @@ steps:
         SLACK_PARAM_IGNORE_ERRORS: "<<parameters.ignore_errors>>"
         SLACK_PARAM_DEBUG: "<<parameters.debug>>"
         SLACK_PARAM_CIRCLECI_HOST: "<<parameters.circleci_host>>"
+        SLACK_PARAM_DEVELOPER_MODE: "<<parameters.developer_mode>>"
         # import pre-built templates using the orb-pack local script include.
         basic_fail_1: "<<include(message_templates/basic_fail_1.json)>>"
         success_tagged_deploy_1: "<<include(message_templates/success_tagged_deploy_1.json)>>"

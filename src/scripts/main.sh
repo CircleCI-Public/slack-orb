@@ -65,39 +65,21 @@ determine_release_latest_version() {
   fi
 }
 
-# Exit if cURL is not installed
-if ! command -v curl >/dev/null; then
-  printf '%s\n' "cURL is required to download the Slack binary."
-  printf '%s\n' "Please install cURL and try again."
-  exit 1
-fi
-
+base_dir="$(printf "%s" "$CIRCLE_WORKING_DIRECTORY" | sed "s|~|$HOME|")"
 repo_org="$CIRCLE_PROJECT_USERNAME"
 repo_name="$CIRCLE_PROJECT_REPONAME"
 
 # If the tag is empty, then we are building the Slack binary
 # Therefore we will manually build and execute the binary for testing purposes
 # Otherwise, we will download the binary from GitHub
-if [ -z "$CIRCLE_TAG" ]; then
-  printf '%s\n' "Building $repo_name binary..."
-  if ! go build -o "$repo_name" ./src/scripts/main.go; then
-    printf '%s\n' "Failed to build $repo_name binary."
+binary=""
+if [ "$SLACK_PARAM_DEVELOPER_MODE" -eq 1 ]; then
+  binary="$repo_name"
+  printf '%s\n' "Building $binary binary..."
+  if ! go build -o "$binary" ./src/scripts/main.go; then
+    printf '%s\n' "Failed to build $binary binary."
     exit 1
   fi
-
-  printf '%s\n' "Making $repo_name binary executable..."
-  if ! chmod +x "$repo_name"; then
-    printf '%s\n' "Failed to make $repo_name binary executable."
-    exit 1
-  fi
-
-  printf '%s\n' "Executing $repo_name binary..."
-  if ! ./"$repo_name"; then
-    printf '%s\n' "Failed to execute $repo_name binary or it exited with a non-zero exit code."
-  fi
-
-  printf '%s\n' "Removing $repo_name binary..."
-  rm -rf "$repo_name"
 else
   if ! determine_http_client; then
     printf '%s\n' "cURL or wget is required to download the Slack binary."
@@ -137,14 +119,21 @@ else
   fi
 
   printf '%s\n' "Downloaded $repo_name binary to $binary_download_dir"
-  chmod +x "$binary"
-  $binary
-  exit_code=$?
-  if [ $exit_code -ne 0 ]; then
-    printf '%s\n' "Failed to execute $repo_name binary or it exited with a non-zero exit code."
-  fi
-
-  printf '%s\n' "Removing $binary_download_dir..."
-  rm -rf "$binary_download_dir"
-  exit $exit_code
 fi
+
+printf '%s\n' "Making $binary binary executable..."
+if ! chmod +x "$binary"; then
+  printf '%s\n' "Failed to make $binary binary executable."
+  exit 1
+fi
+
+printf '%s\n' "Executing \"$base_dir/$binary\" binary..."
+"$base_dir/$binary"
+exit_code=$?
+if [ $exit_code -ne 0 ]; then
+  printf '%s\n' "Failed to execute $binary binary or it exited with a non-zero exit code."
+fi
+
+printf '%s\n' "Removing $binary binary..."
+rm -rf "$binary"
+exit $exit_code
