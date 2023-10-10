@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
   orb-tools: circleci/orb-tools@12.0
+  go: circleci/go@1.9
   slack: {}
 
 filters: &filters
@@ -14,12 +15,24 @@ release-filters: &release-filters
     only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
 
 jobs:
+  unit-tests:
+    executor:
+      name: go/default
+      tag: "1.21.0"
+    steps:
+      - checkout
+      - go/load-cache
+      - go/mod-download
+      - go/save-cache
+      - go/test:
+          covermode: atomic
+          failfast: true
+          race: true
+          verbose: true
   integration-test-templates:
-    parameters:
-      runner:
-        type: executor
-        default: cimg
-    executor: <<parameters.runner>>
+    executor:
+      name: go/default
+      tag: "1.21.0"
     steps:
       - checkout
       - slack/notify:
@@ -202,17 +215,29 @@ jobs:
               "type": "mrkdwn",
               "text": "$(cat /tmp/msg)"
             }
-
+  build-release:
+    executor:
+      name: go/default
+      tag: "1.21.0"
+    steps:
+      - go/install-goreleaser
+      - go/goreleaser-release:
+          publish-release: true
+          validate-yaml: true
 workflows:
   test-deploy:
     jobs:
+      - unit-tests:
+          filters: *filters
       - integration-test-templates:
           context: SLACK_NOTIFICATIONS_TEST
           filters: *filters
-          matrix:
-            parameters:
-              runner: [go]
+          requires: [unit-tests]
       - orb-tools/pack:
+          filters: *release-filters
+      - build-release:
+          requires: [integration-test-templates, orb-tools/pack]
+          context: orb-publisher
           filters: *release-filters
       - orb-tools/publish:
           orb_name: circleci/slack
@@ -220,7 +245,7 @@ workflows:
           pub_type: production
           enable_pr_comment: true
           github_token: GHI_TOKEN
-          requires: [orb-tools/pack, integration-test-templates]
+          requires: [build-release]
           context: orb-publisher
           filters: *release-filters
 executors:
@@ -239,6 +264,3 @@ executors:
       image: windows-server-2019-vs2019:current
       resource_class: windows.medium
       shell: bash.exe
-  go:
-    docker:
-      - image: cimg/go:1.21.2
