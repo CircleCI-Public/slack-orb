@@ -106,9 +106,9 @@ func TestDetermineMessageBody(t *testing.T) {
 		// use custom message body
 		{`{ "customMessageKey": "customMessageValue" }`, "success", "", `{ "customMessageKey": "customMessageValue" }`, false},
 		// use basic_success_1 template because it was explicitly provided
-		{"", "success", "basic_success_1", `{"text":"CircleCI job succeeded!","blocks":[{"type":"header","text":{"type":"plain_text","text":"Job Succeeded. :white_check_mark:","emoji":true}}]}`, false},
+		{"", "pass", "basic_success_1", `{"text":"CircleCI job succeeded!","blocks":[{"type":"header","text":{"type":"plain_text","text":"Job Succeeded. :white_check_mark:","emoji":true}}]}`, false},
 		// use basic_success_1 template because it was inferred from the job status
-		{"", "success", "", `{"text":"CircleCI job succeeded!","blocks":[{"type":"header","text":{"type":"plain_text","text":"Job Succeeded. :white_check_mark:","emoji":true}}]}`, false},
+		{"", "pass", "", `{"text":"CircleCI job succeeded!","blocks":[{"type":"header","text":{"type":"plain_text","text":"Job Succeeded. :white_check_mark:","emoji":true}}]}`, false},
 		// use basic_fail_1 template because it was explicitly provided
 		{"", "fail", "basic_fail_1", `{"text":"CircleCI job failed.","blocks":[{"type":"header","text":{"type":"plain_text","text":"Job Failed. :red_circle:","emoji":true}}]}`, false},
 		// use basic_fail_1 template because it was inferred from the job status
@@ -116,7 +116,7 @@ func TestDetermineMessageBody(t *testing.T) {
 		// error because the job status is invalid.
 		{"", "unknown", "", "", true},
 		// error because the template is empty
-		{"", "success", "some_template_name", "", true},
+		{"", "pass", "some_template_name", "", true},
 	}
 
 	for _, test := range tests {

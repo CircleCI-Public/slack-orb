@@ -66,8 +66,8 @@ determine_release_latest_version() {
 }
 
 base_dir="$(printf "%s" "$CIRCLE_WORKING_DIRECTORY" | sed "s|~|$HOME|")"
-repo_org="$CIRCLE_PROJECT_USERNAME"
-repo_name="$CIRCLE_PROJECT_REPONAME"
+repo_org="CircleCI-Public"
+repo_name="slack-orb-go"
 
 # If the tag is empty, then we are building the Slack binary
 # Therefore we will manually build and execute the binary for testing purposes
