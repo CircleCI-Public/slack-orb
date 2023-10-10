@@ -58,7 +58,7 @@ determine_release_latest_version() {
     LATEST_VERSION="$(curl --fail --retry 3 -Ls -o /dev/null -w '%{url_effective}' "https://github.com/$1/$2/releases/latest" | sed 's:.*/::')"
   elif [ "$3" = "wget" ]; then
     effective_url="$(wget --tries=3 --max-redirect=1000 --server-response -O /dev/null "$url" 2>&1 | awk '/Location: /{print $2}' | tail -1)"
-    LATEST_VERSION=$(printf '%s' $effective_url | sed 's:.*/::')
+    LATEST_VERSION="$(printf '%s' "$effective_url" | sed 's:.*/::')"
   else
     printf '%s\n' "Invalid HTTP client specified."
     return 1
@@ -105,7 +105,7 @@ repo_url="https://github.com/$repo_org/$repo_name/releases/download/$LATEST_VERS
 printf '%s\n' "Release URL: $repo_url."
 
 # TODO: Check the md5sum of the downloaded binary
-binary_download_dir="$(mktemp -d -t $repo_name.XXXXXXXXXX)"
+binary_download_dir="$(mktemp -d -t "$repo_name".XXXXXXXXXX)"
 binary="$binary_download_dir/$repo_name"
 if ! download_binary "$binary" "$repo_url" "$HTTP_CLIENT"; then
   printf '%s\n' "Failed to download $repo_name binary from GitHub."
