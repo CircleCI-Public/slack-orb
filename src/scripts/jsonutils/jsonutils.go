@@ -34,7 +34,7 @@ func ApplyFunctionToJSON(messageBody string, modifier func(interface{}) interfac
 	var jsonTemplate map[string]interface{}
 	err := json.Unmarshal([]byte(messageBody), &jsonTemplate)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("%s: %w", "ApplyFunctionToJSON - Unmarshal", err)
 	}
 
 	modifiedTemplate := modifier(jsonTemplate)
@@ -43,7 +43,7 @@ func ApplyFunctionToJSON(messageBody string, modifier func(interface{}) interfac
 	case map[string]interface{}:
 		result, err := json.Marshal(v)
 		if err != nil {
-			return "", err
+			return "", fmt.Errorf("%s: %w", "ApplyFunctionToJSON - Marshal", err)
 		}
 		return string(result), nil
 	case string:
@@ -77,7 +77,7 @@ func DetermineTemplate(inlineTemplate, jobStatus, envVarContainingTemplate strin
 		var err error
 		envVarContainingTemplate, err = InferTemplateEnvVarFromStatus(jobStatus)
 		if err != nil {
-			return "", err
+			return "", fmt.Errorf("%s: %w", "DetermineTemplate", err)
 		}
 	}
 	template := os.Getenv(envVarContainingTemplate)
