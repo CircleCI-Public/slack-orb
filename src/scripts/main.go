@@ -90,7 +90,6 @@ func main() {
 	channels, _ = envsubst.String(channels)
 	envVarContainingTemplate, _ = envsubst.String(envVarContainingTemplate)
 	eventToSendMessage, _ = envsubst.String(eventToSendMessage)
-	inlineTemplate, _ = envsubst.String(inlineTemplate)
 	invertMatchStr, _ = envsubst.String(invertMatchStr)
 	isDebugStr, _ = envsubst.String(isDebugStr)
 	tagPattern, _ = envsubst.String(tagPattern)
