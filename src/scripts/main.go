@@ -7,10 +7,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/EricRibeiro/slack-orb-go/src/scripts/httputils"
-	"github.com/EricRibeiro/slack-orb-go/src/scripts/ioutils"
-	"github.com/EricRibeiro/slack-orb-go/src/scripts/jsonutils"
-	"github.com/EricRibeiro/slack-orb-go/src/scripts/stringutils"
+	"github.com/CircleCI-Public/slack-orb-go/src/scripts/httputils"
+	"github.com/CircleCI-Public/slack-orb-go/src/scripts/ioutils"
+	"github.com/CircleCI-Public/slack-orb-go/src/scripts/jsonutils"
+	"github.com/CircleCI-Public/slack-orb-go/src/scripts/stringutils"
 
 	"github.com/a8m/envsubst"
 	"github.com/joho/godotenv"

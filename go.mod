@@ -1,4 +1,4 @@
-module github.com/EricRibeiro/slack-orb-go
+module github.com/CircleCI-Public/slack-orb-go
 
 go 1.21.1
 
