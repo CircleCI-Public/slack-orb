@@ -245,6 +245,7 @@ jobs:
       - go/goreleaser-release:
           publish-release: true
           validate-yaml: true
+          project-path: "src/scripts"
 workflows:
   test-deploy:
     jobs:
