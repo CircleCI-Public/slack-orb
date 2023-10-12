@@ -245,7 +245,7 @@ jobs:
       - go/goreleaser-release:
           publish-release: true
           validate-yaml: true
-          project-path: "$HOME/project"
+          project-path: "$CIRCLE_WORKING_DIRECTORY"
 workflows:
   test-deploy:
     jobs:
