@@ -247,6 +247,7 @@ jobs:
           publish-release: true
           validate-yaml: true
           project-path: "$HOME/project/src/scripts"
+          github-token: GHI_TOKEN
 workflows:
   test-deploy:
     jobs:
