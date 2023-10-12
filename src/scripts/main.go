@@ -126,7 +126,7 @@ func main() {
 		if err != nil {
 			log.Fatalf("%v", err)
 		}
-		fmt.Printf("Posting the following JSON to Slack:\n%s", jsonWithChannel)
+		fmt.Printf("Posting the following JSON to Slack:\n%s\n", jsonWithChannel)
 
 		// Post the message to Slack
 		headers := map[string]string{
@@ -137,7 +137,7 @@ func main() {
 		if err != nil {
 			log.Fatalf("Error posting to Slack: %v", err)
 		}
-		fmt.Printf("Slack API response:\n%s", response)
+		fmt.Printf("Slack API response:\n%s\n", response)
 
 		// Check if the Slack API returned an error message
 		errorMsg, err := jsonutils.ApplyFunctionToJSON(response, jsonutils.ExtractRootProperty("error"))
