@@ -39,7 +39,7 @@ func main() {
 	// Fetch environment variables
 	accessToken := os.Getenv("SLACK_ACCESS_TOKEN")
 	branchPattern := os.Getenv("SLACK_PARAM_BRANCHPATTERN")
-	channels := os.Getenv("SLACK_PARAM_CHANNEL")
+	channelsStr := os.Getenv("SLACK_PARAM_CHANNEL")
 	envVarContainingTemplate := os.Getenv("SLACK_PARAM_TEMPLATE")
 	eventToSendMessage := os.Getenv("SLACK_PARAM_EVENT")
 	inlineTemplate := os.Getenv("SLACK_PARAM_CUSTOM")
@@ -53,7 +53,7 @@ func main() {
 	// Expand environment variables
 	accessToken, _ = envsubst.String(accessToken)
 	branchPattern, _ = envsubst.String(branchPattern)
-	channels, _ = envsubst.String(channels)
+	channelsStr, _ = envsubst.String(channelsStr)
 	envVarContainingTemplate, _ = envsubst.String(envVarContainingTemplate)
 	eventToSendMessage, _ = envsubst.String(eventToSendMessage)
 	invertMatchStr, _ = envsubst.String(invertMatchStr)
@@ -67,7 +67,7 @@ func main() {
 				"\nFollow the setup guide available in the wiki: https://github.com/CircleCI-Public/slack-orb/wiki/Setup.",
 		)
 	}
-	if channels == "" {
+	if channelsStr == "" {
 		log.Fatalf(
 			`No channel was provided. Please provide one or more channels using the "SLACK_PARAM_CHANNEL" environment variable or the "channel" parameter.`,
 		)
@@ -106,6 +106,7 @@ func main() {
 		log.Fatalf("the template %q is empty. Exiting without posting to Slack...", template)
 	}
 
+	// Expand environment variables in the template
 	templateWithExpandedVars, err := jsonutils.ApplyFunctionToJSON(template, jsonutils.ExpandEnvVarsInInterface)
 	if err != nil {
 		log.Fatal(err)
@@ -116,37 +117,40 @@ func main() {
 	if err != nil {
 		log.Fatalf("%v", err)
 	}
-	
+
 	ignoreErrors, _ := strconv.ParseBool(ignoreErrorsStr)
-	slackChannels := strings.Split(channels, ",")
-	for _, channel := range slackChannels {
+	channels := strings.Split(channelsStr, ",")
+	for _, channel := range channels {
+		// Add a "channel" property with the current channel
 		jsonWithChannel, err := jsonutils.ApplyFunctionToJSON(modifiedJSON, jsonutils.AddRootProperty("channel", channel))
 		if err != nil {
 			log.Fatalf("%v", err)
 		}
+		fmt.Printf("Posting the following JSON to Slack's %q channel:\n%s", channel, jsonWithChannel)
 
+		// Post the message to Slack
 		headers := map[string]string{
 			"Content-Type":  "application/json",
 			"Authorization": "Bearer " + accessToken,
 		}
-		slackSentResponse, err := httputils.SendHTTPRequest("POST", "https://slack.com/api/chat.postMessage", jsonWithChannel, headers)
+		response, err := httputils.SendHTTPRequest("POST", "https://slack.com/api/chat.postMessage", jsonWithChannel, headers)
 		if err != nil {
 			log.Fatalf("Error posting to Slack: %v", err)
 		}
 
-		slackErrorMsg, err := jsonutils.ApplyFunctionToJSON(slackSentResponse, jsonutils.ExtractRootProperty("error"))
+		// Check if the Slack API returned an error message
+		errorMsg, err := jsonutils.ApplyFunctionToJSON(response, jsonutils.ExtractRootProperty("error"))
 		if err != nil {
 			log.Fatalf("Error extracting error message: %v", err)
 		}
 
-		if slackErrorMsg != "" {
-			fmt.Println("Slack API returned an error message:")
-			fmt.Println(slackErrorMsg)
+		// Exit if the Slack API returned an error message and the ignore errors parameter is not set to true
+		if errorMsg != "" {
+			fmt.Printf("Slack API returned an error message:\n%s", errorMsg)
 			fmt.Println("\n\nView the Setup Guide: https://github.com/CircleCI-Public/slack-orb/wiki/Setup")
 			if !ignoreErrors {
 				os.Exit(1)
 			}
 		}
 	}
-
 }
