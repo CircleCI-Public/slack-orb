@@ -18,9 +18,13 @@ determine_http_client() {
 # $3: The HTTP client to use (curl or wget)
 download_binary() {
   if [ "$3" = "curl" ]; then
+    set -x
     curl --fail --retry 3 -L -o "$1" "$2"
+    set +x
   elif [ "$3" = "wget" ]; then
+    set -x
     wget --tries=3 --timeout=10 --quiet -O "$1" "$2"
+    set +x
   else
     return 1
   fi
@@ -84,7 +88,7 @@ repo_name="slack-orb-go"
 # Otherwise, we will download the binary from GitHub and run it
 binary=""
 if [ -n "$ORB_BOOL_RUN_FROM_SOURCE" ] && [ "$ORB_BOOL_RUN_FROM_SOURCE" -eq 1 ]; then
-  binary="$repo_name"
+  binary="$base_dir/$binary"
   printf '%s\n' "Building $binary binary..."
   if ! go build -o "$binary" ./src/scripts/main.go; then
     printf '%s\n' "Failed to build $binary binary."
@@ -140,9 +144,11 @@ if ! chmod +x "$binary"; then
   exit 1
 fi
 
-printf '%s\n' "Executing \"$base_dir/$binary\" binary..."
-"$base_dir/$binary"
+printf '%s\n' "Executing \"$binary\" binary..."
+set -x
+"$binary"
 exit_code=$?
+set +x
 if [ $exit_code -ne 0 ]; then
   printf '%s\n' "Failed to execute $binary binary or it exited with a non-zero exit code."
 fi
