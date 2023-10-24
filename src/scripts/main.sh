@@ -88,7 +88,7 @@ repo_name="slack-orb-go"
 # Otherwise, we will download the binary from GitHub and run it
 binary=""
 if [ -n "$ORB_BOOL_RUN_FROM_SOURCE" ] && [ "$ORB_BOOL_RUN_FROM_SOURCE" -eq 1 ]; then
-  binary="$base_dir/$binary"
+  binary="$base_dir/$repo_name"
   printf '%s\n' "Building $binary binary..."
   if ! go build -o "$binary" ./src/scripts/main.go; then
     printf '%s\n' "Failed to build $binary binary."
