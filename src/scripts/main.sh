@@ -29,9 +29,9 @@ download_binary() {
 detect_os() {
   detected_platform="$(uname -s | tr '[:upper:]' '[:lower:]')"
   case "$detected_platform" in
-  linux*) PLATFORM=Linux ;;
-  darwin*) PLATFORM=Darwin ;;
-  msys* | cygwin*) PLATFORM=Windows ;;
+  linux*) PLATFORM=linux ;;
+  darwin*) PLATFORM=darwin ;;
+  msys* | cygwin*) PLATFORM=windows ;;
   *) return 1 ;;
   esac
 }
@@ -83,7 +83,7 @@ repo_name="slack-orb-go"
 # If ORB_BOOL_RUN_FROM_SOURCE is set to 1, we will build and run the binary from source
 # Otherwise, we will download the binary from GitHub and run it
 binary=""
-if [ "$ORB_BOOL_RUN_FROM_SOURCE" -eq 1 ]; then
+if [ -n "$ORB_BOOL_RUN_FROM_SOURCE" ] && [ "$ORB_BOOL_RUN_FROM_SOURCE" -eq 1 ]; then
   binary="$repo_name"
   printf '%s\n' "Building $binary binary..."
   if ! go build -o "$binary" ./src/scripts/main.go; then
