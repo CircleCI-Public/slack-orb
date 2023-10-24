@@ -29,9 +29,9 @@ download_binary() {
 detect_os() {
   detected_platform="$(uname -s | tr '[:upper:]' '[:lower:]')"
   case "$detected_platform" in
-  linux*) PLATFORM=linux ;;
-  darwin*) PLATFORM=darwin ;;
-  msys* | cygwin*) PLATFORM=windows ;;
+  linux*) PLATFORM=Linux ;;
+  darwin*) PLATFORM=Darwin ;;
+  msys* | cygwin*) PLATFORM=Windows ;;
   *) return 1 ;;
   esac
 }
@@ -39,8 +39,8 @@ detect_os() {
 detect_arch() {
   detected_arch="$(uname -m)"
   case "$detected_arch" in
-  x86_64 | amd64) ARCH=amd64 ;;
-  i386 | i486 | i586 | i686) ARCH=386 ;;
+  x86_64 | amd64) ARCH=x86_64 ;;
+  i386 | i486 | i586 | i686) ARCH=i386 ;;
   arm64 | aarch64) ARCH=arm64 ;;
   arm*) ARCH=arm ;;
   *) return 1 ;;
