@@ -14,7 +14,7 @@ before:
     - go generate ./...
 
 builds:
-  - main: ./src/scripts/main.go
+  - main: ./main.go
     env:
       - CGO_ENABLED=0
     goos:
