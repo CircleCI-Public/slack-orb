@@ -122,6 +122,7 @@ elif [ -z "$ORB_BOOL_RUN_FROM_SOURCE" ] || [ "$ORB_BOOL_RUN_FROM_SOURCE" -eq 0 ]
 
   # TODO: Make the version configurable via command parameter
   repo_url="https://github.com/$repo_org/$repo_name/releases/download/$LATEST_VERSION/${repo_name}_${PLATFORM}_${ARCH}"
+  [ "$PLATFORM" = "Windows" ] && repo_url="$repo_url.exe"
   printf '%s\n' "Release URL: $repo_url."
 
   # TODO: Check the md5sum of the downloaded binary
