@@ -80,39 +80,33 @@ print_warn() {
 print_warn "This is an experimental version of the Slack Orb in Go."
 print_warn "Thank you for trying it out and please provide feedback to us at https://github.com/CircleCI-Public/slack-orb-go/issues"
 
+if ! detect_os; then
+  printf '%s\n' "Unsupported operating system: $(uname -s)."
+  exit 1
+fi
+printf '%s\n' "Operating system: $PLATFORM."
+
+if ! detect_arch; then
+  printf '%s\n' "Unsupported architecture: $(uname -m)."
+  exit 1
+fi
+printf '%s\n' "Architecture: $ARCH."
+
 base_dir="$(printf "%s" "$CIRCLE_WORKING_DIRECTORY" | sed "s|~|$HOME|")"
+orb_bin_dir="$base_dir/.circleci/orbs/circleci/slack/$PLATFORM/$ARCH"
 repo_org="CircleCI-Public"
 repo_name="slack-orb-go"
+binary="$orb_bin_dir/$repo_name"
 
-# If ORB_BOOL_RUN_FROM_SOURCE is set to 1, we will build and run the binary from source
-# Otherwise, we will download the binary from GitHub and run it
-binary=""
-if [ -n "$ORB_BOOL_RUN_FROM_SOURCE" ] && [ "$ORB_BOOL_RUN_FROM_SOURCE" -eq 1 ]; then
-  binary="$base_dir/$repo_name"
-  printf '%s\n' "Building $binary binary..."
-  if ! go build -o "$binary" ./src/scripts/main.go; then
-    printf '%s\n' "Failed to build $binary binary."
-    exit 1
-  fi
-elif [ -z "$ORB_BOOL_RUN_FROM_SOURCE" ] || [ "$ORB_BOOL_RUN_FROM_SOURCE" -eq 0 ]; then
+
+if [ ! -f "$binary" ]; then
+  mkdir -p "$orb_bin_dir"
   if ! determine_http_client; then
     printf '%s\n' "cURL or wget is required to download the Slack binary."
     printf '%s\n' "Please install cURL or wget and try again."
     exit 1
   fi
   printf '%s\n' "HTTP client: $HTTP_CLIENT."
-
-  if ! detect_os; then
-    printf '%s\n' "Unsupported operating system: $(uname -s)."
-    exit 1
-  fi
-  printf '%s\n' "Operating system: $PLATFORM."
-
-  if ! detect_arch; then
-    printf '%s\n' "Unsupported architecture: $(uname -m)."
-    exit 1
-  fi
-  printf '%s\n' "Architecture: $ARCH."
 
   if ! determine_release_latest_version "$repo_org" "$repo_name" "$HTTP_CLIENT"; then
     printf '%s\n' "Failed to determine latest version."
@@ -125,18 +119,15 @@ elif [ -z "$ORB_BOOL_RUN_FROM_SOURCE" ] || [ "$ORB_BOOL_RUN_FROM_SOURCE" -eq 0 ]
   [ "$PLATFORM" = "Windows" ] && repo_url="$repo_url.exe"
   printf '%s\n' "Release URL: $repo_url."
 
-  # TODO: Check the md5sum of the downloaded binary
-  binary_download_dir="$(mktemp -d -t "$repo_name".XXXXXXXXXX)"
-  binary="$binary_download_dir/$repo_name"
+  # TODO: Check the sha256 of the downloaded binary
   if ! download_binary "$binary" "$repo_url" "$HTTP_CLIENT"; then
     printf '%s\n' "Failed to download $repo_name binary from GitHub."
     exit 1
   fi
 
-  printf '%s\n' "Downloaded $repo_name binary to $binary_download_dir"
+  printf '%s\n' "Downloaded $repo_name binary to $orb_bin_dir"
 else
-  printf '%s\n' "Invalid ORB_BOOL_RUN_FROM_SOURCE value: $ORB_BOOL_RUN_FROM_SOURCE."
-  exit 1
+  printf '%s\n' "Skipping binary download since it already exists at $binary."
 fi
 
 printf '%s\n' "Making $binary binary executable..."
