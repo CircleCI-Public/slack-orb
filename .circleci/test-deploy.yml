@@ -36,9 +36,9 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Set "ORB_BOOL_RUN_FROM_SOURCE" flag to true to run the orb from source instead of downloading and running the GitHub binary.
+          name: Build Latest
           command: |
-            echo 'export ORB_BOOL_RUN_FROM_SOURCE=1' >> $BASH_ENV
+            go build -o ./.circleci/orbs/circleci/slack/Linux/x86_64/slack-orb-go ./src/scripts/main.go
           when: always      
       - slack/notify:
           debug: true
