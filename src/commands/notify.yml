@@ -77,6 +77,14 @@ parameters:
     type: string
     default: Slack - Sending Notification
     description: Specify a custom step name for this command, if desired
+  sha256:
+    type: string
+    default: ""
+    description: |
+      Verify the binary downloaded by this orb for integrity using a SHA256 hash. 
+      Leave empty to skip verification. 
+      Find the hash for your binary in the matching version release on GitHub. 
+      See the "source" link at the top of the orb registry for a link to the repo.
 steps:
   - run:
       when: on_fail
@@ -103,6 +111,7 @@ steps:
         SLACK_PARAM_IGNORE_ERRORS: "<<parameters.ignore_errors>>"
         SLACK_PARAM_DEBUG: "<<parameters.debug>>"
         SLACK_PARAM_CIRCLECI_HOST: "<<parameters.circleci_host>>"
+        SLACK_PARAM_SHA256: "<<parameters.sha256>>"
         # import pre-built templates using the orb-pack local script include.
         basic_fail_1: "<<include(message_templates/basic_fail_1.json)>>"
         success_tagged_deploy_1: "<<include(message_templates/success_tagged_deploy_1.json)>>"

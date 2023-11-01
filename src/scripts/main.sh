@@ -77,6 +77,14 @@ print_warn() {
   printf "${yellow}%s${normal}\n" "$1"
 }
 
+# Print an error message
+# $1: The error message to print
+print_error() {
+  red="\033[0;31m"
+  normal="\033[0m"
+  printf "${red}%s${normal}\n" "$1"
+}
+
 print_warn "This is an experimental version of the Slack Orb in Go."
 print_warn "Thank you for trying it out and please provide feedback to us at https://github.com/CircleCI-Public/slack-orb-go/issues"
 
@@ -96,26 +104,26 @@ if [ -n "$ORB_BOOL_RUN_FROM_SOURCE" ] && [ "$ORB_BOOL_RUN_FROM_SOURCE" -eq 1 ]; 
   fi
 elif [ -z "$ORB_BOOL_RUN_FROM_SOURCE" ] || [ "$ORB_BOOL_RUN_FROM_SOURCE" -eq 0 ]; then
   if ! determine_http_client; then
-    printf '%s\n' "cURL or wget is required to download the Slack binary."
-    printf '%s\n' "Please install cURL or wget and try again."
+    print_error "cURL or wget is required to download the Slack binary."
+    print_error "Please install cURL or wget and try again."
     exit 1
   fi
   printf '%s\n' "HTTP client: $HTTP_CLIENT."
 
   if ! detect_os; then
-    printf '%s\n' "Unsupported operating system: $(uname -s)."
+    print_error "Unsupported operating system: $(uname -s)."
     exit 1
   fi
   printf '%s\n' "Operating system: $PLATFORM."
 
   if ! detect_arch; then
-    printf '%s\n' "Unsupported architecture: $(uname -m)."
+    print_error "Unsupported architecture: $(uname -m)."
     exit 1
   fi
   printf '%s\n' "Architecture: $ARCH."
 
   if ! determine_release_latest_version "$repo_org" "$repo_name" "$HTTP_CLIENT"; then
-    printf '%s\n' "Failed to determine latest version."
+    print_error "Failed to determine latest version."
     exit 1
   fi
   printf '%s\n' "Release's latest version: $LATEST_VERSION."
@@ -125,23 +133,33 @@ elif [ -z "$ORB_BOOL_RUN_FROM_SOURCE" ] || [ "$ORB_BOOL_RUN_FROM_SOURCE" -eq 0 ]
   [ "$PLATFORM" = "Windows" ] && repo_url="$repo_url.exe"
   printf '%s\n' "Release URL: $repo_url."
 
-  # TODO: Check the md5sum of the downloaded binary
   binary_download_dir="$(mktemp -d -t "$repo_name".XXXXXXXXXX)"
   binary="$binary_download_dir/$repo_name"
   if ! download_binary "$binary" "$repo_url" "$HTTP_CLIENT"; then
-    printf '%s\n' "Failed to download $repo_name binary from GitHub."
+    print_error "Failed to download $repo_name binary from GitHub."
     exit 1
   fi
 
   printf '%s\n' "Downloaded $repo_name binary to $binary_download_dir"
 else
-  printf '%s\n' "Invalid ORB_BOOL_RUN_FROM_SOURCE value: $ORB_BOOL_RUN_FROM_SOURCE."
+  print_error "Invalid ORB_BOOL_RUN_FROM_SOURCE value: $ORB_BOOL_RUN_FROM_SOURCE."
   exit 1
+fi
+
+# Validate the SHA256 checksum if provided
+if [ -n "$SLACK_PARAM_SHA256" ]; then
+  printf '%s\n' "Verifying $binary binary SHA256 checksum..."
+  [ ! "$(which shasum256)" ] && printf '%s\n' "shasum256 is required to verify the SHA256 checksum." && exit 1
+  if ! printf '%s  %s' "$SLACK_PARAM_SHA256" "$binary" | sha256sum -c -; then
+    printf '\033[0;31m%s\n' "Failed to verify $binary binary SHA256 checksum."
+    printf '\033[0m' # Reset text color back to default
+    exit 1
+  fi
 fi
 
 printf '%s\n' "Making $binary binary executable..."
 if ! chmod +x "$binary"; then
-  printf '%s\n' "Failed to make $binary binary executable."
+  print_error "Failed to make $binary binary executable."
   exit 1
 fi
 
