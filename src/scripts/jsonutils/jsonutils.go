@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/a8m/envsubst"
+	"github.com/nwidger/jsoncolor"
 )
 
 func ExpandEnvVarsInInterface(value interface{}) interface{} {
@@ -115,4 +116,12 @@ func AddRootProperty(propertyName string, propertyValue interface{}) func(interf
 
 		return jsonMap
 	}
+}
+
+func Colorize(json string) (string) {
+	bytes, err := jsoncolor.MarshalIndentWithFormatter(json, "", "  ", jsoncolor.DefaultFormatter)
+	if err != nil {
+		return json
+	}
+	return string(bytes)
 }
