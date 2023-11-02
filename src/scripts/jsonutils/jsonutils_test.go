@@ -1,10 +1,13 @@
 package jsonutils
 
 import (
+	"bytes"
 	"encoding/json"
 	"os"
 	"reflect"
 	"testing"
+
+	"github.com/fatih/color"
 )
 
 func TestAddRootProperty(t *testing.T) {
@@ -419,5 +422,28 @@ func TestSpecialCharsInTemplate(t *testing.T) {
 		if !reflect.DeepEqual(resultMap, expectedMap) {
 			t.Errorf("For messageBody: %s, expected %+v, got %+v", test.messageBody, expectedMap, resultMap)
 		}
+	}
+}
+
+func TestColorize(t *testing.T) {
+	testJson := `{ "key": "value" }`
+	color.NoColor = false
+	colored, err := Colorize(testJson)
+	if err != nil {
+		t.Errorf("Error colorizing JSON: %v", err)
+	}
+	expectedBytes := []byte{
+		123, 10, 32, 32, // `{`, newline, space, space
+		27, 91, 51, 55, 109, // ESC [ 37 m (white color)
+		34, 107, 101, 121, 34, // "key"
+		58, 32, // `:`, space
+		27, 91, 48, 109, // ESC [ 0 m (reset color)
+		27, 91, 51, 50, 109, // ESC [ 32 m (green color)
+		34, 118, 97, 108, 117, 101, 34, // "value"
+		27, 91, 48, 109, // ESC [ 0 m (reset color)
+		10, 125, // newline, `}`
+	}
+	if !bytes.Equal(expectedBytes, []byte(colored)) {
+		t.Errorf("Colorized JSON did not match expected.\nExpected: %s\nGot: %s", expectedBytes, colored)
 	}
 }

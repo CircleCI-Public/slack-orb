@@ -6,7 +6,9 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/TylerBrock/colorjson"
 	"github.com/a8m/envsubst"
+	"github.com/fatih/color"
 )
 
 func ExpandEnvVarsInInterface(value interface{}) interface{} {
@@ -115,4 +117,20 @@ func AddRootProperty(propertyName string, propertyValue interface{}) func(interf
 
 		return jsonMap
 	}
+}
+
+func Colorize(jsonStr string) (string, error) {
+	// CircleCI supports color output.
+	if os.Getenv("CI") == "true" {
+		color.NoColor = false
+	}
+	var input map[string]interface{}
+	json.Unmarshal([]byte(jsonStr), &input)
+	f := colorjson.NewFormatter()
+	f.Indent = 2
+	colorized, err := f.Marshal(input)
+	if err != nil {
+		return "", err
+	}
+	return string(colorized), nil
 }

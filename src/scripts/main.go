@@ -103,7 +103,12 @@ func main() {
 		if err != nil {
 			log.Fatalf("%v", err)
 		}
-		fmt.Printf("Posting the following JSON to Slack:\n%s\n", jsonWithChannel)
+		fmt.Printf("Posting the following JSON to Slack:\n")
+		colorizedJSONWitChannel, err := jsonutils.Colorize(jsonWithChannel)
+		if err != nil {
+			log.Fatalf("Error coloring JSON: %v", err)
+		}
+		fmt.Println(colorizedJSONWitChannel)
 
 		// Post the message to Slack
 		headers := map[string]string{
@@ -114,7 +119,12 @@ func main() {
 		if err != nil {
 			log.Fatalf("Error posting to Slack: %v", err)
 		}
-		fmt.Printf("Slack API response:\n%s\n", response)
+		fmt.Printf("Slack API response:\n")
+		colorizedResponse, err := jsonutils.Colorize(response)
+		if err != nil {
+			log.Fatalf("Error coloring Slack API response: %v", err)
+		}
+		fmt.Println(colorizedResponse)
 
 		// Check if the Slack API returned an error message
 		errorMsg, err := jsonutils.ApplyFunctionToJSON(response, jsonutils.ExtractRootProperty("error"))
