@@ -145,6 +145,4 @@ if [ $exit_code -ne 0 ]; then
   printf '%s\n' "Failed to execute $binary binary or it exited with a non-zero exit code."
 fi
 
-printf '%s\n' "Removing $binary binary..."
-rm -rf "$binary"
 exit $exit_code
