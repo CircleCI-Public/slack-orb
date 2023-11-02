@@ -39,7 +39,14 @@ jobs:
           name: Build Latest
           command: |
             go build -o ./.circleci/orbs/circleci/slack/Linux/x86_64/slack-orb-go ./src/scripts/main.go
-          when: always      
+            echo "export SLACK_BIN_CHECKSUM=$(sha256sum .circleci/orbs/circleci/slack/Linux/x86_64/slack-orb-go | cut -d ' ' -f 1)" >> $BASH_ENV
+          when: always
+      - slack/notify:
+          debug: true
+          step_name: "Validate Checksum"
+          template: basic_success_1
+          event: always  
+          sha256: "$SLACK_BIN_CHECKSUM"  
       - slack/notify:
           debug: true
           step_name: "Custom template with group mention"
