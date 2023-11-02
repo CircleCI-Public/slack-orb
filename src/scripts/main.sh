@@ -77,6 +77,14 @@ print_warn() {
   printf "${yellow}%s${normal}\n" "$1"
 }
 
+# Print a success message
+# $1: The success message to print
+print_success() {
+  green="\033[0;32m"
+  normal="\033[0m"
+  printf "${green}%s${normal}\n" "$1"
+}
+
 print_warn "This is an experimental version of the Slack Orb in Go."
 print_warn "Thank you for trying it out and please provide feedback to us at https://github.com/CircleCI-Public/slack-orb-go/issues"
 
@@ -97,7 +105,7 @@ orb_bin_dir="$base_dir/.circleci/orbs/circleci/slack/$PLATFORM/$ARCH"
 repo_org="CircleCI-Public"
 repo_name="slack-orb-go"
 binary="$orb_bin_dir/$repo_name"
-
+input_sha256=$(circleci env subst "$SLACK_PARAM_SHA256")
 
 if [ ! -f "$binary" ]; then
   mkdir -p "$orb_bin_dir"
@@ -119,7 +127,6 @@ if [ ! -f "$binary" ]; then
   [ "$PLATFORM" = "Windows" ] && repo_url="$repo_url.exe"
   printf '%s\n' "Release URL: $repo_url."
 
-  # TODO: Check the sha256 of the downloaded binary
   if ! download_binary "$binary" "$repo_url" "$HTTP_CLIENT"; then
     printf '%s\n' "Failed to download $repo_name binary from GitHub."
     exit 1
@@ -129,6 +136,21 @@ if [ ! -f "$binary" ]; then
 else
   printf '%s\n' "Skipping binary download since it already exists at $binary."
 fi
+
+# Validate binary
+## This validates, even if the binary already existed before.
+## This can help with cache integrity but was also a convenience for testing where the binary will never be downloaded.
+  if [ -n "$input_sha256" ]; then
+    actual_sha256=$(sha256sum "$binary" | cut -d' ' -f1)
+    if [ "$actual_sha256" != "$input_sha256" ]; then
+      print_error "SHA256 checksum does not match. Expected $input_sha256 but got $actual_sha256"
+      exit 1
+    else
+      print_success "SHA256 checksum matches. Binary is valid."
+    fi
+    else
+      print_warn "SHA256 checksum not provided. Skipping validation."
+  fi
 
 printf '%s\n' "Making $binary binary executable..."
 if ! chmod +x "$binary"; then
