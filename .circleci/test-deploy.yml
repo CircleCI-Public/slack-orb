@@ -30,23 +30,51 @@ jobs:
           race: true
           verbose: true
   integration-test-templates:
-    executor:
-      name: go/default
-      tag: "1.21.0"
+    parameters:
+      runner:
+        type: executor
+        default: cimg
+    executor: << parameters.runner >>
     steps:
       - checkout
       - run:
           name: Build Latest
           command: |
-            go build -o ./.circleci/orbs/circleci/slack/Linux/x86_64/slack-orb-go ./src/scripts/main.go
-            echo "export SLACK_BIN_CHECKSUM=$(sha256sum .circleci/orbs/circleci/slack/Linux/x86_64/slack-orb-go | cut -d ' ' -f 1)" >> $BASH_ENV
+            detect_os() {
+              detected_platform="$(uname -s | tr '[:upper:]' '[:lower:]')"
+              case "$detected_platform" in
+              linux*) PLATFORM=Linux ;;
+              darwin*) PLATFORM=Darwin ;;
+              msys* | cygwin*) PLATFORM=Windows ;;
+              *) return 1 ;;
+              esac
+            }
+
+            detect_arch() {
+              detected_arch="$(uname -m)"
+              case "$detected_arch" in
+              x86_64 | amd64) ARCH=x86_64 ;;
+              i386 | i486 | i586 | i686) ARCH=i386 ;;
+              arm64 | aarch64) ARCH=arm64 ;;
+              arm*) ARCH=arm ;;
+              *) return 1 ;;
+              esac
+            }
+
+            detect_os
+            detect_arch
+
+            set -x
+            go build -o ./.circleci/orbs/circleci/slack/$PLATFORM/$ARCH/slack-orb-go ./src/scripts/main.go
+            set +x
+            echo "export SLACK_BIN_CHECKSUM=$(sha256sum .circleci/orbs/circleci/slack/$PLATFORM/$ARCH/slack-orb-go | cut -d ' ' -f 1)" >> $BASH_ENV
           when: always
       - slack/notify:
           debug: true
           step_name: "Validate Checksum"
           template: basic_success_1
-          event: always  
-          sha256: "$SLACK_BIN_CHECKSUM"  
+          event: always
+          sha256: "$SLACK_BIN_CHECKSUM"
       - slack/notify:
           debug: true
           step_name: "Custom template with group mention"
@@ -255,6 +283,9 @@ workflows:
           context: SLACK_NOTIFICATIONS_TEST
           filters: *filters
           requires: [unit-tests]
+          matrix:
+            parameters:
+              runner: [cimg, windows]
       - orb-tools/pack:
           filters: *release-filters
       - build-release:
@@ -271,16 +302,16 @@ workflows:
 executors:
   cimg:
     docker:
-      - image: cimg/base:current
+      - image: cimg/go:1.21.3
   mac:
     macos:
-      xcode: 14.0.0
+      xcode: 15.0.0
   alpine:
     # This image contains both CURL and JQ
     docker:
-      - image: dwdraju/alpine-curl-jq
+      - image: golang:alpine
   windows:
     machine:
-      image: windows-server-2019-vs2019:current
+      image: windows-server-2022-gui:current
       resource_class: windows.medium
       shell: bash.exe

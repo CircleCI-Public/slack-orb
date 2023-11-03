@@ -2,6 +2,7 @@ package config
 
 import (
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -194,6 +195,68 @@ func TestLoadEnvFromFile(t *testing.T) {
 				if !present || val != test.envVarValue {
 					t.Errorf("Expected env var value: %q, got: %q", test.envVarValue, val)
 				}
+			}
+		})
+	}
+}
+
+func TestConvertFileToCRLF(t *testing.T) {
+	tests := []struct {
+		description     string
+		fileContent     string
+		expectedErr     bool
+		expectedContent string
+	}{
+		{
+			description:     "FileWithLF",
+			fileContent:     "line1\nline2\nline3",
+			expectedErr:     false,
+			expectedContent: "line1\r\nline2\r\nline3",
+		},
+		{
+			description:     "FileWithCRLF",
+			fileContent:     "line1\r\nline2\r\nline3",
+			expectedErr:     false,
+			expectedContent: "line1\r\nline2\r\nline3",
+		},
+		{
+			description:     "EmptyFile",
+			fileContent:     "",
+			expectedErr:     false,
+			expectedContent: "",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.description, func(t *testing.T) {
+			filePath := "test_file.txt"
+
+			// Creating and writing to a test file
+			err := os.WriteFile(filePath, []byte(test.fileContent), 0644)
+			if err != nil {
+				t.Fatalf("Couldn't create test file: %v", err)
+			}
+			t.Cleanup(func() {
+				err := os.Remove(filePath)
+				if err != nil {
+					t.Logf("Failed to remove test file: %v", err)
+				}
+			})
+
+			// Running the ConvertFileToCRLF function
+			err = ConvertFileToCRLF(filePath)
+			if (err != nil) != test.expectedErr {
+				t.Errorf("Expected error: %v, got: %v", test.expectedErr, err)
+			}
+
+			// Reading the file content after conversion
+			content, err := os.ReadFile(filePath)
+			if err != nil {
+				t.Fatalf("Couldn't read test file: %v", err)
+			}
+
+			if strings.Compare(string(content), test.expectedContent) != 0 {
+				t.Errorf("Expected content: %q, got: %q", test.expectedContent, content)
 			}
 		})
 	}

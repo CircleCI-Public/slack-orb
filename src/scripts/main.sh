@@ -56,13 +56,10 @@ detect_arch() {
 # $2: The GitHub repository
 # $3: The HTTP client to use (curl or wget)
 determine_release_latest_version() {
-  url="https://github.com/$1/$2/releases/latest"
-
   if [ "$3" = "curl" ]; then
     LATEST_VERSION="$(curl --fail --retry 3 -Ls -o /dev/null -w '%{url_effective}' "https://github.com/$1/$2/releases/latest" | sed 's:.*/::')"
   elif [ "$3" = "wget" ]; then
-    effective_url="$(wget --tries=3 --max-redirect=1000 --server-response -O /dev/null "$url" 2>&1 | awk '/Location: /{print $2}' | tail -1)"
-    LATEST_VERSION="$(printf '%s' "$effective_url" | sed 's:.*/::')"
+    LATEST_VERSION="$(wget -qO- "https://api.github.com/repos/$1/$2/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')"
   else
     printf '%s\n' "Invalid HTTP client specified."
     return 1
@@ -83,6 +80,14 @@ print_success() {
   green="\033[0;32m"
   normal="\033[0m"
   printf "${green}%s${normal}\n" "$1"
+}
+
+# Print an error message
+# $1: The error message to print
+print_error() {
+  red="\033[0;31m"
+  normal="\033[0m"
+  printf "${red}%s${normal}\n" "$1"
 }
 
 print_warn "This is an experimental version of the Slack Orb in Go."

@@ -1,12 +1,16 @@
 package config
 
 import (
+	"bytes"
 	"fmt"
 	"os"
+	"runtime"
+	"strings"
 
-	"github.com/CircleCI-Public/slack-orb-go/src/scripts/ioutils"
 	"github.com/a8m/envsubst"
 	"github.com/joho/godotenv"
+
+	"github.com/CircleCI-Public/slack-orb-go/src/scripts/ioutils"
 )
 
 // Config represents the configuration loaded from environment variables.
@@ -96,13 +100,61 @@ func (c *Config) Validate() error {
 	return nil
 }
 
-// LoadEnvFromFile loads environment variables from a specified file.
-func LoadEnvFromFile(filePath string) error {
-	if ioutils.FileExists(filePath) {
-		fmt.Printf("Loading %q into the environment...\n", filePath)
-		if err := godotenv.Load(filePath); err != nil {
-			return fmt.Errorf("Error loading %q file: %v", filePath, err)
+// handleOSSpecifics checks and applies OS-specific modifications to the file.
+func handleOSSpecifics(filePath string) (string, error) {
+	if runtime.GOOS == "windows" {
+		filePath = strings.Replace(filePath, "/tmp", "C:/Users/circleci/AppData/Local/Temp", 1)
+
+		err := ConvertFileToCRLF(filePath)
+		if err != nil {
+			return "", fmt.Errorf("error converting file to CRLF: %w", err)
 		}
 	}
+	return filePath, nil
+}
+
+// LoadEnvFromFile loads environment variables from a specified file.
+func LoadEnvFromFile(filePath string) error {
+	fmt.Println("Starting to load environment variables from file.")
+
+	modifiedPath, err := handleOSSpecifics(filePath)
+	if err != nil {
+		return fmt.Errorf("OS-specific handling failed: %v", err)
+	}
+
+	if !ioutils.FileExists(modifiedPath) {
+		fmt.Printf("File %q does not exist. Skipping...\n", modifiedPath)
+		return nil
+	}
+
+	fmt.Printf("Loading %q into the environment...\n", modifiedPath)
+	if err := godotenv.Load(modifiedPath); err != nil {
+		return fmt.Errorf("error loading %q file: %v", modifiedPath, err)
+	}
+
+	fmt.Println("Environment variables loaded successfully.")
+	return nil
+}
+
+// ConvertFileToCRLF converts line endings in a file to CRLF.
+var (
+	CRLF = []byte{13, 10}
+	LF   = []byte{10}
+)
+
+// ConvertFileToCRLF converts line endings in a file to CRLF.
+func ConvertFileToCRLF(filePath string) error {
+	content, err := os.ReadFile(filePath)
+	if err != nil {
+		return err
+	}
+
+	content = bytes.ReplaceAll(content, CRLF, LF)
+	content = bytes.ReplaceAll(content, LF, CRLF)
+
+	if err := os.WriteFile(filePath, content, 0); err != nil {
+		return err
+	}
+
 	return nil
 }
