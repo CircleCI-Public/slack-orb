@@ -140,17 +140,23 @@ fi
 # Validate binary
 ## This validates, even if the binary already existed before.
 ## This can help with cache integrity but was also a convenience for testing where the binary will never be downloaded.
-  if [ -n "$input_sha256" ]; then
+if [ -n "$input_sha256" ]; then
+  actual_sha256=""
+  if [ "$PLATFORM" = "Windows" ]; then
+    actual_sha256=$(powershell.exe -Command "(Get-FileHash -Path '$binary' -Algorithm SHA256).Hash.ToLower()")
+  else
     actual_sha256=$(sha256sum "$binary" | cut -d' ' -f1)
-    if [ "$actual_sha256" != "$input_sha256" ]; then
-      print_error "SHA256 checksum does not match. Expected $input_sha256 but got $actual_sha256"
-      exit 1
-    else
-      print_success "SHA256 checksum matches. Binary is valid."
-    fi
-    else
-      print_warn "SHA256 checksum not provided. Skipping validation."
   fi
+
+  if [ "$actual_sha256" != "$input_sha256" ]; then
+    print_error "SHA256 checksum does not match. Expected $input_sha256 but got $actual_sha256"
+    exit 1
+  else
+    print_success "SHA256 checksum matches. Binary is valid."
+  fi
+else
+  print_warn "SHA256 checksum not provided. Skipping validation."
+fi
 
 printf '%s\n' "Making $binary binary executable..."
 if ! chmod +x "$binary"; then
