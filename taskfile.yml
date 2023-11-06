@@ -1,0 +1,37 @@
+version: "3"
+
+vars:
+  SRC_DIR: "{{.USER_WORKING_DIR}}/src/scripts"
+  TOOLS_DIR: "{{.USER_WORKING_DIR}}/tools"
+  BIN_DIR: "{{.USER_WORKING_DIR}}/bin"
+
+tasks:
+  tidy:
+    deps: [install-devtools]
+    cmds:
+      - "go mod tidy -v"
+      - "gofmt -l -s -w {{.SRC_DIR}}"
+      - '{{.BIN_DIR}}/gosimports -local "github.com/CircleCI-Public/slack-orb-go" -w {{.SRC_DIR}}'
+
+  lint:
+    deps: [install-devtools]
+    cmd: "{{.BIN_DIR}}/golangci-lint run"
+
+  test:
+    cmd: go test -count=1 {{.SRC_DIR}}/...
+
+  install-devtools:
+    silent: true
+    cmd: |
+      tools=()
+      while IFS='' read -r value; do
+        tools+=("$value")
+      done < <(grep _ {{.TOOLS_DIR}}/tools.go | awk -F'"' '{print $2}')
+
+      for pkg in "${tools[@]}"; do
+        #echo "Installing ${pkg}"
+        (
+          cd {{.TOOLS_DIR}}
+          GOBIN="{{.BIN_DIR}}" go install "${pkg}" > /dev/null 2>&1
+        )
+      done

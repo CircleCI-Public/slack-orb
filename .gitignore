@@ -1,3 +1,4 @@
 .DS_Store
 orb.yml
 dist/
+bin/

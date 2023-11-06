@@ -15,6 +15,39 @@ release-filters: &release-filters
     only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
 
 jobs:
+  lint:
+    executor:
+      name: go/default
+      tag: "1.21.0"
+    steps:
+      - checkout
+      - run:
+          name: "Install go-task"
+          command: sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d
+      - go/load-cache
+      - go/mod-download
+      - go/save-cache
+      - run:
+          name: "Install golang devtools"
+          command: ./bin/task install-devtools
+      - run:
+          name: "Lint golang source"
+          command: ./bin/task lint || echo "Linter soft-fail" # TODO: start hard failing on linter complaints
+  tidy:
+    executor:
+      name: go/default
+      tag: "1.21.0"
+    steps:
+      - checkout
+      - run:
+          name: "Install go-task"
+          command: sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d
+      - go/load-cache
+      - go/mod-download
+      - go/save-cache
+      - run:
+          name: "Run tidy and verify no diffs result"
+          command: ./bin/task tidy && git diff --exit-code || echo "Tidy soft-fail" # TODO: start hard failing on diffs
   unit-tests:
     executor:
       name: go/default
@@ -277,6 +310,10 @@ jobs:
 workflows:
   test-deploy:
     jobs:
+      - lint:
+          filters: *filters
+      - tidy:
+          filters: *filters
       - unit-tests:
           filters: *filters
       - integration-test-templates:

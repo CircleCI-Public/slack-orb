@@ -1,0 +1,152 @@
+# Do not treat these as gospel, adjust as appropriate
+linters-settings:
+  govet:
+    check-shadowing: false
+  golint:
+    min-confidence: 0
+  gocyclo:
+    min-complexity: 15
+  maligned:
+    suggest-new: true
+  depguard:
+    rules:
+      main:
+        deny:
+          - pkg: "github.com/davecgh/go-spew"
+          - pkg: log
+          - pkg: github.com/cenkalti/backof[f]
+            desc: use github.com/cenkalti/backoff/v4 instead
+          - pkg: gotest.tools/assert
+            desc: use gotest.tools/v3/assert instead
+          - pkg: gotest.tools/skip
+            desc: use gotest.tools/v3/skip instead
+          - pkg: gotest.tools/assert/cmp
+            desc: use gotest.tools/v3/assert/cmp instead
+          - pkg: gotest.tools/env
+            desc: use gotest.tools/v3/env instead
+          - pkg: gotest.tools/fs
+            desc: use gotest.tools/v3/fs instead
+          - pkg: gotest.tools/golden
+            desc: use gotest.tools/v3/golden instead
+          - pkg: gotest.tools/icmd
+            desc: use gotest.tools/v3/icmd instead
+          - pkg: gotest.tools/poll
+            desc: use gotest.tools/v3/poll instead
+  dupl:
+    threshold: 100
+  goconst:
+    min-len: 6
+    min-occurrences: 8
+  lll:
+    line-length: 120
+  funlen:
+    lines: 80
+  goimports:
+    local-prefixes: github.com/CircleCI-Public/slack-orb-go
+  nakedret:
+    max-func-lines: 0
+
+issues:
+  # The default exclude list seems rather aggresive, opt-in when needed instead
+  exclude-use-default: false
+
+  exclude-rules:
+    # Duplicated errcheck checks
+    - linters: [gosec]
+      text: G104
+    # Ignore aliasing in tests
+    - linters: [gosec]
+      text: G601
+      path: _test\.go
+    # Non-secure URLs are okay in tests
+    - linters: [gosec]
+      text: G107
+      path: _test\.go
+    # deferred ReadCloser closes okay in tests
+    - linters: [gosec]
+      text: G307
+      path: _test\.go
+    # Duplicated errcheck checks
+    - linters: [revive]
+      text: "package-comments: should have a package comment"
+    # Nil pointers will fail tests anyway
+    - linters: [staticcheck]
+      text: SA5011
+      path: _test\.go
+    # Duplicated errcheck checks
+    - linters: [staticcheck]
+      text: SA5001
+    # Duplicated function naming check
+    - linters: [stylecheck]
+      text: ST1003
+    # We don't require comments on everything
+    - linters: [golint]
+      text: should have( a package)? comment
+    # very long lines are ok if they're URLs
+    - linters: [lll]
+      source: https?://
+    # very long lines are ok if they're in http response message fields
+    - linters: [lll]
+      source: '"message":'
+    # very long lines are ok if they're in CLI config
+    - linters: [lll]
+      source: 'env:"'
+    # Ignore errcheck on deferred Close
+    - linters: [errcheck]
+      source: ^\s*defer .*\.Close(.*)$
+    # Ignore long tests
+    - linters: [funlen]
+      text: ^Function 'Test.*
+    # Ignore fixture setup
+    - linters: [funlen]
+      text: ^Function 'runServices.*
+    # We don't require package docs
+    - linters: [stylecheck]
+      text: ST1000
+    # Unparam is allowed in tests
+    - linters: [unparam]
+      path: _test\.go
+    # We are not that bothered about undocumented structs
+    - linters: [revive]
+      text: "exported:"
+    # I'd rather keep all assignments to ctx, actually
+    - linters: [ineffassign]
+      text: "ineffectual assignment to ctx"
+    # Duplicate of above
+    - linters: [staticcheck]
+      text: "SA4006: this value of `ctx` is never used"
+    - linters: [gocyclo]
+      text: func `TestE2E.*
+    # TODO: Unchecked error returns in tests are probably fine (but decide)
+    - linters: [errcheck]
+      path: _test\.go
+    # Long lines in tests are fine
+    - linters: [lll]
+      path: _test\.go
+
+linters:
+  disable-all: true
+  enable:
+    - bodyclose
+    - depguard
+    - errcheck
+    - funlen
+    - goconst
+    - gocyclo
+    - gofmt
+    - goimports
+    - gosec
+    - gosimple
+    - govet
+    - ineffassign
+    - lll
+    - misspell
+    - nakedret
+    - prealloc
+    - revive
+    - staticcheck
+    - stylecheck
+    - typecheck
+    - unconvert
+    - unparam
+    - unused
