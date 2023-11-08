@@ -98,7 +98,7 @@ jobs:
             detect_arch
 
             set -x
-            go build -o ./.circleci/orbs/circleci/slack/$PLATFORM/$ARCH/slack-orb-go ./src/scripts/main.go
+            go build -o ./.circleci/orbs/circleci/slack/$PLATFORM/$ARCH/slack-orb-go ./packages/cli/main.go
             set +x
             echo "export SLACK_BIN_CHECKSUM=$(sha256sum .circleci/orbs/circleci/slack/$PLATFORM/$ARCH/slack-orb-go | cut -d ' ' -f 1)" >> $BASH_ENV
           when: always
@@ -305,7 +305,7 @@ jobs:
       - go/goreleaser-release:
           publish-release: true
           validate-yaml: true
-          project-path: "$HOME/project/src/scripts"
+          project-path: "$HOME/project/packages/cli"
           github-token: GHI_TOKEN
 workflows:
   test-deploy:

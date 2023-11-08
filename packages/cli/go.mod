@@ -1,4 +1,4 @@
-module github.com/CircleCI-Public/slack-orb-go
+module github.com/CircleCI-Public/slack-orb-go/packages/cli
 
 go 1.21
 
@@ -6,7 +6,7 @@ require github.com/joho/godotenv v1.5.1
 
 require (
 	github.com/a8m/envsubst v1.4.2
-	github.com/circleci/ex v1.0.8223-e2e654d
+	github.com/circleci/ex v1.0.8262-ca54cf8
 	github.com/fatih/color v1.16.0
 	github.com/stretchr/testify v1.8.4
 	gotest.tools/v3 v3.5.1

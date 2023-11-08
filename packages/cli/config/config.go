@@ -7,10 +7,9 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/CircleCI-Public/slack-orb-go/packages/cli/utils"
 	"github.com/a8m/envsubst"
 	"github.com/joho/godotenv"
-
-	"github.com/CircleCI-Public/slack-orb-go/src/scripts/utils"
 )
 
 // Config represents the configuration loaded from environment variables.

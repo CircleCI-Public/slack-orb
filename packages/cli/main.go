@@ -11,9 +11,9 @@ import (
 
 	"github.com/circleci/ex/config/secret"
 
-	"github.com/CircleCI-Public/slack-orb-go/src/scripts/config"
-	"github.com/CircleCI-Public/slack-orb-go/src/scripts/slack"
-	"github.com/CircleCI-Public/slack-orb-go/src/scripts/utils"
+	"github.com/CircleCI-Public/slack-orb-go/packages/cli/config"
+	"github.com/CircleCI-Public/slack-orb-go/packages/cli/slack"
+	"github.com/CircleCI-Public/slack-orb-go/packages/cli/jsonutils"
 )
 
 func main() {

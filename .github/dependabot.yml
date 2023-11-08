@@ -2,7 +2,7 @@ version: 2
 
 updates:
   - package-ecosystem: "gomod"
-    directory: "/src/scripts"
+    directory: "/packages/cli"
     schedule:
       interval: "weekly"
   - package-ecosystem: "gomod"
