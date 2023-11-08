@@ -24,9 +24,7 @@ jobs:
       - run:
           name: "Install go-task"
           command: sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d
-      - go/load-cache
       - go/mod-download
-      - go/save-cache
       - run:
           name: "Install golang devtools"
           command: ./bin/task install-devtools
