@@ -78,7 +78,7 @@ func TestExpandEnvVariables(t *testing.T) {
 			}
 
 			config := &Config{AccessToken: test.configVar}
-			err := config.ExpandEnvVariables()
+			err := config.expandEnvVariables()
 
 			if err != nil {
 				expErr, ok := err.(*ExpansionError)
@@ -184,7 +184,7 @@ func TestLoadEnvFromFile(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.description, func(t *testing.T) {
 
-			err := LoadEnvFromFile(test.filePath)
+			err := loadEnvFromFile(test.filePath)
 
 			if (err != nil) != test.expectedErr {
 				t.Errorf("Expected error: %v, got: %v", test.expectedErr, err)
@@ -231,7 +231,7 @@ func TestConvertFileToCRLF(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			filePath := "test_file.txt"
 
-			// Creating and writing to a test file
+			//nolint:gosec // G306 Creating and writing to a test file
 			err := os.WriteFile(filePath, []byte(test.fileContent), 0644)
 			if err != nil {
 				t.Fatalf("Couldn't create test file: %v", err)

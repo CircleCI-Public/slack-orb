@@ -1,4 +1,4 @@
-package jsonutils
+package utils
 
 import (
 	"bytes"
@@ -426,9 +426,9 @@ func TestSpecialCharsInTemplate(t *testing.T) {
 }
 
 func TestColorize(t *testing.T) {
-	testJson := `{ "key": "value" }`
+	testJSON := `{ "key": "value" }`
 	color.NoColor = false
-	colored, err := Colorize(testJson)
+	colored, err := ColorizeJSON(testJSON)
 	if err != nil {
 		t.Errorf("Error colorizing JSON: %v", err)
 	}

@@ -9,7 +9,7 @@ import (
 	"github.com/circleci/ex/config/secret"
 	"github.com/circleci/ex/httpclient"
 
-	"github.com/CircleCI-Public/slack-orb-go/src/scripts/jsonutils"
+	"github.com/CircleCI-Public/slack-orb-go/src/scripts/utils"
 )
 
 const defaultSlackURL = "https://slack.com/api"
@@ -44,7 +44,7 @@ func NewClient(options ClientOptions) *Client {
 }
 
 func (c *Client) PostMessage(ctx context.Context, message, channel string) error {
-	jsonWithChannel, err := jsonutils.ApplyFunctionToJSON(message, jsonutils.AddRootProperty("channel", channel))
+	jsonWithChannel, err := utils.ApplyFunctionToJSON(message, utils.AddRootProperty("channel", channel))
 	if err != nil {
 		return err
 	}
@@ -56,7 +56,7 @@ func (c *Client) PostMessage(ctx context.Context, message, channel string) error
 		httpclient.JSONDecoder(&response),
 	)
 
-	err = c.hc.Call(context.Background(), req)
+	err = c.hc.Call(ctx, req)
 
 	fmt.Printf("This is the error: %v", err)
 	if err != nil {

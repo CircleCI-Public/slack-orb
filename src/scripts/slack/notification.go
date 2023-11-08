@@ -4,8 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/CircleCI-Public/slack-orb-go/src/scripts/jsonutils"
-	"github.com/CircleCI-Public/slack-orb-go/src/scripts/stringutils"
+	"github.com/CircleCI-Public/slack-orb-go/src/scripts/utils"
 )
 
 type Notification struct {
@@ -26,15 +25,20 @@ func (j *Notification) IsEventMatchingStatus() bool {
 }
 
 func (j *Notification) IsPostConditionMet() bool {
-	branchMatches, _ := stringutils.IsPatternMatchingString(j.BranchPattern, j.Branch)
-	tagMatches, _ := stringutils.IsPatternMatchingString(j.TagPattern, j.Tag)
+	branchMatches, _ := utils.IsPatternMatchingString(j.BranchPattern, j.Branch)
+	tagMatches, _ := utils.IsPatternMatchingString(j.TagPattern, j.Tag)
 	return (branchMatches || tagMatches) != j.InvertMatch
 
 }
 
+var (
+	ErrStatusMismatch      = errors.New("job status does not match configured trigger")
+	ErrPostConditionNotMet = errors.New("post condition is not met")
+)
+
 func (j *Notification) BuildMessageBody() (string, error) {
 	// Build the message body
-	template, err := jsonutils.DetermineTemplate(j.InlineTemplate, j.Status, j.EnvVarContainingTemplate)
+	template, err := utils.DetermineTemplate(j.InlineTemplate, j.Status, j.EnvVarContainingTemplate)
 	if err != nil {
 		return "", err
 	}
@@ -43,26 +47,24 @@ func (j *Notification) BuildMessageBody() (string, error) {
 	}
 
 	// Expand environment variables in the template
-	templateWithExpandedVars, err := jsonutils.ApplyFunctionToJSON(template, jsonutils.ExpandEnvVarsInInterface)
+	templateWithExpandedVars, err := utils.ApplyFunctionToJSON(template, utils.ExpandEnvVarsInInterface)
 	if err != nil {
 		return "", err
 	}
 
 	// Add a "channel" property with a nested "myChannel" property
-	modifiedJSON, err := jsonutils.ApplyFunctionToJSON(templateWithExpandedVars, jsonutils.AddRootProperty("channel", "my_channel"))
+	modifiedJSON, err := utils.ApplyFunctionToJSON(templateWithExpandedVars,
+		utils.AddRootProperty("channel", "my_channel"))
 	if err != nil {
 		return "", err
 	}
 
 	if !j.IsEventMatchingStatus() {
-		message := fmt.Sprintf("Exiting without posting to Slack: The job status %q does not match the status set to send alerts %q.", j.Status, j.Event)
-		err = errors.New(message)
-		return "", err
+		return "", ErrStatusMismatch
 	}
 
 	if !j.IsPostConditionMet() {
-		err = errors.New("Exiting without posting to Slack: The post condition is not met. Neither the branch nor the tag matches the pattern or the match is inverted.")
-		return "", err
+		return "", ErrPostConditionNotMet
 	}
 
 	return modifiedJSON, nil

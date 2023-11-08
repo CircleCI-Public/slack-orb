@@ -10,7 +10,7 @@ import (
 	"github.com/a8m/envsubst"
 	"github.com/joho/godotenv"
 
-	"github.com/CircleCI-Public/slack-orb-go/src/scripts/ioutils"
+	"github.com/CircleCI-Public/slack-orb-go/src/scripts/utils"
 )
 
 // Config represents the configuration loaded from environment variables.
@@ -30,7 +30,17 @@ type Config struct {
 }
 
 // NewConfig loads configuration from environment variables.
-func NewConfig() *Config {
+func NewConfig() (*Config, error) {
+	// Load environment variables from BASH_ENV and SLACK_JOB_STATUS files
+	// This has to be done before loading the configuration because the configuration
+	// depends on the environment variables loaded from these files
+	if err := loadEnvFromFile(os.Getenv("BASH_ENV")); err != nil {
+		return nil, err
+	}
+	if err := loadEnvFromFile("/tmp/SLACK_JOB_STATUS"); err != nil {
+		return nil, err
+	}
+
 	return &Config{
 		AccessToken:              os.Getenv("SLACK_ACCESS_TOKEN"),
 		BranchPattern:            os.Getenv("SLACK_PARAM_BRANCHPATTERN"),
@@ -44,7 +54,7 @@ func NewConfig() *Config {
 		JobTag:                   os.Getenv("CIRCLE_TAG"),
 		TagPattern:               os.Getenv("SLACK_PARAM_TAGPATTERN"),
 		IgnoreErrorsStr:          os.Getenv("SLACK_PARAM_IGNORE_ERRORS"),
-	}
+	}, nil
 }
 
 type EnvVarError struct {
@@ -64,8 +74,8 @@ func (e *ExpansionError) Error() string {
 	return fmt.Sprintf("error expanding %s: %v", e.FieldName, e.Err)
 }
 
-// ExpandEnvVariables expands environment variables in the configuration values.
-func (c *Config) ExpandEnvVariables() error {
+// expandEnvVariables expands environment variables in the configuration values.
+func (c *Config) expandEnvVariables() error {
 	fields := map[string]*string{
 		"AccessToken":              &c.AccessToken,
 		"BranchPattern":            &c.BranchPattern,
@@ -91,6 +101,9 @@ func (c *Config) ExpandEnvVariables() error {
 
 // Validate checks whether the necessary environment variables are set.
 func (c *Config) Validate() error {
+	if err := c.expandEnvVariables(); err != nil {
+		return fmt.Errorf("error expanding environment variables: %v", err)
+	}
 	if c.AccessToken == "" {
 		return &EnvVarError{VarName: "SLACK_ACCESS_TOKEN"}
 	}
@@ -113,8 +126,8 @@ func handleOSSpecifics(filePath string) (string, error) {
 	return filePath, nil
 }
 
-// LoadEnvFromFile loads environment variables from a specified file.
-func LoadEnvFromFile(filePath string) error {
+// loadEnvFromFile loads environment variables from a specified file.
+func loadEnvFromFile(filePath string) error {
 	fmt.Println("Starting to load environment variables from file.")
 
 	modifiedPath, err := handleOSSpecifics(filePath)
@@ -122,7 +135,7 @@ func LoadEnvFromFile(filePath string) error {
 		return fmt.Errorf("OS-specific handling failed: %v", err)
 	}
 
-	if !ioutils.FileExists(modifiedPath) {
+	if !utils.FileExists(modifiedPath) {
 		fmt.Printf("File %q does not exist. Skipping...\n", modifiedPath)
 		return nil
 	}
@@ -144,6 +157,7 @@ var (
 
 // ConvertFileToCRLF converts line endings in a file to CRLF.
 func ConvertFileToCRLF(filePath string) error {
+	//nolint:gosec // G304 path is validated elsewhere
 	content, err := os.ReadFile(filePath)
 	if err != nil {
 		return err

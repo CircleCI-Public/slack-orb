@@ -1,9 +1,9 @@
 version: "3"
 
 vars:
-  SRC_DIR: "{{.USER_WORKING_DIR}}/src/scripts"
-  TOOLS_DIR: "{{.USER_WORKING_DIR}}/tools"
-  BIN_DIR: "{{.USER_WORKING_DIR}}/bin"
+  SRC_DIR: "{{.ROOT_DIR}}/src/scripts"
+  TOOLS_DIR: "{{.ROOT_DIR}}/tools"
+  BIN_DIR: "{{.ROOT_DIR}}/bin"
 
 tasks:
   tidy:

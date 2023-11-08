@@ -32,7 +32,7 @@ jobs:
           command: ./bin/task install-devtools
       - run:
           name: "Lint golang source"
-          command: ./bin/task lint || echo "Linter soft-fail" # TODO: start hard failing on linter complaints
+          command: ./bin/task lint
   tidy:
     executor:
       name: go/default
@@ -47,7 +47,7 @@ jobs:
       - go/save-cache
       - run:
           name: "Run tidy and verify no diffs result"
-          command: ./bin/task tidy && git diff --exit-code || echo "Tidy soft-fail" # TODO: start hard failing on diffs
+          command: ./bin/task tidy && git diff --exit-code
   unit-tests:
     executor:
       name: go/default

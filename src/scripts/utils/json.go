@@ -1,4 +1,4 @@
-package jsonutils
+package utils
 
 import (
 	"encoding/json"
@@ -119,13 +119,18 @@ func AddRootProperty(propertyName string, propertyValue interface{}) func(interf
 	}
 }
 
-func Colorize(jsonStr string) (string, error) {
+func ColorizeJSON(jsonStr string) (string, error) {
 	// CircleCI supports color output.
 	if os.Getenv("CI") == "true" {
 		color.NoColor = false
 	}
+
 	var input map[string]interface{}
-	json.Unmarshal([]byte(jsonStr), &input)
+	err := json.Unmarshal([]byte(jsonStr), &input)
+	if err != nil {
+		return "", err
+	}
+
 	f := colorjson.NewFormatter()
 	f.Indent = 2
 	colorized, err := f.Marshal(input)
