@@ -14,6 +14,13 @@ release-filters: &release-filters
   tags:
     only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
 
+commands:
+  install-task:
+    steps:
+      - run:
+          name: "Install go-task"
+          command: sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d
+
 jobs:
   lint:
     executor:
@@ -37,9 +44,7 @@ jobs:
       tag: "1.21.0"
     steps:
       - checkout
-      - run:
-          name: "Install go-task"
-          command: sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d
+      - install-task
       - go/mod-download
       - run:
           name: "Run tidy and verify no diffs result"
@@ -51,6 +56,7 @@ jobs:
     steps:
       - checkout
       - go/mod-download
+      - install-task
       - run:
           name: go test
           command: task test
