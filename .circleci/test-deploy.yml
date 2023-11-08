@@ -59,7 +59,7 @@ jobs:
       - install-task
       - run:
           name: go test
-          command: task test
+          command: ./bin/task test
   integration-test-templates:
     parameters:
       runner:
