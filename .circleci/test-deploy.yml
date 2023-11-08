@@ -51,11 +51,9 @@ jobs:
     steps:
       - checkout
       - go/mod-download
-      - go/test:
-          covermode: atomic
-          failfast: true
-          race: true
-          verbose: true
+      - run:
+          name: go test
+          command: task test
   integration-test-templates:
     parameters:
       runner:
