@@ -1,9 +1,9 @@
 package slack
 
 import (
+	"bytes"
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/circleci/ex/config/secret"
@@ -52,13 +52,11 @@ func (c *Client) PostMessage(ctx context.Context, message, channel string) error
 	var response APIResponse
 
 	req := httpclient.NewRequest("POST", "/chat.postMessage",
-		httpclient.Body(jsonWithChannel),
+		httpclient.Body(bytes.NewBuffer([]byte(jsonWithChannel))),
 		httpclient.JSONDecoder(&response),
 	)
 
 	err = c.hc.Call(ctx, req)
-
-	fmt.Printf("This is the error: %v", err)
 	if err != nil {
 		return err
 	}

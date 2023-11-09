@@ -1,7 +1,6 @@
 package slack
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -39,17 +38,13 @@ func Test_Post_Message(t *testing.T) {
 
 	t.Run("successful", func(t *testing.T) {
 		err := client.PostMessage(ctx, `{"text": "Hello, world!"}`, "test_channel")
-		fmt.Print(err)
 		assert.NilError(t, err)
-		fmt.Print("\nHEADER: ", recorder.LastRequest().Header["Authorization"])
 		assert.Check(t, cmp.Contains(recorder.LastRequest().Header["Authorization"], "Bearer faketoken"))
 	})
 
 	t.Run("not_authed", func(t *testing.T) {
 		client := NewClient(ClientOptions{BaseURL: server.URL, SlackToken: ""})
-
 		err := client.PostMessage(ctx, `{"text": "Hello, world!"}`, "test_channel")
-		fmt.Printf("\nERROR: %v", err)
 		assert.ErrorContains(t, err, "not_authed")
 	})
 }
