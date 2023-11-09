@@ -72,3 +72,17 @@ View the [FAQ in the wiki](https://github.com/CircleCI-Public/slack-orb/wiki/FAQ
 We welcome [issues](https://github.com/CircleCI-Public/slack-orb/issues) to and [pull requests](https://github.com/CircleCI-Public/slack-orb/pulls) against this repository!
 
 For further questions/comments about this or other orbs, visit [CircleCI's orbs discussion forum](https://discuss.circleci.com/c/orbs).
+
+### Developer Setup
+
+This repository is configured as a monorepo, containing the `orb` source code, which is a collection of `BASH` and CircleCI `YAML`, and the `cli` source code, which is the main `go` binary utilized by this orb.
+
+#### Go
+
+1. Clone this repository
+2. Install [taskfile.dev](https://taskfile.dev/installation/) if you do not have it.
+   1. HOMEBREW: `brew install go-task/tap/go-task`
+   2. NPM: `npm install -g @go-task/cli`
+   3. CHOCOLATEY: `choco install go-task`
+3. Run `task sync` to download dependencies.
+4. Before pushing your branch, ensure to run `task tidy`
