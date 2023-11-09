@@ -9,7 +9,7 @@ import (
 	"github.com/circleci/ex/config/secret"
 	"github.com/circleci/ex/httpclient"
 
-	"github.com/CircleCI-Public/slack-orb-go/src/scripts/utils"
+	"github.com/CircleCI-Public/slack-orb-go/packages/cli/utils"
 )
 
 const defaultSlackURL = "https://slack.com/api"

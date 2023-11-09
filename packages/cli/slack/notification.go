@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/CircleCI-Public/slack-orb-go/src/scripts/utils"
+	"github.com/CircleCI-Public/slack-orb-go/packages/cli/utils"
 )
 
 type Notification struct {

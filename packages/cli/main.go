@@ -13,7 +13,7 @@ import (
 
 	"github.com/CircleCI-Public/slack-orb-go/packages/cli/config"
 	"github.com/CircleCI-Public/slack-orb-go/packages/cli/slack"
-	"github.com/CircleCI-Public/slack-orb-go/packages/cli/jsonutils"
+	"github.com/CircleCI-Public/slack-orb-go/packages/cli/utils"
 )
 
 func main() {
