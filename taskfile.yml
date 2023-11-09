@@ -13,6 +13,11 @@ tasks:
       - "cd {{.SRC_DIR}} && go mod tidy -v"
       - "cd {{.SRC_DIR}} &&  gofmt -l -s -w {{.SRC_DIR}}"
       - '{{.BIN_DIR}}/gosimports -local "github.com/CircleCI-Public/slack-orb-go" -w {{.SRC_DIR}}'
+  
+  sync:
+    deps: [install-devtools]
+    cmds:
+      - go work sync
 
   lint:
     deps: [install-devtools]

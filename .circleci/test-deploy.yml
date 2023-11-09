@@ -20,6 +20,11 @@ commands:
       - run:
           name: "Install go-task"
           command: sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d
+  go-sync:
+    steps:
+      - run:
+          name: go sync
+          command: ./bin/task sync
 
 jobs:
   lint:
@@ -28,10 +33,8 @@ jobs:
       tag: "1.21.0"
     steps:
       - checkout
-      - run:
-          name: "Install go-task"
-          command: sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d
-      - go/mod-download
+      - install-task
+      - go-sync
       - run:
           name: "Install golang devtools"
           command: ./bin/task install-devtools
@@ -45,7 +48,7 @@ jobs:
     steps:
       - checkout
       - install-task
-      - go/mod-download
+      - go-sync
       - run:
           name: "Run tidy and verify no diffs result"
           command: ./bin/task tidy && git diff --exit-code
@@ -55,8 +58,10 @@ jobs:
       tag: "1.21.0"
     steps:
       - checkout
-      - go/mod-download
       - install-task
+      - run:
+          name: go sync
+          command: ./bin/task sync
       - run:
           name: go test
           command: ./bin/task test
