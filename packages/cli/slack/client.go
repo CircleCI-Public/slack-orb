@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"log"
 	"time"
 
 	"github.com/circleci/ex/config/secret"
@@ -46,6 +47,7 @@ func NewClient(options ClientOptions) *Client {
 func (c *Client) PostMessage(ctx context.Context, message, channel string) error {
 	jsonWithChannel, err := utils.ApplyFunctionToJSON(message, utils.AddRootProperty("channel", channel))
 	if err != nil {
+		log.Printf("Error applying Root Properly \"channel\" with value %q", channel)
 		return err
 	}
 
@@ -58,6 +60,7 @@ func (c *Client) PostMessage(ctx context.Context, message, channel string) error
 
 	err = c.hc.Call(ctx, req)
 	if err != nil {
+		log.Println("Error when attempting to call API")
 		return err
 	}
 

@@ -70,9 +70,8 @@ func main() {
 		err = client.PostMessage(context.Background(), modifiedJSON, channel)
 		if err != nil {
 			if !ignoreErrors {
-				log.Fatalf("Error: %v", err)
+				log.Fatalf("Error Posting Message: %v", err)
 			}
-
 			fmt.Printf("Error: %v", err)
 		} else {
 			fmt.Println("Successfully posted message to channel: ", channel)
