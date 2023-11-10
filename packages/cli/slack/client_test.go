@@ -1,6 +1,8 @@
 package slack
 
 import (
+	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -26,6 +28,17 @@ func Test_Post_Message(t *testing.T) {
 			return
 		}
 
+		request := &struct {
+			Channel string `json:"channel"`
+		}{}
+		bodyBytes, _ := io.ReadAll(r.Body)
+
+		err = json.Unmarshal(bodyBytes, &request)
+		if err != nil || request.Channel == "" {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
 		if auth := r.Header.Get("Authorization"); auth == "" {
 			_, _ = w.Write([]byte(`{"error": "not_authed"}`))
 		} else {
@@ -34,9 +47,9 @@ func Test_Post_Message(t *testing.T) {
 
 	}))
 	t.Cleanup(server.Close)
-	client := NewClient(ClientOptions{BaseURL: server.URL, SlackToken: "faketoken"})
 
 	t.Run("successful", func(t *testing.T) {
+		client := NewClient(ClientOptions{BaseURL: server.URL, SlackToken: "faketoken"})
 		err := client.PostMessage(ctx, `{"text": "Hello, world!"}`, "test_channel")
 		assert.NilError(t, err)
 		assert.Check(t, cmp.Contains(recorder.LastRequest().Header["Authorization"], "Bearer faketoken"))

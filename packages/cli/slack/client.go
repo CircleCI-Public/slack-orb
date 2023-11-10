@@ -1,7 +1,6 @@
 package slack
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"time"
@@ -50,9 +49,9 @@ func (c *Client) PostMessage(ctx context.Context, message, channel string) error
 	}
 
 	var response APIResponse
-
 	req := httpclient.NewRequest("POST", "/chat.postMessage",
-		httpclient.Body(bytes.NewBuffer([]byte(jsonWithChannel))),
+		httpclient.Header("Content-Type", httpclient.JSON), // explicitly required by Slack when a post body is sent
+		httpclient.RawBody([]byte(jsonWithChannel)),
 		httpclient.JSONDecoder(&response),
 	)
 

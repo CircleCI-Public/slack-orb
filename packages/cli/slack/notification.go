@@ -52,13 +52,6 @@ func (j *Notification) BuildMessageBody() (string, error) {
 		return "", err
 	}
 
-	// Add a "channel" property with a nested "myChannel" property
-	modifiedJSON, err := utils.ApplyFunctionToJSON(templateWithExpandedVars,
-		utils.AddRootProperty("channel", "my_channel"))
-	if err != nil {
-		return "", err
-	}
-
 	if !j.IsEventMatchingStatus() {
 		return "", ErrStatusMismatch
 	}
@@ -67,5 +60,5 @@ func (j *Notification) BuildMessageBody() (string, error) {
 		return "", ErrPostConditionNotMet
 	}
 
-	return modifiedJSON, nil
+	return templateWithExpandedVars, nil
 }
