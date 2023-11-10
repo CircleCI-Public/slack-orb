@@ -67,6 +67,7 @@ func main() {
 			log.Fatalf("Error coloring JSON: %v", err)
 		}
 		fmt.Println(colorizedJSONWitChannel)
+		fmt.Printf("Posting to channel %s...\n", channel)
 		err = client.PostMessage(context.Background(), modifiedJSON, channel)
 		if err != nil {
 			if !ignoreErrors {
