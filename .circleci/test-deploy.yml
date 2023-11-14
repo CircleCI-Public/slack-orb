@@ -107,12 +107,14 @@ jobs:
           when: always
       - slack/notify:
           debug: true
+          ignore_errors: false
           step_name: "Validate Checksum"
           template: basic_success_1
           event: always
           sha256: "$SLACK_BIN_CHECKSUM"
       - slack/notify:
           debug: true
+          ignore_errors: false
           step_name: "Custom template with group mention"
           event: always
           custom: |
@@ -141,12 +143,14 @@ jobs:
           when: always
       - slack/notify:
           debug: true
+          ignore_errors: false
           step_name: "Fail template with mentions"
           template: basic_fail_1
           mentions: "@orbs"
           event: always
       - slack/notify:
           debug: true
+          ignore_errors: false
           step_name: "Success template with mentions"
           template: basic_success_1
           event: always
@@ -157,11 +161,13 @@ jobs:
           event: always
       - slack/notify:
           debug: true
+          ignore_errors: false
           step_name: "Basic on hold template"
           template: basic_on_hold_1
           event: always
       - slack/notify:
           debug: true
+          ignore_errors: false
           step_name: "Custom template with env var in the message"
           event: always
           custom: >
@@ -185,15 +191,18 @@ jobs:
           when: always
       - slack/notify:
           debug: true
+          ignore_errors: false
           step_name: "Dynamic template with environment variable"
           event: always
           template: MY_ORB_TEMPLATE
       - slack/notify:
           debug: true
+          ignore_errors: false
           step_name: "Notify without template parameter"
       # Should run for every branch but master
       - slack/notify:
           debug: true
+          ignore_errors: false
           step_name: "Invert match set to true on 'master' branch pattern"
           branch_pattern: "master"
           invert_match: true
@@ -205,6 +214,7 @@ jobs:
           when: always
       - slack/notify:
           debug: true
+          ignore_errors: false
           step_name: "Notify with multiline string"
           event: always
           custom: >
@@ -226,6 +236,7 @@ jobs:
           when: always
       - slack/notify:
           debug: true
+          ignore_errors: false
           step_name: "Notify with double-quoted string"
           event: always
           custom: >
@@ -247,6 +258,7 @@ jobs:
           when: always
       - slack/notify:
           debug: true
+          ignore_errors: false
           step_name: "Notify with backslashes string"
           event: always
           custom: >
@@ -268,6 +280,7 @@ jobs:
           when: always
       - slack/notify:
           debug: true
+          ignore_errors: false
           step_name: "Notify with custom message coming from sub-shell and template variable"
           event: always
           custom: |
@@ -291,6 +304,7 @@ jobs:
             }
       - slack/notify:
           debug: true
+          ignore_errors: false
           step_name: "Notify with only custom message coming from sub-shell"
           event: always
           custom: |
