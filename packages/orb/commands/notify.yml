@@ -98,12 +98,12 @@ steps:
       when: on_fail
       name: Slack - Detecting Job Status (FAIL)
       command: |
-        echo 'export CCI_STATUS="fail"' > /tmp/SLACK_JOB_STATUS
+        echo 'CCI_STATUS="fail"' > /tmp/SLACK_JOB_STATUS
   - run:
       when: on_success
       name: Slack - Detecting Job Status (PASS)
       command: |
-        echo 'export CCI_STATUS="pass"' > /tmp/SLACK_JOB_STATUS
+        echo 'CCI_STATUS="pass"' > /tmp/SLACK_JOB_STATUS
   - run:
       when: always
       name: << parameters.step_name >>
