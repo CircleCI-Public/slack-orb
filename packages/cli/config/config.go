@@ -118,7 +118,7 @@ func (c *Config) Validate() error {
 	if c.ChannelsStr == "" {
 		return &EnvVarError{VarName: "SLACK_PARAM_CHANNEL"}
 	}
-	if c.JobStatus != "success" && c.JobStatus != "fail" {
+	if c.JobStatus != "pass" && c.JobStatus != "fail" {
 		return fmt.Errorf("invalid value for CCI_STATUS: %s", c.JobStatus)
 	}
 	return nil

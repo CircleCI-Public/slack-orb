@@ -109,19 +109,19 @@ func TestValidate(t *testing.T) {
 	}{
 		{
 			// This test case checks the behavior when the access token is missing.
-			config:      &Config{AccessToken: "", ChannelsStr: "channel", JobStatus: "success"},
+			config:      &Config{AccessToken: "", ChannelsStr: "channel", JobStatus: "pass"},
 			description: "MissingAccessToken",
 			expectedErr: "SLACK_ACCESS_TOKEN",
 		},
 		{
 			// This test case checks the behavior when the channel string is missing.
-			config:      &Config{AccessToken: "token", ChannelsStr: "", JobStatus: "success"},
+			config:      &Config{AccessToken: "token", ChannelsStr: "", JobStatus: "pass"},
 			description: "MissingChannelString",
 			expectedErr: "SLACK_PARAM_CHANNEL",
 		},
 		{
 			// This test case checks the behavior when nothing is missing.
-			config:      &Config{AccessToken: "token", ChannelsStr: "channel", JobStatus: "success"},
+			config:      &Config{AccessToken: "token", ChannelsStr: "channel", JobStatus: "pass"},
 			description: "ValidConfig",
 			expectedErr: "",
 		},
