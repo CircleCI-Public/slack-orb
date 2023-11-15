@@ -15,6 +15,7 @@ before:
 
 builds:
   - main: ./main.go
+    binary: "slack-orb-go"
     env:
       - CGO_ENABLED=0
     goos:

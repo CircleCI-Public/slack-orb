@@ -107,9 +107,10 @@ printf '%s\n' "Architecture: $ARCH."
 
 base_dir="$(printf "%s" "$CIRCLE_WORKING_DIRECTORY" | sed "s|~|$HOME|")"
 orb_bin_dir="$base_dir/.circleci/orbs/circleci/slack/$PLATFORM/$ARCH"
+bin_name="slack-orb-go"
 repo_org="CircleCI-Public"
 repo_name="slack-orb-go"
-binary="$orb_bin_dir/$repo_name"
+binary="$orb_bin_dir/$bin_name"
 input_sha256=$(circleci env subst "$SLACK_PARAM_SHA256")
 
 if [ ! -f "$binary" ]; then
@@ -171,7 +172,7 @@ fi
 
 printf '%s\n' "Executing \"$binary\" binary..."
 set -x
-"$binary"
+"$binary" notify
 exit_code=$?
 set +x
 if [ $exit_code -ne 0 ]; then
