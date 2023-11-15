@@ -1,14 +1,9 @@
 {
     "users": [
       {
-        "full_name": "Aaron Jones",
-        "github": "Amjcraft",
-        "slack": "aaron"
-      },
-      {
         "full_name": "Billie Hilton",
         "github": "billiegoose",
-        "slack": "will.hilton"
+        "slack": "Billie.hilton"
       },
       {
         "full_name": "Brenda Rearden",
@@ -18,7 +13,7 @@
       {
         "full_name": "Chelsea Hohmann",
         "github": "chohmann",
-        "slack": "chelsea"
+        "slack": "chelsea.hohmann"
       },
       {
         "full_name": "Chris Lanzo",
@@ -26,39 +21,24 @@
         "slack": "chris.lanzo"
       },
       {
-        "full_name": "Curtis Matthews",
-        "github": "matthewsac",
-        "slack": "curtis.matthews"
-      },
-      {
         "full_name": "Daniel A. White",
         "github": "daniel-white",
         "slack": "daniel.white"
-      },
-      {
-        "full_name": "Derek Thompson",
-        "github": "dotslashderek",
-        "slack": "derek.thompson"
-      },
+      }
       {
         "full_name": "Ed Vinyard",
         "github": "EdVinyard",
-        "slack": "ed"
-      },
-      {
-        "full_name": "Feras AlSaffar",
-        "github": "falsaffa",
-        "slack": "feras"
+        "slack": "ed.vinyard"
       },
       {
         "full_name": "Jakub Jankowski",
         "github": "mallachari",
-        "slack": "jakubj"
+        "slack": " jakub.jankowski"
       },
       {
         "full_name": "Jakub Rożek",
         "github": "P0lip",
-        "slack": "jakub"
+        "slack": "jakub.rozek"
       },
       {
         "full_name": "Kayla Chun",
@@ -68,17 +48,7 @@
       {
         "full_name": "Kevin Soviero",
         "github": "ksoviero-stoplight",
-        "slack": "kevin"
-      },
-      {
-        "full_name": "Luke Baker",
-        "github": "lbaker-stoplight",
-        "slack": "luke.baker"
-      },
-      {
-        "full_name": "Matt Voget",
-        "github": "matty-v",
-        "slack": "matt"
+        "slack": "kevin.soviero"
       },
       {
         "full_name": "Matthew Murphy",
@@ -91,19 +61,9 @@
         "slack": "michael.martinez"
       },
       {
-        "full_name": "Michał Miąskowski",
-        "github": "mmiask",
-        "slack": "michael"
-      },
-      {
-        "full_name": "Trey Turner",
-        "github": "treyturner",
-        "slack": "trey.turner"
-      },
-      {
         "full_name": "Vazha Omanashvili",
         "github": "rainum",
-        "slack": "vazha"
+        "slack": "vazha.omanashvili"
       },
       {
         "full_name": "Chad Johnson",
@@ -118,12 +78,12 @@
       {
         "full_name": "paulatulis",
         "github": "paulatulis",
-        "slack": "paula"
+        "slack": "paula.tulis"
       },
       {
         "full_name": "raleigh04",
         "github": "raleigh04",
-        "slack": "raleigh"
+        "slack": "raleigh.schickel"
       }
     ]
   }
