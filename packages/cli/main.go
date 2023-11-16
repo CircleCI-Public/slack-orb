@@ -58,7 +58,10 @@ func main() {
 		log.Fatalf("Failed to build message body: %v", err)
 	}
 
-	client := slack.NewClient(slack.ClientOptions{SlackToken: secret.String(conf.AccessToken)})
+	client := slack.NewClient(slack.ClientOptions{
+		SlackToken: secret.String(conf.AccessToken),
+		BaseURL:    conf.SlackAPIBaseUrl, // this is okay to set, it's ignored if the value is ""
+	})
 
 	for _, channel := range channels {
 		fmt.Printf("Posting the following JSON to Slack:\n")

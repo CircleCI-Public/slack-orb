@@ -27,6 +27,7 @@ type Config struct {
 	JobTag                   string
 	TagPattern               string
 	IgnoreErrorsStr          string
+	SlackAPIBaseUrl          string
 }
 
 // NewConfig loads configuration from environment variables.
@@ -54,6 +55,7 @@ func NewConfig() (*Config, error) {
 		JobTag:                   os.Getenv("CIRCLE_TAG"),
 		TagPattern:               os.Getenv("SLACK_PARAM_TAGPATTERN"),
 		IgnoreErrorsStr:          os.Getenv("SLACK_PARAM_IGNORE_ERRORS"),
+		SlackAPIBaseUrl:          os.Getenv("TEST_SLACK_API_BASE_URL"),
 	}, nil
 }
 

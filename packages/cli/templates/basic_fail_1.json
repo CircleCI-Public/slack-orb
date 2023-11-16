@@ -1,0 +1,67 @@
+{
+	"text": "CircleCI job failed.",
+	"blocks": [
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": "Job Failed. :red_circle:",
+				"emoji": true
+			}
+		},
+		{
+			"type": "section",
+			"fields": [
+				{
+					"type": "mrkdwn",
+					"text": "*Job*: ${CIRCLE_JOB}"
+				}
+			]
+		},
+		{
+			"type": "section",
+			"fields": [
+				{
+					"type": "mrkdwn",
+					"text": "*Project*: $CIRCLE_PROJECT_REPONAME"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Branch*: $CIRCLE_BRANCH"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Author*: $CIRCLE_USERNAME"
+				}
+			],
+			"accessory": {
+				"type": "image",
+				"image_url": "https://assets.brandfolder.com/otz5mn-bw4j2w-6jzqo8/original/circle-logo-badge-black.png",
+				"alt_text": "CircleCI logo"
+			}
+		},
+		{
+			"type": "section",
+			"fields": [
+				{
+					"type": "mrkdwn",
+					"text": "*Mentions*: $SLACK_PARAM_MENTIONS"
+				}
+			]
+		},
+		{
+			"type": "actions",
+			"elements": [
+				{
+					"type": "button",
+					"action_id": "basic_fail_view",
+					"text": {
+						"type": "plain_text",
+						"text": "View Job"
+					},
+					"url": "${CIRCLE_BUILD_URL}"
+				}
+			]
+		}
+	]
+}

@@ -9,6 +9,8 @@ import (
 	"github.com/TylerBrock/colorjson"
 	"github.com/a8m/envsubst"
 	"github.com/fatih/color"
+
+	"github.com/CircleCI-Public/slack-orb-go/packages/cli/templates"
 )
 
 func ExpandEnvVarsInInterface(value interface{}) interface{} {
@@ -59,27 +61,15 @@ func ApplyFunctionToJSON(messageBody string, modifier func(interface{}) interfac
 	}
 }
 
-func InferTemplateEnvVarFromStatus(jobStatus string) (string, error) {
-	switch jobStatus {
-	case "pass":
-		return "basic_success_1", nil
-	case "fail":
-		return "basic_fail_1", nil
-	default:
-		return "", fmt.Errorf("the job status: %q is unexpected", jobStatus)
-	}
-}
-
 func DetermineTemplate(inlineTemplate, jobStatus, envVarContainingTemplate string) (string, error) {
 	if inlineTemplate != "" {
 		return inlineTemplate, nil
 	}
 
 	if envVarContainingTemplate == "" {
-		var err error
-		envVarContainingTemplate, err = InferTemplateEnvVarFromStatus(jobStatus)
-		if err != nil {
-			return "", fmt.Errorf("%s: %w", "DetermineTemplate", err)
+		template := templates.ForStatus(jobStatus) //TODO: code re-org
+		if template != "" {
+			return template, nil
 		}
 	}
 	template := os.Getenv(envVarContainingTemplate)
