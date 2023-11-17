@@ -15,19 +15,21 @@ import (
 
 // Config represents the configuration loaded from environment variables.
 type Config struct {
-	AccessToken              string
-	BranchPattern            string
-	ChannelsStr              string
-	EnvVarContainingTemplate string
-	EventToSendMessage       string
-	InlineTemplate           string
-	InvertMatchStr           string
-	JobBranch                string
-	JobStatus                string
-	JobTag                   string
-	TagPattern               string
-	IgnoreErrorsStr          string
-	SlackAPIBaseUrl          string
+	AccessToken        string
+	BranchPattern      string
+	ChannelsStr        string
+	EventToSendMessage string
+	IgnoreErrorsStr    string
+	InvertMatchStr     string
+	JobBranch          string
+	JobStatus          string
+	JobTag             string
+	SlackAPIBaseUrl    string
+	TagPattern         string
+	TemplateInline     string
+	TemplateName       string
+	TemplatePath       string
+	TemplateVar        string
 }
 
 // NewConfig loads configuration from environment variables.
@@ -43,19 +45,21 @@ func NewConfig() (*Config, error) {
 	}
 
 	return &Config{
-		AccessToken:              os.Getenv("SLACK_ACCESS_TOKEN"),
-		BranchPattern:            os.Getenv("SLACK_PARAM_BRANCHPATTERN"),
-		ChannelsStr:              os.Getenv("SLACK_PARAM_CHANNEL"),
-		EnvVarContainingTemplate: os.Getenv("SLACK_PARAM_TEMPLATE"),
-		EventToSendMessage:       os.Getenv("SLACK_PARAM_EVENT"),
-		InlineTemplate:           os.Getenv("SLACK_PARAM_CUSTOM"),
-		InvertMatchStr:           os.Getenv("SLACK_PARAM_INVERT_MATCH"),
-		JobBranch:                os.Getenv("CIRCLE_BRANCH"),
-		JobStatus:                os.Getenv("CCI_STATUS"),
-		JobTag:                   os.Getenv("CIRCLE_TAG"),
-		TagPattern:               os.Getenv("SLACK_PARAM_TAGPATTERN"),
-		IgnoreErrorsStr:          os.Getenv("SLACK_PARAM_IGNORE_ERRORS"),
-		SlackAPIBaseUrl:          os.Getenv("TEST_SLACK_API_BASE_URL"),
+		AccessToken:        os.Getenv("SLACK_ACCESS_TOKEN"),
+		BranchPattern:      os.Getenv("SLACK_PARAM_BRANCHPATTERN"),
+		ChannelsStr:        os.Getenv("SLACK_PARAM_CHANNEL"),
+		EventToSendMessage: os.Getenv("SLACK_PARAM_EVENT"),
+		IgnoreErrorsStr:    os.Getenv("SLACK_PARAM_IGNORE_ERRORS"),
+		InvertMatchStr:     os.Getenv("SLACK_PARAM_INVERT_MATCH"),
+		JobBranch:          os.Getenv("CIRCLE_BRANCH"),
+		JobStatus:          os.Getenv("CCI_STATUS"),
+		JobTag:             os.Getenv("CIRCLE_TAG"),
+		SlackAPIBaseUrl:    os.Getenv("TEST_SLACK_API_BASE_URL"),
+		TagPattern:         os.Getenv("SLACK_PARAM_TAGPATTERN"),
+		TemplateInline:     os.Getenv("SLACK_STR_TEMPLATE_INLINE"),
+		TemplateName:       os.Getenv("SLACK_STR_TEMPLATE"),
+		TemplatePath:       os.Getenv("SLACK_STR_TEMPLATE_PATH"),
+		TemplateVar:        os.Getenv("SLACK_STR_TEMPLATE_VAR"),
 	}, nil
 }
 
@@ -79,14 +83,16 @@ func (e *ExpansionError) Error() string {
 // expandEnvVariables expands environment variables in the configuration values.
 func (c *Config) expandEnvVariables() error {
 	fields := map[string]*string{
-		"AccessToken":              &c.AccessToken,
-		"BranchPattern":            &c.BranchPattern,
-		"ChannelsStr":              &c.ChannelsStr,
-		"EnvVarContainingTemplate": &c.EnvVarContainingTemplate,
-		"EventToSendMessage":       &c.EventToSendMessage,
-		"InvertMatchStr":           &c.InvertMatchStr,
-		"IgnoreErrorsStr":          &c.IgnoreErrorsStr,
-		"TagPattern":               &c.TagPattern,
+		"AccessToken":        &c.AccessToken,
+		"BranchPattern":      &c.BranchPattern,
+		"ChannelsStr":        &c.ChannelsStr,
+		"EventToSendMessage": &c.EventToSendMessage,
+		"IgnoreErrorsStr":    &c.IgnoreErrorsStr,
+		"InvertMatchStr":     &c.InvertMatchStr,
+		"TagPattern":         &c.TagPattern,
+		"TemplateName":       &c.TemplateName,
+		"TemplatePath":       &c.TemplatePath,
+		"TemplateVar":        &c.TemplateVar,
 	}
 
 	for fieldName, fieldValue := range fields {

@@ -4,20 +4,22 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/CircleCI-Public/slack-orb-go/packages/cli/templates"
 	"github.com/CircleCI-Public/slack-orb-go/packages/cli/utils"
 )
 
 type Notification struct {
-	Status                   string
-	Branch                   string
-	Tag                      string
-	Event                    string
-	BranchPattern            string
-	TagPattern               string
-	InvertMatch              bool
-	Template                 string
-	InlineTemplate           string
-	EnvVarContainingTemplate string
+	Status         string
+	Branch         string
+	Tag            string
+	Event          string
+	BranchPattern  string
+	TagPattern     string
+	InvertMatch    bool
+	TemplateVar    string
+	TemplatePath   string
+	TemplateInline string
+	TemplateName   string
 }
 
 func (j *Notification) IsEventMatchingStatus() bool {
@@ -38,7 +40,7 @@ var (
 
 func (j *Notification) BuildMessageBody() (string, error) {
 	// Build the message body
-	template, err := utils.DetermineTemplate(j.InlineTemplate, j.Status, j.EnvVarContainingTemplate)
+	template, err := templates.DetermineTemplate(j.TemplateVar, j.TemplatePath, j.TemplateInline, j.TemplateName, j.Status)
 	if err != nil {
 		return "", err
 	}

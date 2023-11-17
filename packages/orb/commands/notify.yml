@@ -4,22 +4,32 @@ description: |
   For instructions on how to set them, follow the setup guide available in the wiki: https://github.com/CircleCI-Public/slack-orb/wiki/Setup.
 
 parameters:
-  template:
+  template_var:
     description: |
-      Select which template to use for the notification by its name. The name must be available as an environment variable.
-      The built-in templates can be found and previewed at: https://github.com/CircleCI-Public/slack-orb/wiki#templates.
-      Alternatively, you can create and use your own dynamic templates: https://github.com/CircleCI-Public/slack-orb/wiki/Dynamic-Templates.
-      If left empty and no custom template is provided, the template will be automatically selected based on the job status.
+      Provide an environment variable containing a custom template to use for the notification.
+      This parameter takes precedence over the "template_path", "template_inline", and "template" parameters.
     type: string
     default: ""
-  custom:
+  template_path:
     description: |
-      Enter a custom message template.
-
-      1. Create your message template using the Block Kit Builder: https://app.slack.com/block-kit-builder/.
-      2. Insert any desired environment variables.
-      3. Paste value here.
+      Provide a path to a custom template to use for the notification.
+      The path must be relative to the root of the repository.
+      This parameter takes precedence over the "template_inline" and "template" parameters.
     type: string
+    default: ""
+  template_inline:
+    description: |
+      Provide an inline custom template to use for the notification.
+      This parameter takes precedence over the "template" parameter.
+    type: string
+    default: ""
+  template:
+    description: |
+      Pick a pre-built template to use for the notification.
+      This parameter is ignored if the "template_inline", "template_path", or "template_var" parameters are set.
+      If left blank, the template will be inferred from the job status.
+    type: enum
+    enum: ["basic_fail_1", "basic_on_hold_1", "basic_success_1", "success_tagged_deploy_1", ""]
     default: ""
   event:
     description: |
@@ -99,8 +109,10 @@ steps:
       name: << parameters.step_name >>
       environment:
         SLACK_PARAM_EVENT: "<<parameters.event>>"
-        SLACK_PARAM_TEMPLATE: "<<parameters.template>>"
-        SLACK_PARAM_CUSTOM: "<<parameters.custom>>"
+        SLACK_STR_TEMPLATE_VAR: "<<parameters.template_var>>"
+        SLACK_STR_TEMPLATE_PATH: "<<parameters.template_path>>"
+        SLACK_STR_TEMPLATE_INLINE: "<<parameters.template_inline>>"
+        SLACK_STR_TEMPLATE: "<<parameters.template>>"
         SLACK_PARAM_MENTIONS: "<<parameters.mentions>>"
         SLACK_PARAM_BRANCHPATTERN: "<<parameters.branch_pattern>>"
         SLACK_PARAM_TAGPATTERN: "<<parameters.tag_pattern>>"
@@ -110,9 +122,4 @@ steps:
         SLACK_PARAM_DEBUG: "<<parameters.debug>>"
         SLACK_PARAM_CIRCLECI_HOST: "<<parameters.circleci_host>>"
         SLACK_PARAM_SHA256: "<<parameters.sha256>>"
-        # import pre-built templates using the orb-pack local script include.
-        basic_fail_1: "<<include(message_templates/basic_fail_1.json)>>"
-        success_tagged_deploy_1: "<<include(message_templates/success_tagged_deploy_1.json)>>"
-        basic_on_hold_1: "<<include(message_templates/basic_on_hold_1.json)>>"
-        basic_success_1: "<<include(message_templates/basic_success_1.json)>>"
       command: <<include(scripts/main.sh)>>

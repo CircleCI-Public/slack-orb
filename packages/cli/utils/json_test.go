@@ -8,8 +8,6 @@ import (
 	"testing"
 
 	"github.com/fatih/color"
-
-	"github.com/CircleCI-Public/slack-orb-go/packages/cli/templates"
 )
 
 func TestAddRootProperty(t *testing.T) {
@@ -94,51 +92,6 @@ func TestExtractRootProperty(t *testing.T) {
 			t.Errorf("Expected %+v, got %+v", test.expected, result)
 		}
 	}
-}
-
-func TestDetermineMessageBody(t *testing.T) {
-	// Set up mock environment variables for the test
-	_ = os.Setenv("basic_success_1", `{"text":"CircleCI job succeeded!","blocks":[{"type":"header","text":{"type":"plain_text","text":"Job Succeeded. :white_check_mark:","emoji":true}}]}`)
-	_ = os.Setenv("basic_fail_1", `{"text":"CircleCI job failed.","blocks":[{"type":"header","text":{"type":"plain_text","text":"Job Failed. :red_circle:","emoji":true}}]}`)
-
-	tests := []struct {
-		name                     string
-		inlineTemplate           string
-		jobStatus                string
-		envVarContainingTemplate string
-		expected                 string
-		hasError                 bool
-	}{
-		{"use custom message body", `{ "customMessageKey": "customMessageValue" }`, "success", "", `{ "customMessageKey": "customMessageValue" }`, false},
-		{"use provided template from env var", "", "pass", "basic_success_1", `{"text":"CircleCI job succeeded!","blocks":[{"type":"header","text":{"type":"plain_text","text":"Job Succeeded. :white_check_mark:","emoji":true}}]}`, false},
-		{"use template inferred from job status", "", "pass", "", templates.ForStatus("pass"), false},
-		{"use alternate provided template from env var", "", "fail", "basic_fail_1", `{"text":"CircleCI job failed.","blocks":[{"type":"header","text":{"type":"plain_text","text":"Job Failed. :red_circle:","emoji":true}}]}`, false},
-		{"use alternate inferred template", "", "fail", "", templates.ForStatus("fail"), false},
-		{"error because the job status is invalid", "", "unknown", "", "", true},
-		{"error because the template is empty", "", "pass", "some_template_name", "", true},
-	}
-
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			result, err := DetermineTemplate(test.inlineTemplate, test.jobStatus, test.envVarContainingTemplate)
-			if test.hasError {
-				if err == nil {
-					t.Errorf("Expected an error but got %s", result)
-				}
-			} else {
-				if err != nil {
-					t.Errorf("Unexpected error for %s, error: %v", test.name, err)
-				}
-				if result != test.expected {
-					t.Errorf("For %+v, got %s", test.inlineTemplate, result)
-				}
-			}
-		})
-	}
-
-	// Clean up mock environment variables after the test
-	_ = os.Unsetenv("basic_success_1")
-	_ = os.Unsetenv("basic_fail_1")
 }
 
 func TestExpandEnvVarsInInterface(t *testing.T) {

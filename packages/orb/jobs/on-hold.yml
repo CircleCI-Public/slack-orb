@@ -22,18 +22,32 @@ parameters:
       If the username contains a space, the Slack ID must be used with angled brackets: "<@U8XXXXXXX>"
     type: string
     default: ""
-  template:
-    description: '(optional) By default this job will send the standard "basic_on_hold_1" template. In order to use a custom template you must also set this value to an empty string.'
-    type: string
-    default: "basic_on_hold_1"
-  custom:
+  template_var:
     description: |
-      (optional) Enter a custom message template.
-
-      1. Create your message template using the Block Kit Builder: https://app.slack.com/block-kit-builder/.
-      2. Insert any desired environment variables.
-      3. Paste value here.
+      Provide an environment variable containing a custom template to use for the notification.
+      This parameter takes precedence over the "template_path", "template_inline", and "template" parameters.
     type: string
+    default: ""
+  template_path:
+    description: |
+      Provide a path to a custom template to use for the notification.
+      The path must be relative to the root of the repository.
+      This parameter takes precedence over the "template_inline" and "template" parameters.
+    type: string
+    default: ""
+  template_inline:
+    description: |
+      Provide an inline custom template to use for the notification.
+      This parameter takes precedence over the "template" parameter.
+    type: string
+    default: ""
+  template:
+    description: |
+      Pick a pre-built template to use for the notification.
+      This parameter is ignored if the "template_inline", "template_path", or "template_var" parameters are set.
+      If left blank, the template will be inferred from the job status.
+    type: enum
+    enum: ["basic_fail_1", "basic_on_hold_1", "basic_success_1", "success_tagged_deploy_1", ""]
     default: ""
   channel:
       description: |
@@ -63,10 +77,12 @@ resource_class: small
 steps:
   - notify:
       event: always
-      template: <<parameters.template>>
+      template_var: "<<parameters.template_var>>"
+      template_path: "<<parameters.template_path>>"
+      template_inline: "<<parameters.template_inline>>"
+      template: "<<parameters.template>>"
       branch_pattern: <<parameters.branch_pattern>>
       invert_match: <<parameters.invert_match>>
-      custom: <<parameters.custom>>
       mentions: <<parameters.mentions>>
       channel: <<parameters.channel>>
       debug: <<parameters.debug>>
