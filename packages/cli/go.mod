@@ -9,6 +9,7 @@ require (
 	github.com/circleci/ex v1.0.8262-ca54cf8
 	github.com/fatih/color v1.16.0
 	github.com/gin-gonic/gin v1.9.1
+	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.8.4
 	gotest.tools/v3 v3.5.1
 )
@@ -68,5 +69,4 @@ require (
 	golang.org/x/text v0.13.0 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
-	gopkg.in/ini.v1 v1.67.0 // indirect
 )

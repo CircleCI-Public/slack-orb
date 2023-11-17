@@ -6,12 +6,9 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 
 	"github.com/CircleCI-Public/slack-orb-go/packages/cli/config"
 )
-
-var SlackConfig config.Config
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -39,17 +36,14 @@ func init() {
 }
 
 func initConfig() {
-	viper.SetConfigName("config")
-	SlackConfig, err := config.NewConfig()
+	err := config.InitConfig()
 	if err != nil {
 		log.Fatalf("Error loading environment configuration: \n%v\n", err)
 	}
-	if err := SlackConfig.Validate(); err != nil {
+	if err := config.SlackConfig.Validate(); err != nil {
 		handleConfigurationError(err)
 	}
-
 }
-
 func handleConfigurationError(err error) {
 	var envVarError *config.EnvVarError
 	if errors.As(err, &envVarError) {

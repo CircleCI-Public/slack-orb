@@ -12,6 +12,7 @@ import (
 	"github.com/circleci/ex/config/secret"
 	"github.com/spf13/cobra"
 
+	"github.com/CircleCI-Public/slack-orb-go/packages/cli/config"
 	"github.com/CircleCI-Public/slack-orb-go/packages/cli/slack"
 	"github.com/CircleCI-Public/slack-orb-go/packages/cli/utils"
 )
@@ -29,9 +30,9 @@ func init() {
 }
 
 func executeNotify(cmd *cobra.Command, args []string) {
-	invertMatch, _ := strconv.ParseBool(SlackConfig.InvertMatchStr)
-	ignoreErrors, _ := strconv.ParseBool(SlackConfig.IgnoreErrorsStr)
-	channels := strings.Split(SlackConfig.ChannelsStr, ",")
+	invertMatch, _ := strconv.ParseBool(config.SlackConfig.InvertMatchStr)
+	ignoreErrors, _ := strconv.ParseBool(config.SlackConfig.IgnoreErrorsStr)
+	channels := strings.Split(config.SlackConfig.ChannelsStr, ",")
 
 	slackNotification := slack.Notification{
 		Status:         SlackConfig.JobStatus,
@@ -45,6 +46,7 @@ func executeNotify(cmd *cobra.Command, args []string) {
 		TemplatePath:   SlackConfig.TemplatePath,
 		TemplateInline: SlackConfig.TemplateInline,
 		TemplateName:   SlackConfig.TemplateName,
+
 	}
 
 	modifiedJSON, err := slackNotification.BuildMessageBody()

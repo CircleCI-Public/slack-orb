@@ -13,6 +13,8 @@ import (
 	"github.com/CircleCI-Public/slack-orb-go/packages/cli/utils"
 )
 
+var SlackConfig Config
+
 // Config represents the configuration loaded from environment variables.
 type Config struct {
 	AccessToken        string
@@ -32,16 +34,17 @@ type Config struct {
 	TemplateVar        string
 }
 
-// NewConfig loads configuration from environment variables.
-func NewConfig() (*Config, error) {
+// Initialize the configuration from environment variables.
+// This will set 'SlackConfig' to the loaded configuration.
+func InitConfig() error {
 	// Load environment variables from BASH_ENV and SLACK_JOB_STATUS files
 	// This has to be done before loading the configuration because the configuration
 	// depends on the environment variables loaded from these files
 	if err := loadEnvFromFile(os.Getenv("BASH_ENV")); err != nil {
-		return nil, err
+		return err
 	}
 	if err := loadEnvFromFile("/tmp/SLACK_JOB_STATUS"); err != nil {
-		return nil, err
+		return err
 	}
 
 	return &Config{
