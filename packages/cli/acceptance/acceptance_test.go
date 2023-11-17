@@ -83,7 +83,7 @@ func TestSlackOrbBinary(t *testing.T) {
 				slackAPIServer.Close()
 			})
 
-			cmd := exec.Command(fix.slackOrbPath)
+			cmd := exec.Command(fix.slackOrbPath, "notify")
 
 			comparableOutput := &strings.Builder{}
 			w := io.MultiWriter(os.Stdout, comparableOutput)

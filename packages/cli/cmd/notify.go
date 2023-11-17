@@ -35,18 +35,17 @@ func executeNotify(cmd *cobra.Command, args []string) {
 	channels := strings.Split(config.SlackConfig.ChannelsStr, ",")
 
 	slackNotification := slack.Notification{
-		Status:         SlackConfig.JobStatus,
-		Branch:         SlackConfig.JobBranch,
-		Tag:            SlackConfig.JobTag,
-		Event:          SlackConfig.EventToSendMessage,
-		BranchPattern:  SlackConfig.BranchPattern,
-		TagPattern:     SlackConfig.TagPattern,
+		Status:         config.SlackConfig.JobStatus,
+		Branch:         config.SlackConfig.JobBranch,
+		Tag:            config.SlackConfig.JobTag,
+		Event:          config.SlackConfig.EventToSendMessage,
+		BranchPattern:  config.SlackConfig.BranchPattern,
+		TagPattern:     config.SlackConfig.TagPattern,
 		InvertMatch:    invertMatch,
-		TemplateVar:    SlackConfig.TemplateVar,
-		TemplatePath:   SlackConfig.TemplatePath,
-		TemplateInline: SlackConfig.TemplateInline,
-		TemplateName:   SlackConfig.TemplateName,
-
+		TemplateVar:    config.SlackConfig.TemplateVar,
+		TemplatePath:   config.SlackConfig.TemplatePath,
+		TemplateInline: config.SlackConfig.TemplateInline,
+		TemplateName:   config.SlackConfig.TemplateName,
 	}
 
 	modifiedJSON, err := slackNotification.BuildMessageBody()
@@ -66,8 +65,8 @@ func executeNotify(cmd *cobra.Command, args []string) {
 	}
 
 	client := slack.NewClient(slack.ClientOptions{
-		SlackToken: secret.String(SlackConfig.AccessToken),
-		BaseURL:    SlackConfig.SlackAPIBaseUrl, // this is okay to set, it's ignored if the value is ""
+		SlackToken: secret.String(config.SlackConfig.AccessToken),
+		BaseURL:    config.SlackConfig.SlackAPIBaseUrl, // this is okay to set, it's ignored if the value is ""
 	})
 
 	for _, channel := range channels {

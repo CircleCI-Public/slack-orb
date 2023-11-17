@@ -47,7 +47,7 @@ func InitConfig() error {
 		return err
 	}
 
-	return &Config{
+	SlackConfig = Config{
 		AccessToken:        os.Getenv("SLACK_ACCESS_TOKEN"),
 		BranchPattern:      os.Getenv("SLACK_PARAM_BRANCHPATTERN"),
 		ChannelsStr:        os.Getenv("SLACK_PARAM_CHANNEL"),
@@ -63,7 +63,8 @@ func InitConfig() error {
 		TemplateName:       os.Getenv("SLACK_STR_TEMPLATE"),
 		TemplatePath:       os.Getenv("SLACK_STR_TEMPLATE_PATH"),
 		TemplateVar:        os.Getenv("SLACK_STR_TEMPLATE_VAR"),
-	}, nil
+	}
+	return nil
 }
 
 type EnvVarError struct {
