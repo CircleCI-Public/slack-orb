@@ -3,3 +3,4 @@ orb.yml
 dist/
 bin/
 cover-source.out
+.env
