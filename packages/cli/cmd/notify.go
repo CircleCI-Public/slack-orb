@@ -3,10 +3,10 @@ package cmd
 import (
 	"context"
 	"errors"
-	"github.com/charmbracelet/log"
 	"strconv"
 	"strings"
 
+	"github.com/charmbracelet/log"
 	"github.com/circleci/ex/config/secret"
 	"github.com/spf13/cobra"
 

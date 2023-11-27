@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/charmbracelet/log"
-
 	"github.com/spf13/cobra"
 
 	"github.com/CircleCI-Public/slack-orb-go/packages/cli/config"
