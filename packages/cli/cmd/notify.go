@@ -3,9 +3,7 @@ package cmd
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/charmbracelet/log"
-	"os"
 	"strconv"
 	"strings"
 
