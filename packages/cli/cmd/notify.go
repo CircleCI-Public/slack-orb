@@ -51,14 +51,10 @@ func executeNotify(cmd *cobra.Command, args []string) {
 	modifiedJSON, err := slackNotification.BuildMessageBody()
 	if err != nil {
 		if errors.Is(err, slack.ErrStatusMismatch) {
-			//nolint:lll // user message
-			fmt.Printf("Exiting without posting to Slack: The job status %q does not match the status set to send alerts %q.\n",
+			log.Fatalf("Exiting without posting to Slack: The job status %q does not match the status set to send alerts %q.\n",
 				slackNotification.Status, slackNotification.Event)
-			os.Exit(0)
 		} else if errors.Is(err, slack.ErrPostConditionNotMet) {
-			//nolint:lll // user message
-			fmt.Printf("Exiting without posting to Slack: The post condition is not met. Neither the branch nor the tag matches the pattern or the match is inverted.\n")
-			os.Exit(0)
+			log.Fatalf("Exiting without posting to Slack: The post condition is not met. Neither the branch nor the tag matches the pattern or the match is inverted.\n")
 		}
 
 		log.Fatalf("Failed to build message body: %v", err)
@@ -70,21 +66,21 @@ func executeNotify(cmd *cobra.Command, args []string) {
 	})
 
 	for _, channel := range channels {
-		fmt.Printf("Posting the following JSON to Slack:\n")
+		log.Debugf("Posting the following JSON to Slack:\n")
 		colorizedJSONWitChannel, err := utils.ColorizeJSON(modifiedJSON)
 		if err != nil {
 			log.Fatalf("Error coloring JSON: %v", err)
 		}
-		fmt.Println(colorizedJSONWitChannel)
+		log.Debug(colorizedJSONWitChannel)
 		err = client.PostMessage(context.Background(), modifiedJSON, channel)
 		if err != nil {
 			if !ignoreErrors {
 				log.Fatalf("Error: \n%v\n", err)
 			}
 
-			fmt.Printf("Error: \n%v\n", err)
+			log.Errorf("Error: \n%v\n", err)
 		} else {
-			fmt.Println("Successfully posted message to channel: ", channel)
+			log.Info("Successfully posted message to channel: ", channel)
 		}
 	}
 

@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/a8m/envsubst"
+	"github.com/charmbracelet/log"
 	"github.com/joho/godotenv"
 
 	"github.com/CircleCI-Public/slack-orb-go/packages/cli/utils"
@@ -143,7 +144,7 @@ func handleOSSpecifics(filePath string) (string, error) {
 
 // loadEnvFromFile loads environment variables from a specified file.
 func loadEnvFromFile(filePath string) error {
-	fmt.Println("Starting to load environment variables from file.")
+	log.Info("Starting to load environment variables from file.")
 
 	modifiedPath, err := handleOSSpecifics(filePath)
 	if err != nil {
@@ -151,16 +152,16 @@ func loadEnvFromFile(filePath string) error {
 	}
 
 	if !utils.FileExists(modifiedPath) {
-		fmt.Printf("File %q does not exist. Skipping...\n", modifiedPath)
+		log.Infof("File %q does not exist. Skipping...\n", modifiedPath)
 		return nil
 	}
 
-	fmt.Printf("Loading %q into the environment...\n", modifiedPath)
+	log.Infof("Loading %q into the environment...\n", modifiedPath)
 	if err := godotenv.Load(modifiedPath); err != nil {
 		return fmt.Errorf("error loading %q file: %v", modifiedPath, err)
 	}
 
-	fmt.Println("Environment variables loaded successfully.")
+	log.Info("Environment variables loaded successfully.")
 	return nil
 }
 
