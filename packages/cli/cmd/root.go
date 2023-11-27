@@ -2,8 +2,9 @@ package cmd
 
 import (
 	"errors"
-	"github.com/charmbracelet/log"
 	"os"
+
+	"github.com/charmbracelet/log"
 
 	"github.com/spf13/cobra"
 
@@ -15,9 +16,21 @@ var rootCmd = &cobra.Command{
 	Use:   "slack-orb-cli",
 	Short: "The slack-orb-cli interface for the CircleCI Slack orb",
 	Long:  `The slack-orb-cli by CircleCI is a command-line tool for sending slack notifications as a part of a CI/CD workflow.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		debugFlag, err := cmd.Flags().GetBool("debug")
+		if err != nil {
+			// Handle the error
+			log.Fatalf("Error accessing debug flag: %v", err)
+		}
+		if debugFlag {
+			os.Setenv("SLACK_PARAM_DEBUG", "true")
+		}
+		debugValue := config.GetDebug()
+		if debugValue {
+			log.SetLevel(log.DebugLevel)
+			log.Debug("Debug logging enabled")
+		}
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -32,7 +45,8 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.PersistentFlags().Bool("debug", false, "Enable debug logging")
+
 }
 
 func initConfig() {

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"strconv"
 	"strings"
 
 	"github.com/a8m/envsubst"
@@ -21,6 +22,7 @@ type Config struct {
 	AccessToken        string
 	BranchPattern      string
 	ChannelsStr        string
+	Debug              bool
 	EventToSendMessage string
 	IgnoreErrorsStr    string
 	InvertMatchStr     string
@@ -52,6 +54,7 @@ func InitConfig() error {
 		AccessToken:        os.Getenv("SLACK_ACCESS_TOKEN"),
 		BranchPattern:      os.Getenv("SLACK_PARAM_BRANCHPATTERN"),
 		ChannelsStr:        os.Getenv("SLACK_PARAM_CHANNEL"),
+		Debug:              GetDebug(),
 		EventToSendMessage: os.Getenv("SLACK_PARAM_EVENT"),
 		IgnoreErrorsStr:    os.Getenv("SLACK_PARAM_IGNORE_ERRORS"),
 		InvertMatchStr:     os.Getenv("SLACK_PARAM_INVERT_MATCH"),
@@ -187,4 +190,12 @@ func ConvertFileToCRLF(filePath string) error {
 	}
 
 	return nil
+}
+
+func GetDebug() bool {
+	debugBool, err := strconv.ParseBool(os.Getenv("SLACK_PARAM_DEBUG"))
+	if err != nil {
+		return false
+	}
+	return debugBool
 }
