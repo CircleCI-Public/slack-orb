@@ -147,7 +147,7 @@ func handleOSSpecifics(filePath string) (string, error) {
 
 // loadEnvFromFile loads environment variables from a specified file.
 func loadEnvFromFile(filePath string) error {
-	log.Info("Starting to load environment variables from file.")
+	log.Debug("Starting to load environment variables from file.")
 
 	modifiedPath, err := handleOSSpecifics(filePath)
 	if err != nil {
@@ -155,16 +155,16 @@ func loadEnvFromFile(filePath string) error {
 	}
 
 	if !utils.FileExists(modifiedPath) {
-		log.Infof("File %q does not exist. Skipping...\n", modifiedPath)
+		log.Debugf("File %q does not exist. Skipping...\n", modifiedPath)
 		return nil
 	}
 
-	log.Infof("Loading %q into the environment...\n", modifiedPath)
+	log.Debugf("Loading %q into the environment...\n", modifiedPath)
 	if err := godotenv.Load(modifiedPath); err != nil {
 		return fmt.Errorf("error loading %q file: %v", modifiedPath, err)
 	}
 
-	log.Info("Environment variables loaded successfully.")
+	log.Debug("Environment variables loaded successfully.")
 	return nil
 }
 
