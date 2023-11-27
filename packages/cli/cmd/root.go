@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"errors"
-	"log"
+	"github.com/charmbracelet/log"
 	"os"
 
 	"github.com/spf13/cobra"
