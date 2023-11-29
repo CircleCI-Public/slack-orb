@@ -83,6 +83,8 @@ func TestSlackOrbBinary(t *testing.T) {
 				slackAPIServer.Close()
 			})
 
+			os.Setenv("NO_COLOR", "true")
+			os.Setenv("CI", "false")
 			cmd := exec.Command(fix.slackOrbPath, "notify")
 
 			comparableOutput := &strings.Builder{}
