@@ -3,9 +3,9 @@ package cmd
 import (
 	"context"
 	"errors"
+	"os"
 	"strconv"
 	"strings"
-	"os"
 
 	"github.com/charmbracelet/log"
 	"github.com/circleci/ex/config/secret"
