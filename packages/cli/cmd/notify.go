@@ -5,6 +5,7 @@ import (
 	"errors"
 	"strconv"
 	"strings"
+	"os"
 
 	"github.com/charmbracelet/log"
 	"github.com/circleci/ex/config/secret"
@@ -49,10 +50,12 @@ func executeNotify(cmd *cobra.Command, args []string) {
 	modifiedJSON, err := slackNotification.BuildMessageBody()
 	if err != nil {
 		if errors.Is(err, slack.ErrStatusMismatch) {
-			log.Fatalf("Exiting without posting to Slack: The job status %q does not match the status set to send alerts %q.\n",
+			log.Infof("Exiting without posting to Slack: The job status %q does not match the status set to send alerts %q.\n",
 				slackNotification.Status, slackNotification.Event)
+			os.Exit(0)
 		} else if errors.Is(err, slack.ErrPostConditionNotMet) {
-			log.Fatalf("Exiting without posting to Slack: The post condition is not met. Neither the branch nor the tag matches the pattern or the match is inverted.\n")
+			log.Infof("Exiting without posting to Slack: The post condition is not met. Neither the branch nor the tag matches the pattern or the match is inverted.\n")
+			os.Exit(0)
 		}
 
 		log.Fatalf("Failed to build message body: %v", err)
