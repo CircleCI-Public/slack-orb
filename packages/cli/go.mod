@@ -10,6 +10,7 @@ require (
 	github.com/circleci/ex v1.0.8262-ca54cf8
 	github.com/fatih/color v1.16.0
 	github.com/gin-gonic/gin v1.9.1
+	github.com/muesli/termenv v0.15.2
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.8.4
 	gotest.tools/v3 v3.5.1
@@ -66,7 +67,6 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/muesli/reflow v0.3.0 // indirect
-	github.com/muesli/termenv v0.15.2 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
