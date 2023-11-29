@@ -171,10 +171,8 @@ if ! chmod +x "$binary"; then
 fi
 
 printf '%s\n' "Executing \"$binary\" binary..."
-set -x
 "$binary" notify
 exit_code=$?
-set +x
 if [ $exit_code -ne 0 ]; then
   printf '%s\n' "Failed to execute $binary binary or it exited with a non-zero exit code."
 fi
