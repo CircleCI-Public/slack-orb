@@ -26,6 +26,9 @@ tasks:
   test:
     cmd: go test -count=1 {{.SRC_DIR}}/...
 
+  clean:
+    cmd: go clean -modcache -x
+
   install-devtools:
     silent: true
     cmd: |
