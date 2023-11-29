@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/charmbracelet/log"
+	"github.com/muesli/termenv"
 	"github.com/spf13/cobra"
 
 	"github.com/CircleCI-Public/slack-orb-go/packages/cli/config"
@@ -29,6 +30,11 @@ var rootCmd = &cobra.Command{
 			log.SetLevel(log.DebugLevel)
 			log.Debug("Debug logging enabled")
 		}
+
+		if os.Getenv("CI") == "true" {
+			log.SetColorProfile(termenv.TrueColor)
+		}
+
 	},
 }
 
