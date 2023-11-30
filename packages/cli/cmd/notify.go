@@ -81,7 +81,7 @@ func executeNotify(cmd *cobra.Command, args []string) {
 
 			log.Errorf("Error: \n%v\n", err)
 		} else {
-			log.Info("Successfully posted message to channel: ", channel)
+			log.Infof("Successfully posted message to channel: %s", channel)
 		}
 	}
 
