@@ -39,7 +39,7 @@ func TestSlackOrbBinary(t *testing.T) {
 			"SLACK_PARAM_EVENT":   "pass",
 		},
 		expectedExitCode: 0,
-		expectedOutput:   "Successfully posted message to channel:  test-channel",
+		expectedOutput:   "Successfully posted message to channel: test-channel",
 	}, {
 		name: "Basic fail template",
 		environment: map[string]string{
@@ -49,7 +49,7 @@ func TestSlackOrbBinary(t *testing.T) {
 			"SLACK_PARAM_EVENT":   "fail",
 		},
 		expectedExitCode: 0,
-		expectedOutput:   "Successfully posted message to channel:  test-channel",
+		expectedOutput:   "Successfully posted message to channel: test-channel",
 	}, {
 		name: "Missing slack token",
 		environment: map[string]string{
