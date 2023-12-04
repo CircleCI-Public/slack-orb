@@ -155,6 +155,10 @@ jobs:
           template: basic_success_1
           event: always
       - slack/notify:
+          step_name: "Success template minimal config"
+          template: basic_success_1
+          event: always
+      - slack/notify:
           debug: true
           step_name: "Success tagged template"
           template: success_tagged_deploy_1
