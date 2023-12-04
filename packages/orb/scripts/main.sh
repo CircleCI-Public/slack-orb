@@ -90,6 +90,19 @@ print_error() {
   printf "${red}%s${normal}\n" "$1"
 }
 
+# Print a debug message
+# $1: The debug message to print
+print_debug() {
+    if [ "$SLACK_PARAM_DEBUG" = 1 ]; then
+        # ANSI escape code for blue color
+        BLUE="\033[0;34m"
+        # ANSI escape code to reset color
+        RESET="\033[0m"
+        
+        printf "${BLUE}DEBU ${RESET} %s\n" "$1"
+    fi
+}
+
 print_warn "This is an experimental version of the Slack Orb in Go."
 print_warn "Thank you for trying it out and please provide feedback to us at https://github.com/CircleCI-Public/slack-orb-go/issues"
 
@@ -97,13 +110,14 @@ if ! detect_os; then
   printf '%s\n' "Unsupported operating system: $(uname -s)."
   exit 1
 fi
-printf '%s\n' "Operating system: $PLATFORM."
+print_debug "Operating system: $PLATFORM."
 
 if ! detect_arch; then
   printf '%s\n' "Unsupported architecture: $(uname -m)."
   exit 1
 fi
-printf '%s\n' "Architecture: $ARCH."
+
+print_debug "Architecture: $ARCH."
 
 base_dir="$(printf "%s" "$CIRCLE_WORKING_DIRECTORY" | sed "s|~|$HOME|")"
 orb_bin_dir="$base_dir/.circleci/orbs/circleci/slack/$PLATFORM/$ARCH"
@@ -138,9 +152,9 @@ if [ ! -f "$binary" ]; then
     exit 1
   fi
 
-  printf '%s\n' "Downloaded $repo_name binary to $orb_bin_dir"
+  print_debug "Downloaded $repo_name binary to $orb_bin_dir"
 else
-  printf '%s\n' "Skipping binary download since it already exists at $binary."
+  print_debug "Skipping binary download since it already exists at $binary."
 fi
 
 # Validate binary
@@ -164,13 +178,13 @@ else
   print_warn "SHA256 checksum not provided. Skipping validation."
 fi
 
-printf '%s\n' "Making $binary binary executable..."
+print_debug "Making $binary binary executable..."
 if ! chmod +x "$binary"; then
   printf '%s\n' "Failed to make $binary binary executable."
   exit 1
 fi
 
-printf '%s\n' "Executing \"$binary\" binary..."
+print_debug "Executing \"$binary\" binary..."
 "$binary" notify
 exit_code=$?
 if [ $exit_code -ne 0 ]; then
