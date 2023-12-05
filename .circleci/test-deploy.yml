@@ -53,9 +53,11 @@ jobs:
           name: "Run tidy and verify no diffs result"
           command: ./bin/task tidy && git diff --exit-code
   unit-tests:
-    executor:
-      name: go/default
-      tag: "1.21.0"
+    parameters:
+      runner:
+        type: executor
+        default: cimg
+    executor: << parameters.runner >>
     steps:
       - checkout
       - install-task
@@ -336,6 +338,9 @@ workflows:
           filters: *filters
       - unit-tests:
           filters: *filters
+          matrix:
+            parameters:
+              runner: [cimg, alpine]
       - integration-test-templates:
           context: SLACK_NOTIFICATIONS_TEST
           filters: *filters
