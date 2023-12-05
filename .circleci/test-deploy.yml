@@ -60,13 +60,9 @@ jobs:
     executor: << parameters.runner >>
     steps:
       - checkout
-      - when:
-          condition:
-            equal: [<< parameters.runner >>, alpine]
-          steps:
-            - run:
-                name: Install Curl on Alpine
-                command: apk add curl
+      - run:
+          name: Maybe Install Curl on Alpine
+          command: apk add curl || exit 0
       - install-task
       - run:
           name: go sync
