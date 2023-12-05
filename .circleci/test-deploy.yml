@@ -344,6 +344,7 @@ workflows:
             parameters:
               runner: [cimg, windows, alpine]
       - orb-tools/pack:
+          source_dir: packages/orb
           filters: *release-filters
       - build-release:
           requires: [integration-test-templates, orb-tools/pack]
