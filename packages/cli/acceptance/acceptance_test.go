@@ -26,10 +26,11 @@ func TestSlackOrbBinary(t *testing.T) {
 	fix := setupE2E(ctx, t)
 
 	tests := []struct {
-		name             string
-		environment      map[string]string
-		expectedExitCode int
-		expectedOutput   string
+		name                      string
+		environment               map[string]string
+		expectedExitCode          int
+		expectedOutput            string
+		expectedSlackAPICallCount int
 	}{{
 		name: "Basic success template",
 		environment: map[string]string{
@@ -38,8 +39,9 @@ func TestSlackOrbBinary(t *testing.T) {
 			"CCI_STATUS":          "pass",
 			"SLACK_PARAM_EVENT":   "pass",
 		},
-		expectedExitCode: 0,
-		expectedOutput:   "Successfully posted message to channel: test-channel",
+		expectedExitCode:          0,
+		expectedOutput:            "Successfully posted message to channel: test-channel",
+		expectedSlackAPICallCount: 1,
 	}, {
 		name: "Debug flag enabled",
 		environment: map[string]string{
@@ -49,8 +51,9 @@ func TestSlackOrbBinary(t *testing.T) {
 			"SLACK_PARAM_EVENT":   "pass",
 			"SLACK_PARAM_DEBUG":   "true",
 		},
-		expectedExitCode: 0,
-		expectedOutput:   "DEBU Posting the following JSON to Slack",
+		expectedExitCode:          0,
+		expectedOutput:            "DEBU Posting the following JSON to Slack",
+		expectedSlackAPICallCount: 1,
 	}, {
 		name: "Basic fail template",
 		environment: map[string]string{
@@ -59,8 +62,9 @@ func TestSlackOrbBinary(t *testing.T) {
 			"CCI_STATUS":          "fail",
 			"SLACK_PARAM_EVENT":   "fail",
 		},
-		expectedExitCode: 0,
-		expectedOutput:   "Successfully posted message to channel: test-channel",
+		expectedExitCode:          0,
+		expectedOutput:            "Successfully posted message to channel: test-channel",
+		expectedSlackAPICallCount: 1,
 	}, {
 		name: "Missing slack token",
 		environment: map[string]string{
@@ -108,17 +112,19 @@ func TestSlackOrbBinary(t *testing.T) {
 ]
 }`,
 		},
+		expectedSlackAPICallCount: 1,
 	}}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			slackAPIServer := httptest.NewServer(fix.slackAPI.Handler())
 			t.Cleanup(func() {
+				fix.slackAPI.Reset()
 				slackAPIServer.Close()
 			})
 
-			os.Setenv("NO_COLOR", "true")
-			os.Setenv("CI", "false")
+			_ = os.Setenv("NO_COLOR", "true")
+			_ = os.Setenv("CI", "false")
 			cmd := exec.Command(fix.slackOrbPath, "notify")
 
 			comparableOutput := &strings.Builder{}
@@ -141,6 +147,7 @@ func TestSlackOrbBinary(t *testing.T) {
 			}
 
 			assert.Check(t, cmp.Equal(cmd.ProcessState.ExitCode(), tt.expectedExitCode))
+			assert.Check(t, cmp.Equal(len(fix.slackAPI.AllRequests()), tt.expectedSlackAPICallCount))
 
 			if tt.expectedOutput != "" {
 				assert.Check(t, cmp.Contains(comparableOutput.String(), tt.expectedOutput))
