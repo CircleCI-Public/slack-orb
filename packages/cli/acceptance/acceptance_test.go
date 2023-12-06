@@ -40,6 +40,17 @@ func TestSlackOrbBinary(t *testing.T) {
 		},
 		expectedExitCode: 0,
 		expectedOutput:   "Successfully posted message to channel: test-channel",
+	},{
+		name: "Debug flag enabled",
+		environment: map[string]string{
+			"SLACK_ACCESS_TOKEN":  "test-token",
+			"SLACK_PARAM_CHANNEL": "test-channel",
+			"CCI_STATUS":          "pass",
+			"SLACK_PARAM_EVENT":   "pass",
+			"SLACK_PARAM_DEBUG":   "true",
+		},
+		expectedExitCode: 0,
+		expectedOutput:   "DEBU Posting the following JSON to Slack",
 	}, {
 		name: "Basic fail template",
 		environment: map[string]string{
