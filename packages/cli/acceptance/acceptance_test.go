@@ -40,7 +40,7 @@ func TestSlackOrbBinary(t *testing.T) {
 		},
 		expectedExitCode: 0,
 		expectedOutput:   "Successfully posted message to channel: test-channel",
-	},{
+	}, {
 		name: "Debug flag enabled",
 		environment: map[string]string{
 			"SLACK_ACCESS_TOKEN":  "test-token",
@@ -84,6 +84,29 @@ func TestSlackOrbBinary(t *testing.T) {
 			"SLACK_PARAM_CHANNEL": "test-channel",
 			"CCI_STATUS":          "fail",
 			"SLACK_PARAM_EVENT":   "pass",
+		},
+	}, {
+		name:             "Multiline string env var parsed correctly",
+		expectedExitCode: 0,
+		expectedOutput:   `This message should show over multiple lines: Line 1.\\nLine 2.\\nLine 3.`,
+		environment: map[string]string{
+			"SLACK_ACCESS_TOKEN":  "test-token",
+			"SLACK_PARAM_CHANNEL": "test-channel",
+			"CCI_STATUS":          "pass",
+			"SLACK_PARAM_EVENT":   "pass",
+			"SLACK_PARAM_DEBUG":   "true",
+			"MULTILINE_STRING":    `Line 1.\nLine 2.\nLine 3.`,
+			"SLACK_STR_TEMPLATE_INLINE": `{
+"blocks": [
+	{
+		"type": "section",
+		"text": {
+			"type": "mrkdwn",
+			"text": "This message should show over multiple lines: $MULTILINE_STRING"
+		}
+	}
+]
+}`,
 		},
 	}}
 
