@@ -6,7 +6,7 @@ require github.com/joho/godotenv v1.5.1
 
 require (
 	github.com/a8m/envsubst v1.4.2
-	github.com/charmbracelet/log v0.3.0
+	github.com/charmbracelet/log v0.3.1
 	github.com/circleci/ex v1.0.8262-ca54cf8
 	github.com/fatih/color v1.16.0
 	github.com/gin-gonic/gin v1.9.1
