@@ -150,14 +150,14 @@ func handleOSSpecifics(filePath string) (string, error) {
 func loadEnvFromFile(filePath string) error {
 	log.Debug("Starting to load environment variables from file.")
 
+	if !utils.FileExists(filePath) {
+		log.Debugf("File %q does not exist. Skipping...\n", filePath)
+		return nil
+	}
+
 	modifiedPath, err := handleOSSpecifics(filePath)
 	if err != nil {
 		return fmt.Errorf("OS-specific handling failed: %v", err)
-	}
-
-	if !utils.FileExists(modifiedPath) {
-		log.Debugf("File %q does not exist. Skipping...\n", modifiedPath)
-		return nil
 	}
 
 	log.Debugf("Loading %q into the environment...\n", modifiedPath)
