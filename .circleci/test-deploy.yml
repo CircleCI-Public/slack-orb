@@ -1,4 +1,8 @@
 version: 2.1
+
+x-data:
+  go-version: &go-version "1.21.5"
+
 orbs:
   orb-tools: circleci/orb-tools@12.0
   go: circleci/go@1.9
@@ -30,7 +34,7 @@ jobs:
   lint:
     executor:
       name: go/default
-      tag: "1.21.0"
+      tag: *go-version
     steps:
       - checkout
       - install-task
@@ -44,7 +48,7 @@ jobs:
   tidy:
     executor:
       name: go/default
-      tag: "1.21.0"
+      tag: *go-version
     steps:
       - checkout
       - install-task
@@ -323,7 +327,7 @@ jobs:
   build-release:
     executor:
       name: go/default
-      tag: "1.21.0"
+      tag: *go-version
     steps:
       - go/install-goreleaser
       - checkout
@@ -368,7 +372,7 @@ workflows:
 executors:
   cimg:
     docker:
-      - image: cimg/go:1.21.3
+      - image: cimg/go:1.21.5
   mac:
     macos:
       xcode: 15.0.0
