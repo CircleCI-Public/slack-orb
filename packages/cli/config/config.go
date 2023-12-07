@@ -132,14 +132,15 @@ func (c *Config) Validate() error {
 	return nil
 }
 
-// handleOSSpecifics checks and applies OS-specific modifications to the file.
 func handleOSSpecifics(filePath string) (string, error) {
 	if runtime.GOOS == "windows" {
-		filePath = strings.Replace(filePath, "/tmp", "C:/Users/circleci/AppData/Local/Temp", 1)
-
-		err := ConvertFileToCRLF(filePath)
-		if err != nil {
-			return "", fmt.Errorf("error converting file to CRLF: %w", err)
+		filePath := strings.Replace(filePath, "/tmp", "C:/Users/circleci/AppData/Local/Temp", 1)
+		if utils.FileExists(filePath) {
+			if err := ConvertFileToCRLF(filePath); err != nil {
+				return "", fmt.Errorf("error converting file to CRLF: %w", err)
+			}
+		} else {
+			return "", fmt.Errorf("file %q does not exist", filePath)
 		}
 	}
 	return filePath, nil
