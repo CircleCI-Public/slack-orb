@@ -136,10 +136,11 @@ func (c *Config) Validate() error {
 func handleOSSpecifics(filePath string) (string, error) {
 	if runtime.GOOS == "windows" {
 		filePath = strings.Replace(filePath, "/tmp", "C:/Users/circleci/AppData/Local/Temp", 1)
-
-		err := ConvertFileToCRLF(filePath)
-		if err != nil {
-			return "", fmt.Errorf("error converting file to CRLF: %w", err)
+		if !utils.FileExists(filePath) {
+			err := ConvertFileToCRLF(filePath)
+			if err != nil {
+				return "", fmt.Errorf("error converting file to CRLF: %w", err)
+			}
 		}
 	}
 	return filePath, nil
