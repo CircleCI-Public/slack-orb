@@ -229,7 +229,7 @@ jobs:
       - run:
           name: Export variable with a multiline string
           command: |
-            printf 'export MULTILINE_STRING="Line 1.\\nLine 2.\\nLine 3."\n' >> "$BASH_ENV"
+            echo 'export MULTILINE_STRING="Line 1.\nLine 2.\nLine 3."' >> "$BASH_ENV"
           when: always
       - slack/notify:
           debug: true
@@ -250,7 +250,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "This message should show over multiple lines:\\n $MULTILINE_STRING"
+                    "text": "This message should show over multiple lines:\n $MULTILINE_STRING"
                   }
                 }
               ]
@@ -258,7 +258,7 @@ jobs:
       - run:
           name: Export variable with double quotes
           command: |
-            printf '%s\n' 'export DOUBLE_QUOTES_STRING=$(printf "%s\\n" "Hello There! My name is \"Potato\"")' >> "$BASH_ENV"
+            echo 'export DOUBLE_QUOTES_STRING="Hello There! My name is \"Potato\""' >> "$BASH_ENV"
           when: always
       - slack/notify:
           debug: true
@@ -287,7 +287,7 @@ jobs:
       - run:
           name: Export variable with backslashes
           command: |
-            printf '%s\n' 'export BACKSLASHES_STRING="This is how a \ looks like"' >> "$BASH_ENV"
+            echo 'export BACKSLASHES_STRING="This is how a \ looks like"' >> "$BASH_ENV"
           when: always
       - slack/notify:
           debug: true
