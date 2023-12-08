@@ -250,7 +250,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "This message should show over multiple lines: $MULTILINE_STRING"
+                    "text": "This message should show over multiple lines:\\n $MULTILINE_STRING"
                   }
                 }
               ]
