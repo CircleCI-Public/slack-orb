@@ -27,16 +27,13 @@ var rootCmd = &cobra.Command{
 		}
 		debugValue := config.GetDebug()
 		if debugValue {
+			if os.Getenv("CI") == "true" {
+				log.SetColorProfile(termenv.TrueColor)
+			}
 			log.SetLevel(log.DebugLevel)
 			log.Debug("Debug logging enabled")
 		}
-
 		initConfig()
-
-		if os.Getenv("CI") == "true" {
-			log.SetColorProfile(termenv.TrueColor)
-		}
-
 	},
 }
 
