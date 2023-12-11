@@ -31,6 +31,8 @@ var rootCmd = &cobra.Command{
 			log.Debug("Debug logging enabled")
 		}
 
+		initConfig()
+
 		if os.Getenv("CI") == "true" {
 			log.SetColorProfile(termenv.TrueColor)
 		}
@@ -48,8 +50,6 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
-
 	rootCmd.PersistentFlags().Bool("debug", false, "Enable debug logging")
 
 }
