@@ -290,40 +290,6 @@ jobs:
           command: |
             printf '%s\n' "Hello There!" > /tmp/msg
           when: always
-      - slack/notify:
-          debug: true
-          ignore_errors: false
-          step_name: "Notify with custom message coming from sub-shell and template variable"
-          event: always
-          template_inline: |
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "Current Job: $CIRCLE_JOB"
-                  }
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "$(cat /tmp/msg)"
-                  }
-                }
-              ]
-            }
-      - slack/notify:
-          debug: true
-          ignore_errors: false
-          step_name: "Notify with only custom message coming from sub-shell"
-          event: always
-          template_inline: |
-            {
-              "type": "mrkdwn",
-              "text": "$(cat /tmp/msg)"
-            }
   build-release:
     executor:
       name: go/default
