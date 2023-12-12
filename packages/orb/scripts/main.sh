@@ -51,21 +51,6 @@ detect_arch() {
   esac
 }
 
-# Determine the latest version of a GitHub release.
-# $1: The GitHub organization
-# $2: The GitHub repository
-# $3: The HTTP client to use (curl or wget)
-determine_release_latest_version() {
-  if [ "$3" = "curl" ]; then
-    LATEST_VERSION="$(curl --fail --retry 3 -Ls -o /dev/null -w '%{url_effective}' "https://github.com/$1/$2/releases/latest" | sed 's:.*/::')"
-  elif [ "$3" = "wget" ]; then
-    LATEST_VERSION="$(wget -qO- "https://api.github.com/repos/$1/$2/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')"
-  else
-    printf '%s\n' "Invalid HTTP client specified."
-    return 1
-  fi
-}
-
 # Print a warning message
 # $1: The warning message to print
 print_warn() {
@@ -136,14 +121,9 @@ if [ ! -f "$binary" ]; then
   fi
   printf '%s\n' "HTTP client: $HTTP_CLIENT."
 
-  if ! determine_release_latest_version "$repo_org" "$repo_name" "$HTTP_CLIENT"; then
-    printf '%s\n' "Failed to determine latest version."
-    exit 1
-  fi
-  printf '%s\n' "Release's latest version: $LATEST_VERSION."
+  print_debug "Slack orb binary version selected: $SLACK_STR_BIN_VERSION"
 
-  # TODO: Make the version configurable via command parameter
-  repo_url="https://github.com/$repo_org/$repo_name/releases/download/$LATEST_VERSION/${repo_name}_${PLATFORM}_${ARCH}"
+  repo_url="https://github.com/$repo_org/$repo_name/releases/download/$SLACK_STR_BIN_VERSION/${repo_name}_${PLATFORM}_${ARCH}"
   [ "$PLATFORM" = "Windows" ] && repo_url="$repo_url.exe"
   printf '%s\n' "Release URL: $repo_url."
 

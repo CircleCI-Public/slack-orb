@@ -122,4 +122,5 @@ steps:
         SLACK_PARAM_DEBUG: "<<parameters.debug>>"
         SLACK_PARAM_CIRCLECI_HOST: "<<parameters.circleci_host>>"
         SLACK_PARAM_SHA256: "<<parameters.sha256>>"
+        SLACK_STR_BIN_VERSION: "v1.0.0"
       command: <<include(scripts/main.sh)>>
