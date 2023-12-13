@@ -93,6 +93,12 @@ parameters:
     description: |
       Provide a SHA256 value to validate the binary utilized by this orb. By default, no validation is performed.
       You can locate the SHA256 value for the matching version of this orb in the GitHub release via the checksums.txt file.
+  bin_override_url:
+    type: string
+    default: ""
+    description: |
+      Provide a URL to download a specific build of the Slack Orb CLI binary. This is useful if you are behind a firewall or need to test a specific build in your pipeline.
+      This URL must be publicly accessible from the CircleCI build environment.
 steps:
   - run:
       when: on_fail
@@ -123,4 +129,5 @@ steps:
         SLACK_PARAM_CIRCLECI_HOST: "<<parameters.circleci_host>>"
         SLACK_PARAM_SHA256: "<<parameters.sha256>>"
         SLACK_STR_BIN_VERSION: "v1.0.0"
+        SLACK_STR_BIN_OVERRIDE_URL: "<<parameters.bin_override_url>>"
       command: <<include(scripts/main.sh)>>

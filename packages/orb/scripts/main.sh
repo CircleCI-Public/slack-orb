@@ -109,6 +109,8 @@ orb_bin_dir="$base_dir/.circleci/orbs/circleci/slack/$PLATFORM/$ARCH"
 bin_name="slack-orb-go"
 repo_org="CircleCI-Public"
 repo_name="slack-orb-go"
+repo_url=""
+repo_source_location="" # reference for error message
 binary="$orb_bin_dir/$bin_name"
 input_sha256=$(circleci env subst "$SLACK_PARAM_SHA256")
 
@@ -121,14 +123,22 @@ if [ ! -f "$binary" ]; then
   fi
   printf '%s\n' "HTTP client: $HTTP_CLIENT."
 
-  print_debug "Slack orb binary version selected: $SLACK_STR_BIN_VERSION"
+  if [ -z "$SLACK_STR_BIN_OVERRIDE_URL" ]; then
+    print_debug "Slack orb binary version selected: $SLACK_STR_BIN_VERSION"
+    repo_url="https://github.com/$repo_org/$repo_name/releases/download/$SLACK_STR_BIN_VERSION/${repo_name}_${PLATFORM}_${ARCH}"
+    repo_source_location="GitHub Release: $repo_url"
+  else
+    print_debug "Slack orb binary URL override: $SLACK_STR_BIN_OVERRIDE_URL"
+    repo_url="$SLACK_STR_BIN_OVERRIDE_URL"
+    repo_source_location="URL override: $SLACK_STR_BIN_OVERRIDE_URL"
+  fi
 
-  repo_url="https://github.com/$repo_org/$repo_name/releases/download/$SLACK_STR_BIN_VERSION/${repo_name}_${PLATFORM}_${ARCH}"
+  
   [ "$PLATFORM" = "Windows" ] && repo_url="$repo_url.exe"
   printf '%s\n' "Release URL: $repo_url."
 
   if ! download_binary "$binary" "$repo_url" "$HTTP_CLIENT"; then
-    printf '%s\n' "Failed to download $repo_name binary from GitHub."
+    printf '%s\n' "Failed to download $repo_name binary from $repo_source_location."
     exit 1
   fi
 
