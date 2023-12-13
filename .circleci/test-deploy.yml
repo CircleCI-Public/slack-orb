@@ -341,11 +341,6 @@ jobs:
                 }
               ]
             }
-      - run:
-          name: Export value to file
-          command: |
-            printf '%s\n' "Hello There!" > /tmp/msg
-          when: always
   build-release:
     executor:
       name: go/default
