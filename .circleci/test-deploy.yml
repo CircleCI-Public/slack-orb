@@ -330,6 +330,22 @@ jobs:
           validate-yaml: true
           project-path: "$HOME/project/packages/cli"
           github-token: GHI_TOKEN
+  pre-deploy-validation:
+    executor: cimg
+    steps:
+      - checkout
+      - run:
+          name: Validate Binary Version Change
+          command: |
+            excaped_expected_val="\<\< parameters.step_name \>\>"
+            expected_val=$(echo "$excaped_expected_val" | sed -e's/\//\\\//g')
+            CONFIGURED_BIN_VERSION=$(cat packages/orb/commands/notify.yml | yq '.steps[] | select(.run.name =="$expected_val") | .run.environment.SLACK_STR_BIN_VERSION')
+            if [[ "$CONFIGURED_BIN_VERSION" != "$CIRCLE_TAG" ]]; then
+              echo "The current release tag does not match the pinned version in the orb source."
+              echo "Please delete this tag, update the pinned binary version in the orb source, and re-trigger a new release."
+              exit 1
+            fi
+
 workflows:
   test-deploy:
     jobs:
@@ -349,11 +365,13 @@ workflows:
           matrix:
             parameters:
               runner: [cimg, windows, alpine]
+      - pre-deploy-validation:
+          filters: *release-filters
       - orb-tools/pack:
           source_dir: packages/orb
           filters: *release-filters
       - build-release:
-          requires: [integration-test-templates, orb-tools/pack]
+          requires: [integration-test-templates, pre-deploy-validation, orb-tools/pack]
           context: orb-publisher
           filters: *release-filters
       - orb-tools/publish:
