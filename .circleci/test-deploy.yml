@@ -202,6 +202,31 @@ jobs:
                 }
               ]
             }
+      - slack/notify:
+          debug: true
+          ignore_errors: false
+          step_name: "Test custom override URL"
+          event: always
+          bin_override_url: "https://github.com/CircleCI-Public/slack-orb-go/releases/download/v0.2.5/slack-orb-go_Linux_x86_64"
+          template_inline: >
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Current Job: $CIRCLE_JOB"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "this message was sent using override url build v0.2.5"
+                  }
+                }
+              ]
+            }
       - run:
           name: Dynamically populate the mention and export the template as an environment variable
           command: |
