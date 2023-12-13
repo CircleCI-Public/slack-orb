@@ -337,6 +337,10 @@ jobs:
       - run:
           name: Validate Binary Version Change
           command: |
+            if [[ "$CIRCLE_TAG" ~= "dev" ]]; then
+              echo "Dev tag detected, skipping validation."
+              exit 0
+            fi
             excaped_expected_val="\<\< parameters.step_name \>\>"
             expected_val=$(echo "$excaped_expected_val" | sed -e's/\//\\\//g')
             CONFIGURED_BIN_VERSION=$(cat packages/orb/commands/notify.yml | yq '.steps[] | select(.run.name =="$expected_val") | .run.environment.SLACK_STR_BIN_VERSION')
