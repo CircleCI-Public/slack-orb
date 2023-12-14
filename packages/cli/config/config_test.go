@@ -117,7 +117,7 @@ func TestValidate(t *testing.T) {
 			// This test case checks the behavior when the channel string is missing.
 			config:      &Config{AccessToken: "token", ChannelsStr: "", JobStatus: "pass"},
 			description: "MissingChannelString",
-			expectedErr: "SLACK_PARAM_CHANNEL",
+			expectedErr: "SLACK_STR_CHANNEL",
 		},
 		{
 			// This test case checks the behavior when nothing is missing.

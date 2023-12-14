@@ -45,7 +45,7 @@
 			"fields": [
 				{
 					"type": "mrkdwn",
-					"text": "*Mentions*: $SLACK_PARAM_MENTIONS"
+					"text": "*Mentions*: $SLACK_STR_MENTIONS"
 				}
 			]
 		},

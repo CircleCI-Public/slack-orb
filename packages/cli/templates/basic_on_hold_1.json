@@ -36,7 +36,7 @@
 			"fields": [
 				{
 					"type": "mrkdwn",
-					"text": "*Mentions*: $SLACK_PARAM_MENTIONS"
+					"text": "*Mentions*: $SLACK_STR_MENTIONS"
 				}
 			]
 		},
@@ -50,7 +50,7 @@
 						"type": "plain_text",
 						"text": "View Workflow"
 					},
-					"url": "${SLACK_PARAM_CIRCLECI_HOST}/workflow-run/${CIRCLE_WORKFLOW_ID}"
+					"url": "${SLACK_STR_CIRCLECI_HOST}/workflow-run/${CIRCLE_WORKFLOW_ID}"
 				}
 			]
 		}

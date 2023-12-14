@@ -55,7 +55,7 @@ parameters:
     default: false
   mentions:
     description: |
-      Exports to the "$SLACK_PARAM_MENTIONS" environment variable for use in templates.
+      Exports to the "$SLACK_STR_MENTIONS" environment variable for use in templates.
       Mention users via the @ symbol: "@USER"
       If the username contains a space, the Slack ID must be used with angled brackets: "<@U8XXXXXXX>"
     type: string
@@ -114,20 +114,20 @@ steps:
       when: always
       name: << parameters.step_name >>
       environment:
-        SLACK_PARAM_EVENT: "<<parameters.event>>"
+        SLACK_STR_EVENT: "<<parameters.event>>"
         SLACK_STR_TEMPLATE_VAR: "<<parameters.template_var>>"
         SLACK_STR_TEMPLATE_PATH: "<<parameters.template_path>>"
         SLACK_STR_TEMPLATE_INLINE: "<<parameters.template_inline>>"
         SLACK_STR_TEMPLATE: "<<parameters.template>>"
-        SLACK_PARAM_MENTIONS: "<<parameters.mentions>>"
-        SLACK_PARAM_BRANCHPATTERN: "<<parameters.branch_pattern>>"
-        SLACK_PARAM_TAGPATTERN: "<<parameters.tag_pattern>>"
-        SLACK_PARAM_INVERT_MATCH: "<<parameters.invert_match>>"
-        SLACK_PARAM_CHANNEL: "<<parameters.channel>>"
-        SLACK_PARAM_IGNORE_ERRORS: "<<parameters.ignore_errors>>"
-        SLACK_PARAM_DEBUG: "<<parameters.debug>>"
-        SLACK_PARAM_CIRCLECI_HOST: "<<parameters.circleci_host>>"
-        SLACK_PARAM_SHA256: "<<parameters.sha256>>"
+        SLACK_STR_MENTIONS: "<<parameters.mentions>>"
+        SLACK_STR_BRANCHPATTERN: "<<parameters.branch_pattern>>"
+        SLACK_STR_TAGPATTERN: "<<parameters.tag_pattern>>"
+        SLACK_STR_INVERT_MATCH: "<<parameters.invert_match>>"
+        SLACK_STR_CHANNEL: "<<parameters.channel>>"
+        SLACK_BOOL_IGNORE_ERRORS: "<<parameters.ignore_errors>>"
+        SLACK_BOOL_DEBUG: "<<parameters.debug>>"
+        SLACK_STR_CIRCLECI_HOST: "<<parameters.circleci_host>>"
+        SLACK_STR_SHA256: "<<parameters.sha256>>"
         SLACK_STR_BIN_VERSION: "v1.0.0"
         SLACK_STR_BIN_OVERRIDE_URL: "<<parameters.bin_override_url>>"
       command: <<include(scripts/main.sh)>>

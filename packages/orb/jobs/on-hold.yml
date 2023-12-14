@@ -17,7 +17,7 @@ parameters:
     default: false
   mentions:
     description: |
-      Exports to the "$SLACK_PARAM_MENTIONS" environment variable for use in templates.
+      Exports to the "$SLACK_STR_MENTIONS" environment variable for use in templates.
       Mention users via the @ symbol: "@USER"
       If the username contains a space, the Slack ID must be used with angled brackets: "<@U8XXXXXXX>"
     type: string

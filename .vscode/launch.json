@@ -13,10 +13,10 @@
       "args": ["notify"],
       "env": {
         "SLACK_ACCESS_TOKEN": "YOU_TOKEN",
-        "SLACK_PARAM_CHANNEL": "YOUR_CHANNEL",
-        "SLACK_PARAM_TEMPLATE": "YOUR_TEMPLATE",
+        "SLACK_STR_CHANNEL": "YOUR_CHANNEL",
+        "SLACK_STR_TEMPLATE": "YOUR_TEMPLATE",
         "CCI_STATUS": "pass",
-        "SLACK_PARAM_DEBUG": "1"
+        "SLACK_BOOL_DEBUG": "1"
       }
     }
   ]

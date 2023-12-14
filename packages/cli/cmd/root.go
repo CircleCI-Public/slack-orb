@@ -23,7 +23,7 @@ var rootCmd = &cobra.Command{
 			log.Fatalf("Error accessing debug flag: %v", err)
 		}
 		if debugFlag {
-			os.Setenv("SLACK_PARAM_DEBUG", "true")
+			os.Setenv("SLACK_BOOL_DEBUG", "true")
 		}
 		debugValue := config.GetDebug()
 		if debugValue {
@@ -69,10 +69,10 @@ func handleConfigurationError(err error) {
 				"In order to use the Slack Orb an OAuth token must be present via the SLACK_ACCESS_TOKEN environment variable." +
 					"\nFollow the setup guide available in the wiki: https://github.com/CircleCI-Public/slack-orb/wiki/Setup.",
 			)
-		case "SLACK_PARAM_CHANNEL":
+		case "SLACK_STR_CHANNEL":
 			//nolint:lll // user message
 			log.Fatalf(
-				`No channel was provided. Please provide one or more channels using the "SLACK_PARAM_CHANNEL" environment variable or the "channel" parameter.`,
+				`No channel was provided. Please provide one or more channels using the "SLACK_STR_CHANNEL" environment variable or the "channel" parameter.`,
 			)
 		default:
 			log.Fatalf("Configuration validation failed: Environment variable not set: %s", envVarError.VarName)

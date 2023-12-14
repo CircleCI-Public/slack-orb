@@ -78,7 +78,7 @@ print_error() {
 # Print a debug message
 # $1: The debug message to print
 print_debug() {
-    if [ "$SLACK_PARAM_DEBUG" = 1 ]; then
+    if [ "$SLACK_BOOL_DEBUG" = 1 ]; then
         # ANSI escape code for blue color
         BLUE="\033[0;34m"
         # ANSI escape code to reset color
@@ -112,7 +112,7 @@ repo_name="slack-orb-go"
 repo_url=""
 repo_source_location="" # reference for error message
 binary="$orb_bin_dir/$bin_name"
-input_sha256=$(circleci env subst "$SLACK_PARAM_SHA256")
+input_sha256=$(circleci env subst "$SLACK_STR_SHA256")
 
 if [ ! -f "$binary" ]; then
   mkdir -p "$orb_bin_dir"

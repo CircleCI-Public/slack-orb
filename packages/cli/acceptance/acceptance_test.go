@@ -34,10 +34,10 @@ func TestSlackOrbBinary(t *testing.T) {
 	}{{
 		name: "Basic success template",
 		environment: map[string]string{
-			"SLACK_ACCESS_TOKEN":  "test-token",
-			"SLACK_PARAM_CHANNEL": "test-channel",
-			"CCI_STATUS":          "pass",
-			"SLACK_PARAM_EVENT":   "pass",
+			"SLACK_ACCESS_TOKEN": "test-token",
+			"SLACK_STR_CHANNEL":  "test-channel",
+			"CCI_STATUS":         "pass",
+			"SLACK_STR_EVENT":    "pass",
 		},
 		expectedExitCode:          0,
 		expectedOutput:            "Successfully posted message to channel: test-channel",
@@ -45,11 +45,11 @@ func TestSlackOrbBinary(t *testing.T) {
 	}, {
 		name: "Debug flag enabled",
 		environment: map[string]string{
-			"SLACK_ACCESS_TOKEN":  "test-token",
-			"SLACK_PARAM_CHANNEL": "test-channel",
-			"CCI_STATUS":          "pass",
-			"SLACK_PARAM_EVENT":   "pass",
-			"SLACK_PARAM_DEBUG":   "true",
+			"SLACK_ACCESS_TOKEN": "test-token",
+			"SLACK_STR_CHANNEL":  "test-channel",
+			"CCI_STATUS":         "pass",
+			"SLACK_STR_EVENT":    "pass",
+			"SLACK_BOOL_DEBUG":   "true",
 		},
 		expectedExitCode:          0,
 		expectedOutput:            "DEBU Posting the following JSON to Slack",
@@ -57,10 +57,10 @@ func TestSlackOrbBinary(t *testing.T) {
 	}, {
 		name: "Basic fail template",
 		environment: map[string]string{
-			"SLACK_ACCESS_TOKEN":  "test-token",
-			"SLACK_PARAM_CHANNEL": "test-channel",
-			"CCI_STATUS":          "fail",
-			"SLACK_PARAM_EVENT":   "fail",
+			"SLACK_ACCESS_TOKEN": "test-token",
+			"SLACK_STR_CHANNEL":  "test-channel",
+			"CCI_STATUS":         "fail",
+			"SLACK_STR_EVENT":    "fail",
 		},
 		expectedExitCode:          0,
 		expectedOutput:            "Successfully posted message to channel: test-channel",
@@ -68,7 +68,7 @@ func TestSlackOrbBinary(t *testing.T) {
 	}, {
 		name: "Missing slack token",
 		environment: map[string]string{
-			"SLACK_PARAM_CHANNEL": "test-channel",
+			"SLACK_STR_CHANNEL": "test-channel",
 		},
 		expectedExitCode: 1,
 		expectedOutput:   "In order to use the Slack Orb an OAuth token must be present via the SLACK_ACCESS_TOKEN environment variable.",
@@ -78,28 +78,28 @@ func TestSlackOrbBinary(t *testing.T) {
 			"SLACK_ACCESS_TOKEN": "test-token",
 		},
 		expectedExitCode: 1,
-		expectedOutput:   `No channel was provided. Please provide one or more channels using the "SLACK_PARAM_CHANNEL" environment variable or the "channel" parameter.`,
+		expectedOutput:   `No channel was provided. Please provide one or more channels using the "SLACK_STR_CHANNEL" environment variable or the "channel" parameter.`,
 	}, {
 		name:             "Job status does not match",
 		expectedExitCode: 0,
 		expectedOutput:   `Exiting without posting to Slack: The job status "fail" does not match the status set to send alerts "pass".`,
 		environment: map[string]string{
-			"SLACK_ACCESS_TOKEN":  "test-token",
-			"SLACK_PARAM_CHANNEL": "test-channel",
-			"CCI_STATUS":          "fail",
-			"SLACK_PARAM_EVENT":   "pass",
+			"SLACK_ACCESS_TOKEN": "test-token",
+			"SLACK_STR_CHANNEL":  "test-channel",
+			"CCI_STATUS":         "fail",
+			"SLACK_STR_EVENT":    "pass",
 		},
 	}, {
 		name:             "Multiline string env var parsed correctly",
 		expectedExitCode: 0,
 		expectedOutput:   `This message should show over multiple lines: Line 1.\\nLine 2.\\nLine 3.`,
 		environment: map[string]string{
-			"SLACK_ACCESS_TOKEN":  "test-token",
-			"SLACK_PARAM_CHANNEL": "test-channel",
-			"CCI_STATUS":          "pass",
-			"SLACK_PARAM_EVENT":   "pass",
-			"SLACK_PARAM_DEBUG":   "true",
-			"MULTILINE_STRING":    `Line 1.\nLine 2.\nLine 3.`,
+			"SLACK_ACCESS_TOKEN": "test-token",
+			"SLACK_STR_CHANNEL":  "test-channel",
+			"CCI_STATUS":         "pass",
+			"SLACK_STR_EVENT":    "pass",
+			"SLACK_BOOL_DEBUG":   "true",
+			"MULTILINE_STRING":   `Line 1.\nLine 2.\nLine 3.`,
 			"SLACK_STR_TEMPLATE_INLINE": `{
 "blocks": [
 	{

@@ -52,17 +52,17 @@ func InitConfig() error {
 
 	SlackConfig = Config{
 		AccessToken:        os.Getenv("SLACK_ACCESS_TOKEN"),
-		BranchPattern:      os.Getenv("SLACK_PARAM_BRANCHPATTERN"),
-		ChannelsStr:        os.Getenv("SLACK_PARAM_CHANNEL"),
+		BranchPattern:      os.Getenv("SLACK_STR_BRANCHPATTERN"),
+		ChannelsStr:        os.Getenv("SLACK_STR_CHANNEL"),
 		Debug:              GetDebug(),
-		EventToSendMessage: os.Getenv("SLACK_PARAM_EVENT"),
-		IgnoreErrorsStr:    os.Getenv("SLACK_PARAM_IGNORE_ERRORS"),
-		InvertMatchStr:     os.Getenv("SLACK_PARAM_INVERT_MATCH"),
+		EventToSendMessage: os.Getenv("SLACK_STR_EVENT"),
+		IgnoreErrorsStr:    os.Getenv("SLACK_BOOL_IGNORE_ERRORS"),
+		InvertMatchStr:     os.Getenv("SLACK_STR_INVERT_MATCH"),
 		JobBranch:          os.Getenv("CIRCLE_BRANCH"),
 		JobStatus:          os.Getenv("CCI_STATUS"),
 		JobTag:             os.Getenv("CIRCLE_TAG"),
 		SlackAPIBaseUrl:    os.Getenv("TEST_SLACK_API_BASE_URL"),
-		TagPattern:         os.Getenv("SLACK_PARAM_TAGPATTERN"),
+		TagPattern:         os.Getenv("SLACK_STR_TAGPATTERN"),
 		TemplateInline:     os.Getenv("SLACK_STR_TEMPLATE_INLINE"),
 		TemplateName:       os.Getenv("SLACK_STR_TEMPLATE"),
 		TemplatePath:       os.Getenv("SLACK_STR_TEMPLATE_PATH"),
@@ -124,7 +124,7 @@ func (c *Config) Validate() error {
 		return &EnvVarError{VarName: "SLACK_ACCESS_TOKEN"}
 	}
 	if c.ChannelsStr == "" {
-		return &EnvVarError{VarName: "SLACK_PARAM_CHANNEL"}
+		return &EnvVarError{VarName: "SLACK_STR_CHANNEL"}
 	}
 	if c.JobStatus != "pass" && c.JobStatus != "fail" {
 		return fmt.Errorf("invalid value for CCI_STATUS: %s", c.JobStatus)
@@ -194,7 +194,7 @@ func ConvertFileToCRLF(filePath string) error {
 }
 
 func GetDebug() bool {
-	debugBool, err := strconv.ParseBool(os.Getenv("SLACK_PARAM_DEBUG"))
+	debugBool, err := strconv.ParseBool(os.Getenv("SLACK_BOOL_DEBUG"))
 	if err != nil {
 		return false
 	}
