@@ -313,34 +313,7 @@ jobs:
                 }
               ]
             }
-      - run:
-          name: Clear binary from Linux cache
-          command: rm -rf ./.circleci/orbs/circleci/slack/Linux
-      - slack/notify:
-          debug: true
-          ignore_errors: false
-          step_name: "Test custom override URL (Linux)"
-          event: always
-          bin_override_url: "https://github.com/CircleCI-Public/slack-orb-go/releases/download/v0.2.5/slack-orb-go_Linux_x86_64"
-          template_inline: >
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "Current Job: $CIRCLE_JOB"
-                  }
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "this message was sent using override url build v0.2.5"
-                  }
-                }
-              ]
-            }
+
   build-release:
     executor:
       name: go/default
