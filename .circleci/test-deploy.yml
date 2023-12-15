@@ -175,12 +175,6 @@ jobs:
       - slack/notify:
           debug: true
           ignore_errors: false
-          step_name: "Basic on hold template"
-          template: basic_on_hold_1
-          event: always
-      - slack/notify:
-          debug: true
-          ignore_errors: false
           step_name: "Custom template with env var in the message"
           event: always
           template_inline: >

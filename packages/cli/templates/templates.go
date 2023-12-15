@@ -13,9 +13,6 @@ var (
 	//go:embed basic_fail_1.json
 	basicFail string
 
-	//go:embed basic_on_hold_1.json
-	basicOnHold string
-
 	//go:embed basic_success_1.json
 	basicSuccess string
 
@@ -31,7 +28,6 @@ var (
 
 	preparedNames = map[string]string{
 		"basic_fail_1":            basicFail,
-		"basic_on_hold_1":         basicOnHold,
 		"basic_success_1":         basicSuccess,
 		"success_tagged_deploy_1": successTaggedDeploy,
 	}

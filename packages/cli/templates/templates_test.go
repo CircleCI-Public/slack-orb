@@ -130,16 +130,6 @@ func TestDetermineMessageBody(t *testing.T) {
 			hasError:       false,
 		},
 		{
-			name:           "template coming from file",
-			templateVar:    "",
-			templatePath:   "./basic_on_hold_1.json",
-			templateInline: "",
-			template:       "",
-			jobStatus:      "pass",
-			expected:       ForName("basic_on_hold_1"),
-			hasError:       false,
-		},
-		{
 			name:           "invalid template path",
 			templateVar:    "",
 			templatePath:   "./basic_potato.json",

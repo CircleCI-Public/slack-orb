@@ -29,7 +29,7 @@ parameters:
       This parameter is ignored if the "template_inline", "template_path", or "template_var" parameters are set.
       If left blank, the template will be inferred from the job status.
     type: enum
-    enum: ["basic_fail_1", "basic_on_hold_1", "basic_success_1", "success_tagged_deploy_1", ""]
+    enum: ["basic_fail_1", "basic_success_1", "success_tagged_deploy_1", ""]
     default: ""
   event:
     description: |
