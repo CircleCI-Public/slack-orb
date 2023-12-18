@@ -25,7 +25,7 @@ parameters:
     description: |
       In what event should this message send? Options: ["fail", "pass", "always"]
     type: enum
-    enum: ["fail", "pass", "always"]
+    enum: ["fail", "pass", "always", "notify_destroy"]
     default: "always"
   branch_pattern:
     description: |
