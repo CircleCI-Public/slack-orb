@@ -61,7 +61,7 @@ jobs:
       - slack/notify:
           channel: slack-notify
           event: notify_destroy
-          template: v2_on_hold
+          template: tf_destroy_warning
 
 workflows:
   test-deploy:

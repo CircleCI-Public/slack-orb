@@ -113,4 +113,5 @@ steps:
         success_release: "<<include(message_templates/success-release.json)>>"
         tagged_deploy_success: "<<include(message_templates/tagged-deploy-success.json)>>"
         v2_on_hold: "<<include(message_templates/v2-on-hold.json)>>"
+        tf_destroy_warning: "<<include(message_templates/terraform-destroy-warning.json)>>"
       command: <<include(scripts/main.sh)>>
