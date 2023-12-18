@@ -5,9 +5,18 @@
       "type": "header",
       "text": {
         "type": "plain_text",
-        "text": "Pipeline is ON HOLD because this commit is attempting a Terraform Destroy.  Please review the plan before continuingg  :raised_hand:",
+        "text": "ON HOLD - Terraform Destroy :raised_hand:",
         "emoji": true
       }
+    },
+    {
+      "type": "section",
+      "fields": [
+        {
+          "type": "mrkdwn",
+          "text": "This commit has a proposed terraform destroy.  Please review the plan and approve to continue the pipeline"
+        }
+      ]
     },
     {
       "type": "section",
