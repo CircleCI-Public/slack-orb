@@ -184,7 +184,7 @@ CheckEnvVars() {
 }
 
 ShouldPost() {
-    if [ "$CCI_STATUS" = "$SLACK_PARAM_EVENT" ] || [ "$SLACK_PARAM_EVENT" = "always" ] || [ [ "$SLACK_PARAM_EVENT" = "notify_destroy" ] && [ "$SEND_TF_DESTROY_NOTIFICATION" = true ] ]; then
+    if [ "$CCI_STATUS" = "$SLACK_PARAM_EVENT" ] || [ "$SLACK_PARAM_EVENT" = "always" ] || [ ("$SLACK_PARAM_EVENT" = "notify_destroy" && "$SEND_TF_DESTROY_NOTIFICATION" = true ) ]; then
         # In the event the Slack notification would be sent, first ensure it is allowed to trigger
         # on this branch or this tag.
         FilterBy "$SLACK_PARAM_BRANCHPATTERN" "${CIRCLE_BRANCH:-}"
