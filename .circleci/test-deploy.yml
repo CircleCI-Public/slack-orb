@@ -41,6 +41,11 @@ jobs:
     resource_class: small
     steps:
       - checkout
+      - run:
+          name: Terraform action
+          shell: /bin/bash -xo pipefail
+          command: |
+            echo "export apply_job_name=terraform-apply-prod" >> $BASH_ENV
       - slack/notify:
           channel: slack-notify
           event: always
@@ -53,6 +58,11 @@ jobs:
           channel: slack-notify
           event: always
           template: fail_v2_deploy
+      - slack/notify:
+          channel: slack-notify
+          branch_pattern: v2
+          event: notify_destroy
+          template: v2_on_hold
 
 workflows:
   test-deploy:
