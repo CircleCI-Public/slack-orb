@@ -45,7 +45,7 @@ jobs:
           name: Terraform action
           shell: /bin/bash -xo pipefail
           command: |
-            echo "export apply_job_name=terraform-apply-prod" >> $BASH_ENV
+            echo "export SEND_TF_DESTROY_NOTIFICATION=true" >> $BASH_ENV
       - slack/notify:
           channel: slack-notify
           event: always
