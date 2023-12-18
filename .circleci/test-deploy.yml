@@ -60,7 +60,6 @@ jobs:
           template: fail_v2_deploy
       - slack/notify:
           channel: slack-notify
-          branch_pattern: v2
           event: notify_destroy
           template: v2_on_hold
 
