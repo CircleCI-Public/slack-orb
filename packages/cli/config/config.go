@@ -2,6 +2,7 @@ package config
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"os"
 	"runtime"
@@ -10,7 +11,9 @@ import (
 
 	"github.com/a8m/envsubst"
 	"github.com/charmbracelet/log"
+	"github.com/hashicorp/go-multierror"
 	"github.com/joho/godotenv"
+	"github.com/spf13/viper"
 
 	"github.com/CircleCI-Public/slack-orb-go/packages/cli/utils"
 )
@@ -19,27 +22,50 @@ var SlackConfig Config
 
 // Config represents the configuration loaded from environment variables.
 type Config struct {
-	AccessToken        string
+	// Required configuration
+	AccessToken string
+	Channels    string
+
+	// Trigger matching
 	BranchPattern      string
-	ChannelsStr        string
-	Debug              bool
+	TagPattern         string
 	EventToSendMessage string
-	IgnoreErrorsStr    string
-	InvertMatchStr     string
 	JobBranch          string
 	JobStatus          string
 	JobTag             string
-	SlackAPIBaseUrl    string
-	TagPattern         string
-	TemplateInline     string
-	TemplateName       string
-	TemplatePath       string
-	TemplateVar        string
+
+	// Flags
+	Debug        bool
+	IgnoreErrors string
+	InvertMatch  string
+
+	// Message template
+	TemplateInline string
+	TemplateName   string
+	TemplatePath   string
+	TemplateVar    string
+
+	// Overridable for testing
+	SlackAPIBaseUrl string
 }
 
-// Initialize the configuration from environment variables.
+// InitConfig will initialize the configuration from environment variables.
 // This will set 'SlackConfig' to the loaded configuration.
 func InitConfig() error {
+	if err := bindEnv(); err != nil {
+		return err
+	}
+
+	var cfg Config
+	if err := viper.Unmarshal(&cfg); err != nil {
+		return errors.New("unable to bind configuration")
+	}
+
+	SlackConfig = cfg
+	return nil
+}
+
+func bindEnv() error {
 	// Load environment variables from BASH_ENV and SLACK_JOB_STATUS files
 	// This has to be done before loading the configuration because the configuration
 	// depends on the environment variables loaded from these files
@@ -50,25 +76,29 @@ func InitConfig() error {
 		return err
 	}
 
-	SlackConfig = Config{
-		AccessToken:        os.Getenv("SLACK_ACCESS_TOKEN"),
-		BranchPattern:      os.Getenv("SLACK_STR_BRANCHPATTERN"),
-		ChannelsStr:        os.Getenv("SLACK_STR_CHANNEL"),
-		Debug:              GetDebug(),
-		EventToSendMessage: os.Getenv("SLACK_STR_EVENT"),
-		IgnoreErrorsStr:    os.Getenv("SLACK_BOOL_IGNORE_ERRORS"),
-		InvertMatchStr:     os.Getenv("SLACK_STR_INVERT_MATCH"),
-		JobBranch:          os.Getenv("CIRCLE_BRANCH"),
-		JobStatus:          os.Getenv("CCI_STATUS"),
-		JobTag:             os.Getenv("CIRCLE_TAG"),
-		SlackAPIBaseUrl:    os.Getenv("TEST_SLACK_API_BASE_URL"),
-		TagPattern:         os.Getenv("SLACK_STR_TAGPATTERN"),
-		TemplateInline:     os.Getenv("SLACK_STR_TEMPLATE_INLINE"),
-		TemplateName:       os.Getenv("SLACK_STR_TEMPLATE"),
-		TemplatePath:       os.Getenv("SLACK_STR_TEMPLATE_PATH"),
-		TemplateVar:        os.Getenv("SLACK_STR_TEMPLATE_VAR"),
+	var errs error
+	for k, v := range map[string]string{
+		"AccessToken":        "SLACK_ACCESS_TOKEN",
+		"Channels":           "SLACK_STR_CHANNEL",
+		"BranchPattern":      "SLACK_STR_BRANCHPATTERN",
+		"EventToSendMessage": "SLACK_STR_EVENT",
+		"IgnoreErrors":       "SLACK_BOOL_IGNORE_ERRORS",
+		"InvertMatch":        "SLACK_BOOL_INVERT_MATCH",
+		"JobBranch":          "CIRCLE_BRANCH",
+		"JobStatus":          "CCI_STATUS",
+		"JobTag":             "CIRCLE_TAG",
+		"SlackAPIBaseUrl":    "TEST_SLACK_API_BASE_URL",
+		"TagPattern":         "SLACK_STR_TAGPATTERN",
+		"TemplateInline":     "SLACK_STR_TEMPLATE_INLINE",
+		"TemplateName":       "SLACK_STR_TEMPLATE",
+		"TemplatePath":       "SLACK_STR_TEMPLATE_PATH",
+		"TemplateVar":        "SLACK_STR_TEMPLATE_VAR",
+		"Debug":              "SLACK_BOOL_DEBUG",
+	} {
+		errs = multierror.Append(errs, viper.BindEnv(k, v))
 	}
-	return nil
+
+	return errs.(*multierror.Error).ErrorOrNil()
 }
 
 type EnvVarError struct {
@@ -93,10 +123,10 @@ func (c *Config) expandEnvVariables() error {
 	fields := map[string]*string{
 		"AccessToken":        &c.AccessToken,
 		"BranchPattern":      &c.BranchPattern,
-		"ChannelsStr":        &c.ChannelsStr,
+		"Channels":           &c.Channels,
 		"EventToSendMessage": &c.EventToSendMessage,
-		"IgnoreErrorsStr":    &c.IgnoreErrorsStr,
-		"InvertMatchStr":     &c.InvertMatchStr,
+		"IgnoreErrors":       &c.IgnoreErrors,
+		"InvertMatch":        &c.InvertMatch,
 		"TagPattern":         &c.TagPattern,
 		"TemplateName":       &c.TemplateName,
 		"TemplatePath":       &c.TemplatePath,
@@ -105,10 +135,10 @@ func (c *Config) expandEnvVariables() error {
 
 	for fieldName, fieldValue := range fields {
 		val, err := envsubst.String(*fieldValue)
-
 		if err != nil {
 			return &ExpansionError{FieldName: fieldName, Err: err}
 		}
+
 		*fieldValue = val
 	}
 
@@ -123,7 +153,7 @@ func (c *Config) Validate() error {
 	if c.AccessToken == "" {
 		return &EnvVarError{VarName: "SLACK_ACCESS_TOKEN"}
 	}
-	if c.ChannelsStr == "" {
+	if c.Channels == "" {
 		return &EnvVarError{VarName: "SLACK_STR_CHANNEL"}
 	}
 	if c.JobStatus != "pass" && c.JobStatus != "fail" {
@@ -169,7 +199,6 @@ func loadEnvFromFile(filePath string) error {
 	return nil
 }
 
-// ConvertFileToCRLF converts line endings in a file to CRLF.
 var (
 	CRLF = []byte{13, 10}
 	LF   = []byte{10}

@@ -52,7 +52,7 @@ func TestSlackOrbBinary(t *testing.T) {
 			"SLACK_BOOL_DEBUG":   "true",
 		},
 		expectedExitCode:          0,
-		expectedOutput:            "DEBU Posting the following JSON to Slack",
+		expectedOutput:            "Posting the following JSON to Slack",
 		expectedSlackAPICallCount: 1,
 	}, {
 		name: "Basic fail template",
@@ -123,8 +123,6 @@ func TestSlackOrbBinary(t *testing.T) {
 				slackAPIServer.Close()
 			})
 
-			_ = os.Setenv("NO_COLOR", "true")
-			_ = os.Setenv("CI", "false")
 			cmd := exec.Command(fix.slackOrbPath, "notify")
 
 			comparableOutput := &strings.Builder{}

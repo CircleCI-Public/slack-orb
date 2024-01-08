@@ -23,10 +23,9 @@ var rootCmd = &cobra.Command{
 			log.Fatalf("Error accessing debug flag: %v", err)
 		}
 		if debugFlag {
-			os.Setenv("SLACK_BOOL_DEBUG", "true")
+			_ = os.Setenv("SLACK_BOOL_DEBUG", "true")
 		}
-		debugValue := config.GetDebug()
-		if debugValue {
+		if config.GetDebug() {
 			if os.Getenv("CI") == "true" {
 				log.SetColorProfile(termenv.TrueColor)
 			}
@@ -48,7 +47,6 @@ func Execute() {
 
 func init() {
 	rootCmd.PersistentFlags().Bool("debug", false, "Enable debug logging")
-
 }
 
 func initConfig() {
@@ -60,14 +58,14 @@ func initConfig() {
 		handleConfigurationError(err)
 	}
 }
+
 func handleConfigurationError(err error) {
 	var envVarError *config.EnvVarError
 	if errors.As(err, &envVarError) {
 		switch envVarError.VarName {
 		case "SLACK_ACCESS_TOKEN":
-			log.Fatalf(
-				"In order to use the Slack Orb an OAuth token must be present via the SLACK_ACCESS_TOKEN environment variable." +
-					"\nFollow the setup guide available in the wiki: https://github.com/CircleCI-Public/slack-orb/wiki/Setup.",
+			log.Fatalf(`In order to use the Slack Orb an OAuth token must be present via the SLACK_ACCESS_TOKEN environment variable.
+Follow the setup guide available in the wiki: https://github.com/CircleCI-Public/slack-orb/wiki/Setup.`,
 			)
 		case "SLACK_STR_CHANNEL":
 			//nolint:lll // user message

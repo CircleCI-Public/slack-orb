@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"os"
 	"strings"
 	"testing"
@@ -72,17 +73,18 @@ func TestExpandEnvVariables(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			// Setting environment variables
 			for varName, val := range test.envVars {
-				os.Setenv(varName, val)
-				defer os.Unsetenv(varName)
-
+				_ = os.Setenv(varName, val)
+				t.Cleanup(func() {
+					_ = os.Unsetenv(varName)
+				})
 			}
 
 			config := &Config{AccessToken: test.configVar}
 			err := config.expandEnvVariables()
 
 			if err != nil {
-				expErr, ok := err.(*ExpansionError)
-				if ok {
+				var expErr *ExpansionError
+				if errors.As(err, &expErr) {
 					if expErr.FieldName != test.expectedErr {
 						t.Errorf("Expected error field name: %q, got: %s", test.expectedErr, expErr.FieldName)
 					}
@@ -109,19 +111,19 @@ func TestValidate(t *testing.T) {
 	}{
 		{
 			// This test case checks the behavior when the access token is missing.
-			config:      &Config{AccessToken: "", ChannelsStr: "channel", JobStatus: "pass"},
+			config:      &Config{AccessToken: "", Channels: "channel", JobStatus: "pass"},
 			description: "MissingAccessToken",
 			expectedErr: "SLACK_ACCESS_TOKEN",
 		},
 		{
 			// This test case checks the behavior when the channel string is missing.
-			config:      &Config{AccessToken: "token", ChannelsStr: "", JobStatus: "pass"},
+			config:      &Config{AccessToken: "token", Channels: "", JobStatus: "pass"},
 			description: "MissingChannelString",
 			expectedErr: "SLACK_STR_CHANNEL",
 		},
 		{
 			// This test case checks the behavior when nothing is missing.
-			config:      &Config{AccessToken: "token", ChannelsStr: "channel", JobStatus: "pass"},
+			config:      &Config{AccessToken: "token", Channels: "channel", JobStatus: "pass"},
 			description: "ValidConfig",
 			expectedErr: "",
 		},
@@ -132,8 +134,8 @@ func TestValidate(t *testing.T) {
 			err := test.config.Validate()
 
 			if err != nil {
-				envErr, ok := err.(*EnvVarError)
-				if ok {
+				var envErr *EnvVarError
+				if errors.As(err, &envErr) {
 					if envErr.VarName != test.expectedErr {
 						t.Errorf("Expected error var name: %s, got: %s", test.expectedErr, envErr.VarName)
 					}

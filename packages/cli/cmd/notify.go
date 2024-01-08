@@ -28,23 +28,25 @@ func init() {
 	rootCmd.AddCommand(notifyCmd)
 }
 
-func executeNotify(cmd *cobra.Command, args []string) {
-	invertMatch, _ := strconv.ParseBool(config.SlackConfig.InvertMatchStr)
-	ignoreErrors, _ := strconv.ParseBool(config.SlackConfig.IgnoreErrorsStr)
-	channels := strings.Split(config.SlackConfig.ChannelsStr, ",")
+func executeNotify(_ *cobra.Command, _ []string) {
+	cfg := config.SlackConfig
+	channels := strings.Split(cfg.Channels, ",")
+
+	invertMatch, _ := strconv.ParseBool(cfg.InvertMatch) // will default to false on a parse error
+	ignoreErrors, _ := strconv.ParseBool(cfg.IgnoreErrors)
 
 	slackNotification := slack.Notification{
-		Status:         config.SlackConfig.JobStatus,
-		Branch:         config.SlackConfig.JobBranch,
-		Tag:            config.SlackConfig.JobTag,
-		Event:          config.SlackConfig.EventToSendMessage,
-		BranchPattern:  config.SlackConfig.BranchPattern,
-		TagPattern:     config.SlackConfig.TagPattern,
+		Status:         cfg.JobStatus,
+		Branch:         cfg.JobBranch,
+		Tag:            cfg.JobTag,
+		Event:          cfg.EventToSendMessage,
+		BranchPattern:  cfg.BranchPattern,
+		TagPattern:     cfg.TagPattern,
 		InvertMatch:    invertMatch,
-		TemplateVar:    config.SlackConfig.TemplateVar,
-		TemplatePath:   config.SlackConfig.TemplatePath,
-		TemplateInline: config.SlackConfig.TemplateInline,
-		TemplateName:   config.SlackConfig.TemplateName,
+		TemplateVar:    cfg.TemplateVar,
+		TemplatePath:   cfg.TemplatePath,
+		TemplateInline: cfg.TemplateInline,
+		TemplateName:   cfg.TemplateName,
 	}
 
 	modifiedJSON, err := slackNotification.BuildMessageBody()
@@ -62,17 +64,17 @@ func executeNotify(cmd *cobra.Command, args []string) {
 	}
 
 	client := slack.NewClient(slack.ClientOptions{
-		SlackToken: secret.String(config.SlackConfig.AccessToken),
-		BaseURL:    config.SlackConfig.SlackAPIBaseUrl, // this is okay to set, it's ignored if the value is ""
+		SlackToken: secret.String(cfg.AccessToken),
+		BaseURL:    cfg.SlackAPIBaseUrl, // this is okay to set, it's ignored if the value is ""
 	})
 
 	for _, channel := range channels {
 		log.Debugf("Posting the following JSON to Slack:\n")
-		colorizedJSONWitChannel, err := utils.ColorizeJSON(modifiedJSON)
+		colorizedJSONWithChannel, err := utils.ColorizeJSON(modifiedJSON)
 		if err != nil {
 			log.Fatalf("Error coloring JSON: %v", err)
 		}
-		log.Debug(colorizedJSONWitChannel)
+		log.Debug(colorizedJSONWithChannel)
 		err = client.PostMessage(context.Background(), modifiedJSON, channel)
 		if err != nil {
 			if !ignoreErrors {
