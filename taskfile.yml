@@ -17,6 +17,14 @@ tasks:
       - '{{.BIN_DIR}}/gosimports -local "github.com/CircleCI-Public/slack-orb-go" -w {{.SRC_DIR}}'
       - go work sync
   
+  update-deps:
+    deps: [install-devtools]
+    cmds:
+      - "cd {{.SRC_DIR}} && go get -u ./..."
+      - "cd {{.SRC_DIR}} && go mod tidy -v"
+      - "cd {{.TOOLS_DIR}} && go get -u ./..."
+      - "cd {{.TOOLS_DIR}} && go mod tidy -v"
+  
   sync:
     deps: [install-devtools]
     cmds:
