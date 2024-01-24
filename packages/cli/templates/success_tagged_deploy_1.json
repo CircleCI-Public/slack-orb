@@ -27,7 +27,7 @@
 			],
 			"accessory": {
 				"type": "image",
-				"image_url": "https://assets.brandfolder.com/otz5mn-bw4j2w-6jzqo8/original/circle-logo-badge-black.png",
+				"image_url": "https://production-cci-com.imgix.net/blog/media/circle-logo-badge-black.png",
 				"alt_text": "CircleCI logo"
 			}
 		},
