@@ -327,7 +327,7 @@ jobs:
       - run:
           name: Validate Binary Version Change
           command: |
-            if [[ "$CIRCLE_TAG" ~= "dev" ]]; then
+            if [[ "$CIRCLE_TAG" =~ "dev" ]]; then
               echo "Dev tag detected, skipping validation."
               exit 0
             fi
