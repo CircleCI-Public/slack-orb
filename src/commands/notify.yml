@@ -77,6 +77,11 @@ parameters:
     type: string
     default: Slack - Sending Notification
     description: Specify a custom step name for this command, if desired
+  thread:
+    type: string
+    default: ""
+    description: |
+      Name of the thread in the pipeline. Enables threads.
 steps:
   - run:
       when: on_fail
@@ -88,6 +93,13 @@ steps:
       name: Slack - Detecting Job Status (PASS)
       command: |
         echo 'export CCI_STATUS="pass"' > /tmp/SLACK_JOB_STATUS
+  - when:
+      condition:
+        - not:
+            equal: [ "", <<parameters.thread>> ]
+      steps:
+        - attach_workspace:
+            at: /tmp/SLACK_THREAD_INFO
   - run:
       when: always
       name: << parameters.step_name >>
@@ -103,6 +115,7 @@ steps:
         SLACK_PARAM_IGNORE_ERRORS: "<<parameters.ignore_errors>>"
         SLACK_PARAM_DEBUG: "<<parameters.debug>>"
         SLACK_PARAM_CIRCLECI_HOST: "<<parameters.circleci_host>>"
+        SLACK_PARAM_THREAD: "<<parameters.thread>>"
         SLACK_SCRIPT_NOTIFY: "<<include(scripts/notify.sh)>>"
         SLACK_SCRIPT_UTILS: "<<include(scripts/utils.sh)>>"
         # import pre-built templates using the orb-pack local script include.
@@ -111,3 +124,12 @@ steps:
         basic_on_hold_1: "<<include(message_templates/basic_on_hold_1.json)>>"
         basic_success_1: "<<include(message_templates/basic_success_1.json)>>"
       command: <<include(scripts/main.sh)>>
+  - when:
+      condition:
+        - not:
+            equal: [ "", <<parameters.thread>> ]
+      steps:
+        - persists_to_workspace:
+            root: /tmp/SLACK_THREAD_INFO
+            paths:
+              - *

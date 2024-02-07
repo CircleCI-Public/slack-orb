@@ -41,10 +41,19 @@ BuildMessageBody() {
 PostToSlack() {
     # Post once per channel listed by the channel parameter
     #    The channel must be modified in SLACK_MSG_BODY
+    #    Thread ts is appended if thread messages are enabled in the pipeline
 
     # shellcheck disable=SC2001
     for i in $(eval echo \""$SLACK_PARAM_CHANNEL"\" | sed "s/,/ /g")
     do
+        if [ ! "$SLACK_PARAM_THREAD" = "" ]; then
+            SLACK_THREAD_EXPORT=$(cat /tmp/SLACK_THREAD_INFO/$i | grep -m1 $SLACK_PARAM_THREAD)
+            if [ ! "$SLACK_THREAD_EXPORT" = "" ]; then
+                eval $SLACK_THREAD_EXPORT
+            fi
+            SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg thread_ts "${!SLACK_PARAM_THREAD}" '.thread_ts = $thread_ts')
+        fi
+
         echo "Sending to Slack Channel: $i"
         SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg channel "$i" '.channel = $channel')
         if [ "$SLACK_PARAM_DEBUG" -eq 1 ]; then
@@ -69,6 +78,13 @@ PostToSlack() {
             echo "View the Setup Guide: https://github.com/CircleCI-Public/slack-orb/wiki/Setup"
             if [ "$SLACK_PARAM_IGNORE_ERRORS" = "0" ]; then
                 exit 1
+            fi
+        fi
+
+        if [ ! "$SLACK_PARAM_THREAD" = "" ]; then
+            SLACK_THREAD_TS=$(echo "$SLACK_SENT_RESPONSE" | jq '.ts')
+            if [ ! "$SLACK_THREAD_TS" = "null" ] ; then
+                echo "${!SLACK_PARAM_THREAD}=$SLACK_THREAD_TS" >> /tmp/SLACK_THREAD_INFO/$i
             fi
         fi
     done
