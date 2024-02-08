@@ -132,4 +132,4 @@ steps:
         - persists_to_workspace:
             root: /tmp/SLACK_THREAD_INFO
             paths:
-              - *
+              - .

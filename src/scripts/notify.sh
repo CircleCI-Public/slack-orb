@@ -47,11 +47,12 @@ PostToSlack() {
     for i in $(eval echo \""$SLACK_PARAM_CHANNEL"\" | sed "s/,/ /g")
     do
         if [ ! "$SLACK_PARAM_THREAD" = "" ]; then
-            SLACK_THREAD_EXPORT=$(cat /tmp/SLACK_THREAD_INFO/$i | grep -m1 $SLACK_PARAM_THREAD)
+            SLACK_THREAD_EXPORT=$(cat /tmp/SLACK_THREAD_INFO/"$i" | grep -m1 $SLACK_PARAM_THREAD)
             if [ ! "$SLACK_THREAD_EXPORT" = "" ]; then
-                eval $SLACK_THREAD_EXPORT
+                eval "$SLACK_THREAD_EXPORT"
             fi
-            SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg thread_ts "${!SLACK_PARAM_THREAD}" '.thread_ts = $thread_ts')
+            SLACK_THREAD_TS=$(eval "echo \"\$$SLACK_PARAM_THREAD\"")
+            SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg thread_ts "$SLACK_THREAD_TS" '.thread_ts = $thread_ts')
         fi
 
         echo "Sending to Slack Channel: $i"
@@ -84,7 +85,7 @@ PostToSlack() {
         if [ ! "$SLACK_PARAM_THREAD" = "" ]; then
             SLACK_THREAD_TS=$(echo "$SLACK_SENT_RESPONSE" | jq '.ts')
             if [ ! "$SLACK_THREAD_TS" = "null" ] ; then
-                echo "${!SLACK_PARAM_THREAD}=$SLACK_THREAD_TS" >> /tmp/SLACK_THREAD_INFO/$i
+                echo "$SLACK_PARAM_THREAD=$SLACK_THREAD_TS" >> /tmp/SLACK_THREAD_INFO/"$i"
             fi
         fi
     done
