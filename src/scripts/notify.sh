@@ -43,10 +43,11 @@ PostToSlack() {
     #    The channel must be modified in SLACK_MSG_BODY
     #    Thread ts is appended if thread messages are enabled in the pipeline
 
-    # shellcheck disable=SC2001-SC2002
+    # shellcheck disable=SC2001
     for i in $(eval echo \""$SLACK_PARAM_CHANNEL"\" | sed "s/,/ /g")
     do
         if [ ! "$SLACK_PARAM_THREAD" = "" ]; then
+            # shellcheck disable=SC2002
             SLACK_THREAD_EXPORT=$(cat /tmp/SLACK_THREAD_INFO/"$i" | grep -m1 "$SLACK_PARAM_THREAD")
             if [ ! "$SLACK_THREAD_EXPORT" = "" ]; then
                 eval "$SLACK_THREAD_EXPORT"
