@@ -95,8 +95,8 @@ steps:
         echo 'export CCI_STATUS="pass"' > /tmp/SLACK_JOB_STATUS
   - when:
       condition:
-        - not:
-            equal: [ "", <<parameters.thread>> ]
+        not:
+          equal: [ "", <<parameters.thread>> ]
       steps:
         - attach_workspace:
             at: /tmp/SLACK_THREAD_INFO
@@ -126,10 +126,10 @@ steps:
       command: <<include(scripts/main.sh)>>
   - when:
       condition:
-        - not:
-            equal: [ "", <<parameters.thread>> ]
+        not:
+          equal: [ "", <<parameters.thread>> ]
       steps:
-        - persists_to_workspace:
+        - persist_to_workspace:
             root: /tmp/SLACK_THREAD_INFO
             paths:
               - .
