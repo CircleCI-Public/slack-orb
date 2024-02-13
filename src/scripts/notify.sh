@@ -46,7 +46,7 @@ PostToSlack() {
     # shellcheck disable=SC2001
     for i in $(eval echo \""$SLACK_PARAM_CHANNEL"\" | sed "s/,/ /g")
     do
-        if [ ! "$SLACK_PARAM_THREAD" = "" ]; then
+        if [ ! "$SLACK_PARAM_THREAD" = "" ] && [ -f "/tmp/SLACK_THREAD_INFO/$i" ]; then
             # shellcheck disable=SC2002
             SLACK_THREAD_EXPORT=$(cat /tmp/SLACK_THREAD_INFO/"$i" | grep -m1 "$SLACK_PARAM_THREAD")
             if [ ! "$SLACK_THREAD_EXPORT" = "" ]; then
