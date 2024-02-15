@@ -1,6 +1,6 @@
 description: |
   Send a Slack notification to a channel and use the same message to post replies in a thread.
-  `thread` parameter holds a thread name placeholder in case there are multiple notifications in the pipeline
+  `thread_id` parameter holds a thread identifier in case there are multiple notifications in the pipeline
 usage:
   version: 2.1
   orbs:
@@ -14,7 +14,7 @@ usage:
         - slack/notify:
             event: always
             channel: engineering
-            thread: testing
+            thread_id: testing
             custom: |
               {
                 "blocks": [
@@ -33,7 +33,7 @@ usage:
         - slack/notify:
             event: always
             channel: engineering
-            thread: testing
+            thread_id: testing
             custom: |
               {
                 "blocks": [
@@ -56,7 +56,7 @@ usage:
         - slack/notify:
             event: always
             channel: engineering
-            thread: deployment
+            thread_id: deployment
             custom: |
               {
                 "blocks": [
@@ -75,7 +75,7 @@ usage:
         - slack/notify:
             event: always
             channel: engineering
-            thread: deployment
+            thread_id: deployment
             custom: |
               {
                 "blocks": [
