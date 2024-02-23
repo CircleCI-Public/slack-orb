@@ -48,6 +48,8 @@ PostToSlack() {
     # shellcheck disable=SC2001
     for i in $(eval echo \""$SLACK_PARAM_CHANNEL"\" | sed "s/,/ /g")
     do
+        # replace non-alpha
+        SLACK_PARAM_THREAD=$(echo $SLACK_PARAM_THREAD | sed -r 's/[^[:alpha:][:digit:].]/_/g')
         # check if the invoked `notify` command is intended to post threaded messages &
         # check for persisted thread info file for each channel listed in channel parameter
         if [ ! "$SLACK_PARAM_THREAD" = "" ] && [ -f "/tmp/SLACK_THREAD_INFO/$i" ]; then
@@ -100,6 +102,7 @@ PostToSlack() {
             SLACK_THREAD_TS=$(echo "$SLACK_SENT_RESPONSE" | jq '.ts')
             if [ ! "$SLACK_THREAD_TS" = "null" ] ; then
                 # store the thread_ts in the specified channel for the specified thread_id
+                mkdir -p /tmp/SLACK_THREAD_INFO
                 echo "$SLACK_PARAM_THREAD=$SLACK_THREAD_TS" >> /tmp/SLACK_THREAD_INFO/"$i"
             fi
         fi

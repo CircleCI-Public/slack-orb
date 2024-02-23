@@ -100,8 +100,9 @@ steps:
         not:
           equal: [ "", <<parameters.thread_id>> ]
       steps:
-        - attach_workspace:
-            at: /tmp/SLACK_THREAD_INFO
+        - restore_cache:
+            keys:
+              - cache-<< parameters.thread_id >>-{{ .Environment.CIRCLE_WORKFLOW_ID }}
   - run:
       when: always
       name: << parameters.step_name >>
@@ -131,7 +132,7 @@ steps:
         not:
           equal: [ "", <<parameters.thread_id>> ]
       steps:
-        - persist_to_workspace:
-            root: /tmp/SLACK_THREAD_INFO
+        - save_cache:
+            key: cache-<< parameters.thread_id >>-{{ .Environment.CIRCLE_WORKFLOW_ID }}
             paths:
-              - .
+              - /tmp/SLACK_THREAD_INFO
