@@ -63,6 +63,51 @@ A comma separated list of regex matchable branch or tag names. Notifications wil
 
 See [usage examples](https://circleci.com/developer/orbs/orb/circleci/slack#usage-examples).
 
+## Thread Messages
+
+Post replies in threads with a special parameter `thread_id`. Including this parameter in the `notify` command reference stores the id of the message in a small portion of bytes in cache. Any subsequent invocation of the command with the same value for `thread_id` will post a reply to the initial message in a thread. Example:
+
+```yaml
+- slack/notify:
+      event: always
+      channel: engineering
+      thread_id: testing
+      custom: |
+        {
+          "blocks": [
+            {
+              "type": "section",
+              "fields": [
+                {
+                  "type": "plain_text",
+                  "text": "*Tests started.*",
+                  "emoji": true
+                }
+              ]
+            }
+          ]
+        }
+- slack/notify:
+      event: always
+      channel: engineering
+      thread_id: testing
+      custom: |
+        {
+          "blocks": [
+            {
+              "type": "section",
+              "fields": [
+                {
+                  "type": "plain_text",
+                  "text": "*Tests finished.*",
+                  "emoji": true
+                }
+              ]
+            }
+          ]
+        }
+```
+
 ---
 
 ## FAQ
