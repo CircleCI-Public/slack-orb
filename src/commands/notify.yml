@@ -103,7 +103,8 @@ steps:
       steps:
         - restore_cache:
             keys:
-              - cache-<< parameters.thread_id >>-{{ .Environment.CIRCLE_WORKFLOW_ID }}
+              - cache-{{ .Revision }}-{{ .Environment.CIRCLE_WORKFLOW_ID }}
+              - cache-{{ .Revision }}
   - run:
       when: always
       name: << parameters.step_name >>
@@ -134,6 +135,10 @@ steps:
           equal: [ "", <<parameters.thread_id>> ]
       steps:
         - save_cache:
-            key: cache-<< parameters.thread_id >>-{{ .Environment.CIRCLE_WORKFLOW_ID }}
+            key: cache-{{ .Revision }}-{{ .Environment.CIRCLE_WORKFLOW_ID }}
+            paths:
+              - /tmp/SLACK_THREAD_INFO
+        - save_cache:
+            key: cache-{{ .Revision }}
             paths:
               - /tmp/SLACK_THREAD_INFO
