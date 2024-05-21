@@ -250,7 +250,7 @@ SanitizeVars() {
     # Escape backslashes.
     sanitized_value="$(printf '%s' "$sanitized_value" | awk '{gsub(/\\/, "&\\"); print $0}')"
     # Escape newlines.
-    sanitized_value="$(printf '%s' "$sanitized_value" | awk 'NR > 1 { printf("\\n") } { printf("%s", $0) }')"
+    sanitized_value="$(printf '%s' "$sanitized_value" | tr -d '\r' | awk 'NR > 1 { printf("\\n") } { printf("%s", $0) }')"
     # Escape double quotes.
     if [ "$PLATFORM" = "windows" ]; then
         sanitized_value="$(printf '%s' "$sanitized_value" | awk '{gsub(/"/, "\\\""); print $0}')"
