@@ -77,8 +77,11 @@ PostToSlack() {
             echo "$SLACK_MSG_BODY"
         fi
 
-        if [ -n "${SLACK_PARAM_POSTAT:-}" ]; then
-            SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg post_at "$SLACK_PARAM_POSTAT" '.post_at = $post_at')
+        if [ "${SLACK_PARAM_OFFSET:0}" -ne 0 ]; then
+            POST_AT=$(date -d "now + ${SLACK_PARAM_OFFSET} seconds" +%s)
+            SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg post_at "$POST_AT" '.post_at = ($post_at|tonumber)')
+            # text is required for scheduled messages
+            SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq '.text = "Dummy fallback text"')
             SLACK_SENT_RESPONSE=$(curl -s -f -X POST -H 'Content-type: application/json' -H "Authorization: Bearer $SLACK_ACCESS_TOKEN" --data "$SLACK_MSG_BODY" https://slack.com/api/chat.scheduleMessage)
         else
             SLACK_SENT_RESPONSE=$(curl -s -f -X POST -H 'Content-type: application/json' -H "Authorization: Bearer $SLACK_ACCESS_TOKEN" --data "$SLACK_MSG_BODY" https://slack.com/api/chat.postMessage)
