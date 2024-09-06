@@ -150,6 +150,7 @@ FilterBy() {
 
     # If any pattern supplied matches the current branch or the current tag, proceed; otherwise, exit with message.
     FLAG_MATCHES_FILTER="false"
+    # shellcheck disable=SC2001
     for i in $(echo "$1" | sed "s/,/ /g"); do
         if echo "$2" | grep -Eq "^${i}$"; then
             FLAG_MATCHES_FILTER="true"
