@@ -85,11 +85,11 @@ parameters:
       Any subsequent `notify` usage with the same identifier will be posted within the initial message's thread.
       `thread_id` should be set to any arbitrary string to help you identify different threads. See examples for more information.
       Enabling thread messages with this parameter implies using a very small amount of cacheing: ~200 B
-    scheduled_offset_seconds:
-      type: integer
-      default: 0
-      description: |
-        When set, the notification is a scheduled message.
+  scheduled_offset_seconds:
+    type: integer
+    default: 0
+    description: |
+      When set, the notification is a scheduled message.
 steps:
   - run:
       when: on_fail
