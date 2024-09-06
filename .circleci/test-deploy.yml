@@ -87,22 +87,22 @@ jobs:
               ]
             }
       - slack/notify:
-            event: always
-            debug: true
-            step_name: "Custom template with scheduled offset"
-            scheduled_offset_seconds: 60 # 30 seconds after the job starts
-            custom: |
-              {
-                "blocks": [
-                  {
-                    "type": "section",
-                    "text": {
-                      "type": "mrkdwn",
-                      "text": "Sample link using environment variable in markdown <${CIRCLE_BUILD_URL}|LINK >"
-                    }
+          event: always
+          debug: true
+          step_name: "Custom template with scheduled offset"
+          scheduled_offset_seconds: 60 # 60 seconds after the job starts
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Sample link using environment variable in markdown <${CIRCLE_BUILD_URL}|LINK >"
                   }
-                ]
-              }
+                }
+              ]
+            }
       - run:
           name: Dynamically populate the mention and export the template as an environment variable
           command: |
