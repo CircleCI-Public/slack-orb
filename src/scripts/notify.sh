@@ -81,9 +81,12 @@ PostToSlack() {
             if date --version >/dev/null 2>&1; then
                 # GNU date function
                 POST_AT=$(date -d "now + ${SLACK_PARAM_OFFSET} seconds" +%s)
-            else
+            elif date -v+1S >/dev/null 2>&1; then
                 # BSD date function
                 POST_AT=$(date -v"+${SLACK_PARAM_OFFSET}S" +%s)
+            else
+                # Alpine
+                POST_AT=$(date -u +%s | awk -v sec="$SLACK_PARAM_OFFSET" '{print $1 + sec}')
             fi
             SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg post_at "$POST_AT" '.post_at = ($post_at|tonumber)')
             # text is required for scheduled messages
