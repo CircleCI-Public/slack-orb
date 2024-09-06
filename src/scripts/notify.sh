@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2016,SC3043
-
+set -x
 # Import utils.
 eval "$SLACK_SCRIPT_UTILS"
 JQ_PATH=/usr/local/bin/jq
@@ -78,7 +78,13 @@ PostToSlack() {
         fi
 
         if [ "${SLACK_PARAM_OFFSET:0}" -ne 0 ]; then
-            POST_AT=$(date -d "now + ${SLACK_PARAM_OFFSET} seconds" +%s)
+            if date --version >/dev/null 2>&1; then
+                # GNU date function
+                POST_AT=$(date -d "now + ${SLACK_PARAM_OFFSET} seconds" +%s)
+            else
+                # BSD date function
+                POST_AT=$(date -v"+${SLACK_PARAM_OFFSET}S" +%s)
+            fi
             SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg post_at "$POST_AT" '.post_at = ($post_at|tonumber)')
             # text is required for scheduled messages
             SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq '.text = "Dummy fallback text"')
@@ -290,3 +296,4 @@ if [ "${0#*"$ORB_TEST_ENV"}" = "$0" ]; then
     BuildMessageBody
     PostToSlack
 fi
+set +x
