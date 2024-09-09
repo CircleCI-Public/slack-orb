@@ -90,7 +90,7 @@ jobs:
           event: always
           debug: true
           step_name: "Custom template with scheduled offset"
-          scheduled_offset_seconds: 60 # 60 seconds after the job starts
+          scheduled_offset_seconds: 600 # 600 seconds after the job starts
           custom: |
             {
               "blocks": [
@@ -98,7 +98,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "Sample link using environment variable in markdown <${CIRCLE_BUILD_URL}|LINK >"
+                    "text": "Sample sent using schedule offset after 5 minutes >"
                   }
                 }
               ]
