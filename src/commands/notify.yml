@@ -77,6 +77,14 @@ parameters:
     type: string
     default: Slack - Sending Notification
     description: Specify a custom step name for this command, if desired
+  thread_id:
+    type: string
+    default: ""
+    description: |
+      When set, the first `notify` with a given `thread_id` will appear as a regular slack message.
+      Any subsequent `notify` usage with the same identifier will be posted within the initial message's thread.
+      `thread_id` should be set to any arbitrary string to help you identify different threads. See examples for more information.
+      Enabling thread messages with this parameter implies using a very small amount of cacheing: ~200 B
 steps:
   - run:
       when: on_fail
@@ -88,6 +96,15 @@ steps:
       name: Slack - Detecting Job Status (PASS)
       command: |
         echo 'export CCI_STATUS="pass"' > /tmp/SLACK_JOB_STATUS
+  - when:
+      condition:
+        not:
+          equal: [ "", <<parameters.thread_id>> ]
+      steps:
+        - restore_cache:
+            keys:
+              - cache-<< parameters.thread_id >>-{{ .Environment.CIRCLE_PIPELINE_ID }}
+            when: always
   - run:
       when: always
       name: << parameters.step_name >>
@@ -103,6 +120,7 @@ steps:
         SLACK_PARAM_IGNORE_ERRORS: "<<parameters.ignore_errors>>"
         SLACK_PARAM_DEBUG: "<<parameters.debug>>"
         SLACK_PARAM_CIRCLECI_HOST: "<<parameters.circleci_host>>"
+        SLACK_PARAM_THREAD: "<<parameters.thread_id>>"
         SLACK_SCRIPT_NOTIFY: "<<include(scripts/notify.sh)>>"
         SLACK_SCRIPT_UTILS: "<<include(scripts/utils.sh)>>"
         # import pre-built templates using the orb-pack local script include.
@@ -111,3 +129,13 @@ steps:
         basic_on_hold_1: "<<include(message_templates/basic_on_hold_1.json)>>"
         basic_success_1: "<<include(message_templates/basic_success_1.json)>>"
       command: <<include(scripts/main.sh)>>
+  - when:
+      condition:
+        not:
+          equal: [ "", <<parameters.thread_id>> ]
+      steps:
+        - save_cache:
+            key: cache-<< parameters.thread_id >>-{{ .Environment.CIRCLE_PIPELINE_ID }}
+            paths:
+              - /tmp/SLACK_THREAD_INFO
+            when: always

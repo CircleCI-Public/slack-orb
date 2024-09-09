@@ -41,10 +41,34 @@ BuildMessageBody() {
 PostToSlack() {
     # Post once per channel listed by the channel parameter
     #    The channel must be modified in SLACK_MSG_BODY
+    #    If thread_id is used a file containing the initial message `thread_ts` per each channel is persisted
+    #    /tmp/SLACK_THREAD_INFO/<channel_name> will contain:
+    #    <thread_id>=12345.12345
 
     # shellcheck disable=SC2001
     for i in $(eval echo \""$SLACK_PARAM_CHANNEL"\" | sed "s/,/ /g")
     do
+        # replace non-alpha
+        SLACK_PARAM_THREAD=$(echo "$SLACK_PARAM_THREAD" | sed -r 's/[^[:alpha:][:digit:].]/_/g')
+        # check if the invoked `notify` command is intended to post threaded messages &
+        # check for persisted thread info file for each channel listed in channel parameter
+        if [ ! "$SLACK_PARAM_THREAD" = "" ] && [ -f "/tmp/SLACK_THREAD_INFO/$i" ]; then
+            # get the initial message thread_ts targeting the correct channel and thread id
+            # || [ "$?" = "1" ] - this is used to avoid exit status 1 if grep doesn't match anything
+            # shellcheck disable=SC2002
+            SLACK_THREAD_EXPORT=$(grep -m1 "$SLACK_PARAM_THREAD" /tmp/SLACK_THREAD_INFO/"$i" || [ "$?" = "1" ])
+            if [ ! "$SLACK_THREAD_EXPORT" = "" ]; then
+                # if there is an initial message with a thread id, load it into the environment
+                # thread_id=12345.12345
+                eval "$SLACK_THREAD_EXPORT"
+            fi
+            # get the value of the specified thread from the environment
+            # SLACK_THREAD_TS=12345.12345
+            SLACK_THREAD_TS=$(eval "echo \"\$$SLACK_PARAM_THREAD\"")
+            # append the thread_ts to the body for posting the message in the correct thread
+            SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg thread_ts "$SLACK_THREAD_TS" '.thread_ts = $thread_ts')
+        fi
+
         echo "Sending to Slack Channel: $i"
         SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg channel "$i" '.channel = $channel')
         if [ "$SLACK_PARAM_DEBUG" -eq 1 ]; then
@@ -69,6 +93,17 @@ PostToSlack() {
             echo "View the Setup Guide: https://github.com/CircleCI-Public/slack-orb/wiki/Setup"
             if [ "$SLACK_PARAM_IGNORE_ERRORS" = "0" ]; then
                 exit 1
+            fi
+        fi
+
+        # check if the invoked `notify` command is intended to post messages in threads
+        if [ ! "$SLACK_PARAM_THREAD" = "" ]; then
+            # get message thread_ts from response
+            SLACK_THREAD_TS=$(echo "$SLACK_SENT_RESPONSE" | jq '.ts')
+            if [ ! "$SLACK_THREAD_TS" = "null" ] ; then
+                # store the thread_ts in the specified channel for the specified thread_id
+                mkdir -p /tmp/SLACK_THREAD_INFO
+                echo "$SLACK_PARAM_THREAD=$SLACK_THREAD_TS" >> /tmp/SLACK_THREAD_INFO/"$i"
             fi
         fi
     done
