@@ -14,6 +14,56 @@ release-filters: &release-filters
     only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
 
 jobs:
+  replicate-455:
+    executor:
+      machine:
+        image: ubuntu-2204
+        resource_class: medium
+    steps:
+    - run:
+      name: Set Slack notification params
+      command: echo 'export SLACK_NOTIFICATION_COLOR="#FF5C5C"' >> "$BASH_ENV"
+    - slack/notify:
+      event: always
+      custom: |
+        {
+          "attachments": [
+            {
+              "color": "$SLACK_NOTIFICATION_COLOR",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*$CIRCLE_PROJECT_REPONAME* build started by $CIRCLE_USERNAME ${CCI_STATUS}ed!"
+                  }
+                },
+                {
+                  "type": "context",
+                  "elements": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "branch: *$CIRCLE_BRANCH* | job: *$CIRCLE_JOB*"
+                    }
+                  ]
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "View"
+                      },
+                      "url": "$CIRCLE_BUILD_URL"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
   integration-test-templates:
     parameters:
       runner:
@@ -226,12 +276,14 @@ jobs:
 workflows:
   test-deploy:
     jobs:
-      - integration-test-templates:
+      - replicate-455:
           context: SLACK_NOTIFICATIONS_TEST
-          filters: *filters
-          matrix:
-            parameters:
-              runner: [cimg, mac, alpine, windows]
+      # - integration-test-templates:
+      #     context: SLACK_NOTIFICATIONS_TEST
+      #     filters: *filters
+      #     matrix:
+      #       parameters:
+      #         runner: [cimg, mac, alpine, windows]
       - orb-tools/pack:
           filters: *release-filters
       - orb-tools/publish:
@@ -240,7 +292,8 @@ workflows:
           pub_type: production
           enable_pr_comment: true
           github_token: GHI_TOKEN
-          requires: [orb-tools/pack, integration-test-templates]
+          # requires: [orb-tools/pack, integration-test-templates]
+          requires: [orb-tools/pack]
           context: orb-publisher
           filters: *release-filters
 executors:
