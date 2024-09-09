@@ -22,7 +22,7 @@ jobs:
         name: Set Slack notification params
         command: echo 'export SLACK_NOTIFICATION_COLOR="#FF5C5C"' >> "$BASH_ENV"
     - slack/notify:
-        event: always
+        event: fail
         custom: |
           {
             "attachments": [
