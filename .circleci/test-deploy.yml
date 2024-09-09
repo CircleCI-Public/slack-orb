@@ -16,54 +16,52 @@ release-filters: &release-filters
 jobs:
   replicate-455:
     executor:
-      machine:
-        image: ubuntu-2204
-        resource_class: medium
+      name: machine
     steps:
     - run:
-      name: Set Slack notification params
-      command: echo 'export SLACK_NOTIFICATION_COLOR="#FF5C5C"' >> "$BASH_ENV"
+        name: Set Slack notification params
+        command: echo 'export SLACK_NOTIFICATION_COLOR="#FF5C5C"' >> "$BASH_ENV"
     - slack/notify:
-      event: always
-      custom: |
-        {
-          "attachments": [
-            {
-              "color": "$SLACK_NOTIFICATION_COLOR",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*$CIRCLE_PROJECT_REPONAME* build started by $CIRCLE_USERNAME ${CCI_STATUS}ed!"
-                  }
-                },
-                {
-                  "type": "context",
-                  "elements": [
-                    {
+        event: always
+        custom: |
+          {
+            "attachments": [
+              {
+                "color": "$SLACK_NOTIFICATION_COLOR",
+                "blocks": [
+                  {
+                    "type": "section",
+                    "text": {
                       "type": "mrkdwn",
-                      "text": "branch: *$CIRCLE_BRANCH* | job: *$CIRCLE_JOB*"
+                      "text": "*$CIRCLE_PROJECT_REPONAME* build started by $CIRCLE_USERNAME ${CCI_STATUS}ed!"
                     }
-                  ]
-                },
-                {
-                  "type": "actions",
-                  "elements": [
-                    {
-                      "type": "button",
-                      "text": {
-                        "type": "plain_text",
-                        "text": "View"
-                      },
-                      "url": "$CIRCLE_BUILD_URL"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
+                  },
+                  {
+                    "type": "context",
+                    "elements": [
+                      {
+                        "type": "mrkdwn",
+                        "text": "branch: *$CIRCLE_BRANCH* | job: *$CIRCLE_JOB*"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "actions",
+                    "elements": [
+                      {
+                        "type": "button",
+                        "text": {
+                          "type": "plain_text",
+                          "text": "View"
+                        },
+                        "url": "$CIRCLE_BUILD_URL"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
   integration-test-templates:
     parameters:
       runner:
@@ -283,7 +281,7 @@ workflows:
       #     filters: *filters
       #     matrix:
       #       parameters:
-      #         runner: [cimg, mac, alpine, windows]
+      #         runner: [cimg, mac, alpine, windows, machine]
       - orb-tools/pack:
           filters: *release-filters
       - orb-tools/publish:
@@ -297,12 +295,16 @@ workflows:
           context: orb-publisher
           filters: *release-filters
 executors:
+  machine:
+    machine:
+      image: ubuntu-2004:current
+      resource_class: medium
   cimg:
     docker:
       - image: cimg/base:current
   mac:
     macos:
-      xcode: 14.0.0
+      xcode: 15.3.0
   alpine:
     # This image contains both CURL and JQ
     docker:
