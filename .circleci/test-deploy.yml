@@ -299,6 +299,7 @@ executors:
     machine:
       image: ubuntu-2004:current
       resource_class: medium
+      shell: bash -leo pipefail
   cimg:
     docker:
       - image: cimg/base:current
