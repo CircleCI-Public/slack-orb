@@ -255,4 +255,4 @@ executors:
     machine:
       image: windows-server-2019-vs2019:current
       resource_class: windows.medium
-      shell: powershell.exe
+      shell: bash.exe
