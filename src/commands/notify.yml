@@ -87,13 +87,13 @@ parameters:
       Enabling thread messages with this parameter implies using a very small amount of cacheing: ~200 B
 steps:
   - run:
-      shell: bash
+      shell: bash -eo pipefail
       when: on_fail
       name: Slack - Detecting Job Status (FAIL)
       command: |
         echo 'export CCI_STATUS="fail"' > /tmp/SLACK_JOB_STATUS
   - run:
-      shell: bash
+      shell: bash -eo pipefail
       when: on_success
       name: Slack - Detecting Job Status (PASS)
       command: |
@@ -108,7 +108,7 @@ steps:
               - cache-<< parameters.thread_id >>-{{ .Environment.CIRCLE_PIPELINE_ID }}
             when: always
   - run:
-      shell: bash
+      shell: bash -eo pipefail
       when: always
       name: << parameters.step_name >>
       environment:
