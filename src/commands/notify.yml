@@ -92,13 +92,11 @@ parameters:
       When set, the notification is a scheduled message.
 steps:
   - run:
-      shell: bash.exe -eo pipefail
       when: on_fail
       name: Slack - Detecting Job Status (FAIL)
       command: |
         echo 'export CCI_STATUS="fail"' > /tmp/SLACK_JOB_STATUS
   - run:
-      shell: bash.exe -eo pipefail
       when: on_success
       name: Slack - Detecting Job Status (PASS)
       command: |
@@ -114,7 +112,6 @@ steps:
             when: always
   - run:
       when: always
-      shell: bash.exe -eo pipefail
       name: << parameters.step_name >>
       environment:
         SLACK_PARAM_EVENT: "<<parameters.event>>"

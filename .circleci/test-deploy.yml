@@ -111,6 +111,7 @@ jobs:
             echo 'export MY_ORB_TEMPLATE=$(cat src/message_templates/basic_success_1.json)' >> $BASH_ENV
       - slack/notify:
           debug: true
+          shell: bash -oe pipefail
           step_name: "Dynamic template with environment variable"
           event: always
           template: MY_ORB_TEMPLATE
