@@ -114,7 +114,7 @@ steps:
             when: always
   - run:
       when: always
-      # shell: bash -eo pipefail
+      shell: bash -eo pipefail
       name: << parameters.step_name >>
       environment:
         SLACK_PARAM_EVENT: "<<parameters.event>>"
