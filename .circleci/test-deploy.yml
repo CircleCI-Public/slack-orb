@@ -145,6 +145,26 @@ jobs:
               ]
             }
       - run:
+          name: Export variable with a multiline string and carriage
+          command: |
+            printf '%s\n' 'export MULTILINE_STRING_CARRIAGE=$(printf "%s\\r\\n" "Line 1." "Line 2." "Line 3.")' >> "$BASH_ENV"
+      - slack/notify:
+          debug: true
+          step_name: "Notify with multiline string and carriage"
+          event: pass
+          custom: >
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "This message should show over multiple lines despite carriage: $MULTILINE_STRING_CARRIAGE"
+                  }
+                }
+              ]
+            }
+      - run:
           name: Export variable with double quotes
           command: |
             printf '%s\n' 'export DOUBLE_QUOTES_STRING=$(printf "%s\\n" "Hello There! My name is \"Potato\"")' >> "$BASH_ENV"
