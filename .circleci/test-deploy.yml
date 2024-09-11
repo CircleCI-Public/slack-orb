@@ -239,6 +239,7 @@ workflows:
             parameters:
               runner: [cimg, mac, alpine, windows]
       - slack/on-hold:
+          context: SLACK_NOTIFICATIONS_TEST
           debug: true
           step_name: "On hold with thread"
           template: basic_success_1
