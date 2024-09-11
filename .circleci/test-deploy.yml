@@ -24,6 +24,12 @@ jobs:
       - checkout
       - slack/notify:
           debug: true
+          step_name: "Initial message with thread"
+          template: basic_success_1
+          event: always
+          thread_id: orb-testing-thread-<${CIRCLE_SHA1}>
+      - slack/notify:
+          debug: true
           step_name: "Custom template with group mention"
           event: always
           custom: |
@@ -60,17 +66,6 @@ jobs:
           step_name: "Success template with mentions"
           template: basic_success_1
           event: always
-      - slack/notify:
-          debug: true
-          step_name: "Initial message with thread"
-          template: basic_success_1
-          event: always
-          thread_id: orb-testing-thread-<${CIRCLE_SHA1}>
-      - slack/on-hold:
-          debug: true
-          step_name: "On hold with thread"
-          template: basic_success_1
-          thread_id: orb-testing-thread-<${CIRCLE_SHA1}>
       - slack/notify:
           debug: true
           step_name: "Success tagged template"
@@ -243,6 +238,14 @@ workflows:
           matrix:
             parameters:
               runner: [cimg, mac, alpine, windows]
+      - slack/on-hold:
+          debug: true
+          step_name: "On hold with thread"
+          template: basic_success_1
+          thread_id: orb-testing-thread-<${CIRCLE_SHA1}>-<<matrix.executor>>
+          matrix:
+            parameters:
+              executor: [cimg, mac, alpine, windows]
       - orb-tools/pack:
           filters: *release-filters
       - orb-tools/publish:
