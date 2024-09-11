@@ -65,12 +65,12 @@ jobs:
           step_name: "Initial message with thread"
           template: basic_success_1
           event: always
-          threa_id: orb-testing-thread-<${CIRCLE_SHA1}>
+          thread_id: orb-testing-thread-<${CIRCLE_SHA1}>
       - slack/on-hold:
           debug: true
           step_name: "On hold with thread"
           template: basic_success_1
-          threa_id: orb-testing-thread-<${CIRCLE_SHA1}>
+          thread_id: orb-testing-thread-<${CIRCLE_SHA1}>
       - slack/notify:
           debug: true
           step_name: "Success tagged template"
