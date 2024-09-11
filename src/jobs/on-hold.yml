@@ -55,6 +55,14 @@ parameters:
     type: string
     default: Slack - Sending Notification
     description: Specify a custom step name for this command, if desired
+  thread_id:
+    type: string
+    default: ""
+    description: |
+      When set, the first `notify` with a given `thread_id` will appear as a regular slack message.
+      Any subsequent `notify` usage with the same identifier will be posted within the initial message's thread.
+      `thread_id` should be set to any arbitrary string to help you identify different threads. See examples for more information.
+      Enabling thread messages with this parameter implies using a very small amount of cacheing: ~200 B    
 
 docker:
   - image: cimg/base:stable
@@ -72,3 +80,4 @@ steps:
       debug: <<parameters.debug>>
       circleci_host: <<parameters.circleci_host>>
       step_name: <<parameters.step_name>>
+      thread_id: <<parameters.thread_id>>
