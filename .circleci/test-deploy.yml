@@ -242,10 +242,7 @@ workflows:
           debug: true
           step_name: "On hold with thread"
           template: basic_success_1
-          thread_id: orb-testing-thread-<${CIRCLE_SHA1}>-<<matrix.executor>>
-          matrix:
-            parameters:
-              executor: [cimg, mac, alpine, windows]
+          thread_id: orb-testing-thread-<${CIRCLE_SHA1}>
       - orb-tools/pack:
           filters: *release-filters
       - orb-tools/publish:
