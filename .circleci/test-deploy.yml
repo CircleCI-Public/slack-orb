@@ -24,6 +24,29 @@ jobs:
       - checkout
       - slack/notify:
           debug: true
+          step_name: "apostrophe's template"
+          event: always
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Current Job: $CIRCLE_JOB"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "This message's apostrophe"
+                  }
+                }
+              ]
+            }
+      - slack/notify:
+          debug: true
           step_name: "Custom template with group mention"
           event: always
           custom: |
