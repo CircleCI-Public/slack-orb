@@ -92,8 +92,26 @@ jobs:
                 }
               ]
             }
+      - slack/notify:
+          event: always
+          debug: true
+          step_name: "Custom template with scheduled offset"
+          scheduled_offset_seconds: 600 # 600 seconds after the job starts
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Sample sent using schedule offset after 5 minutes >"
+                  }
+                }
+              ]
+            }
       - run:
           name: Dynamically populate the mention and export the template as an environment variable
+          shell: bash -eo pipefail
           command: |
             echo 'export COMMIT_MESSAGE="This text comes from an environment variable"' >> $BASH_ENV
             echo 'export SLACK_PARAM_MENTIONS="$COMMIT_MESSAGE"' >> $BASH_ENV
@@ -270,4 +288,4 @@ executors:
     machine:
       image: windows-server-2019-vs2019:current
       resource_class: windows.medium
-      shell: bash.exe
+      shell: powershell.exe

@@ -106,6 +106,32 @@ Post replies in threads with a special parameter `thread_id`. Including this par
         }
 ```
 
+## Scheduled Message
+
+Set the `scheduled_offset_seconds` special parameter to a number of seconds if you want to post a scheduled message. Example:
+
+  ```yaml
+- slack/notify:
+      event: always
+      scheduled_offset_seconds: 30
+      custom: |
+        {
+          "blocks": [
+            {
+              "type": "section",
+              "fields": [
+                {
+                  "type": "plain_text",
+                  "text": "*This is a text notification*",
+                  "emoji": true
+                }
+              ]
+            }
+          ]
+        }
+  ```
+
+
 ---
 
 ## FAQ
