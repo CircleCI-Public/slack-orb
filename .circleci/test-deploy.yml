@@ -24,6 +24,12 @@ jobs:
       - checkout
       - slack/notify:
           debug: true
+          step_name: "Initial message with thread"
+          template: basic_success_1
+          event: always
+          thread_id: orb-testing-thread-<${CIRCLE_SHA1}>
+      - slack/notify:
+          debug: true
           step_name: "Custom template with group mention"
           event: always
           custom: |
@@ -232,6 +238,12 @@ workflows:
           matrix:
             parameters:
               runner: [cimg, mac, alpine, windows]
+      - slack/on-hold:
+          context: SLACK_NOTIFICATIONS_TEST
+          debug: true
+          step_name: "On hold with thread"
+          template: basic_success_1
+          thread_id: orb-testing-thread-<${CIRCLE_SHA1}>
       - orb-tools/pack:
           filters: *release-filters
       - orb-tools/publish:
