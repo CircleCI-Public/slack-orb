@@ -150,6 +150,22 @@ jobs:
                 }
               ]
             }
+      - slack/notify:
+          debug: true
+          step_name: "Notify with multiline lines using scape character and json"
+          event: pass
+          custom: >
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "This text \n must be multi line"
+                  }
+                }
+              ]
+            }
       - run:
           name: Export variable with a multiline string and carriage
           command: |
