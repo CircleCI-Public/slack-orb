@@ -150,6 +150,14 @@ jobs:
                 }
               ]
             }
+      - run:
+          name: Export variable with a multiline string
+          command: |
+            printf '%s\n' 'export MULTILINE_STRING_TEMP=$(printf "%s\\n" "Line Temp 1." "Line Temp 2." "Line Temp 3.")' >> "$BASH_ENV"
+      - run:
+          name: Export variable with a multiline string
+          command: |
+            printf '%s\n' 'export MULTILINE_FROM_VARIABLE=$(printf "%b" "$MULTILINE_STRING_TEMP")' >> "$BASH_ENV"
       - slack/notify:
           debug: true
           step_name: "Notify with multiline lines using scape character and json"
@@ -161,7 +169,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "This text \n must be multi line"
+                    "text": "This text \n must be multi line $MULTILINE_FROM_VARIABLE"
                   }
                 }
               ]
