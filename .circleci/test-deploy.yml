@@ -24,7 +24,7 @@ jobs:
       - checkout
       - slack/notify:
           debug: true
-          step_name: "Test to send notification based on branch"
+          step_name: "Test to send notification based on tag"
           custom: |
             {
               "blocks": [
@@ -32,13 +32,13 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "This text is coming because branch is issue-415"
+                    "text": "This should not be sent as there is no tag"
                   }
                 }
               ]
             }
           event: always
-          branch_pattern: .
+          tag_pattern: v[A-Za-z_0-9]+
       # - slack/notify:
       #     debug: true
       #     step_name: "Initial message with thread"
@@ -279,22 +279,21 @@ workflows:
           step_name: "On hold with thread"
           template: basic_success_1
           thread_id: orb-testing-thread-<${CIRCLE_SHA1}>
-      - orb-tools/pack:
-          filters: *release-filters
-      - orb-tools/publish:
-          orb_name: circleci/slack
-          vcs_type: << pipeline.project.type >>
-          pub_type: production
-          enable_pr_comment: true
-          github_token: GHI_TOKEN
-          requires: [orb-tools/pack, integration-test-templates]
-          context: orb-publisher
-          filters: *release-filters
+      # - orb-tools/pack:
+      #     filters: *release-filters
+      # - orb-tools/publish:
+      #     orb_name: circleci/slack
+      #     vcs_type: << pipeline.project.type >>
+      #     pub_type: production
+      #     enable_pr_comment: true
+      #     github_token: GHI_TOKEN
+      #     requires: [orb-tools/pack, integration-test-templates]
+      #     context: orb-publisher
+      #     filters: *release-filters
 executors:
   machine:
     machine:
       image: ubuntu-2004:current
-    shell: bash -leo pipefail
   cimg:
     docker:
       - image: cimg/base:current
@@ -303,7 +302,6 @@ executors:
       xcode: 14.0.0
   alpine:
     # This image contains both CURL and JQ
-    shell: bash -leo pipefail
     docker:
       - image: dwdraju/alpine-curl-jq
   windows:
