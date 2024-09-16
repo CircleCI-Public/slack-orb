@@ -24,14 +24,7 @@ jobs:
       - checkout
       - slack/notify:
           debug: true
-          step_name: "Initial message with thread"
-          template: basic_success_1
-          event: always
-          thread_id: orb-testing-thread-<${CIRCLE_SHA1}>
-      - slack/notify:
-          debug: true
-          step_name: "Custom template with group mention"
-          event: always
+          step_name: "Test to send notification based on branch"
           custom: |
             {
               "blocks": [
@@ -39,213 +32,237 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "Current Job: $CIRCLE_JOB"
-                  }
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "This test will @ a normal user, a user ID, and normal group name: <@U8C9ETTUG>, @orbs, @gabriel"
+                    "text": "This text is coming because branch is issue-415"
                   }
                 }
               ]
             }
-      - run:
-          name: Verify SLACK_JOB_STATUS is written
-          command: |
-            grep "pass" /tmp/SLACK_JOB_STATUS
-      - slack/notify:
-          debug: true
-          step_name: "Fail template with mentions"
-          template: basic_fail_1
-          mentions: "@orbs"
           event: always
-      - slack/notify:
-          debug: true
-          step_name: "Success template with mentions"
-          template: basic_success_1
-          event: always
-      - slack/notify:
-          debug: true
-          step_name: "Success tagged template"
-          template: success_tagged_deploy_1
-          event: always
-      - slack/notify:
-          debug: true
-          step_name: "Basic on hold template"
-          template: basic_on_hold_1
-          event: always
-      - slack/notify:
-          debug: true
-          step_name: "Custom template with env var in the message"
-          event: pass
-          custom: >
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "Sample link using environment variable in markdown <${CIRCLE_BUILD_URL}|LINK >"
-                  }
-                }
-              ]
-            }
-      - slack/notify:
-          event: always
-          debug: true
-          step_name: "Custom template with scheduled offset"
-          scheduled_offset_seconds: 600 # 600 seconds after the job starts
-          custom: |
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "Sample sent using schedule offset after 5 minutes >"
-                  }
-                }
-              ]
-            }
-      - run:
-          name: Dynamically populate the mention and export the template as an environment variable
-          shell: bash -eo pipefail
-          command: |
-            echo 'export COMMIT_MESSAGE="This text comes from an environment variable"' >> $BASH_ENV
-            echo 'export SLACK_PARAM_MENTIONS="$COMMIT_MESSAGE"' >> $BASH_ENV
-            echo 'export MY_ORB_TEMPLATE=$(cat src/message_templates/basic_success_1.json)' >> $BASH_ENV
-      - slack/notify:
-          debug: true
-          step_name: "Dynamic template with environment variable"
-          event: always
-          template: MY_ORB_TEMPLATE
-      - slack/notify:
-          debug: true
-          step_name: "Notify without template parameter"
-      # Should run for every branch but master
-      - slack/notify:
-          debug: true
-          step_name: "Invert match set to true on 'master' branch pattern"
-          branch_pattern: "master"
-          invert_match: true
-      - run:
-          name: Export variable with a multiline string
-          command: |
-            printf '%s\n' 'export MULTILINE_STRING=$(printf "%s\\n" "Line 1." "Line 2." "Line 3.")' >> "$BASH_ENV"
-      - slack/notify:
-          debug: true
-          step_name: "Notify with multiline string"
-          event: pass
-          custom: >
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "This message should show over multiple lines: $MULTILINE_STRING"
-                  }
-                }
-              ]
-            }
-      - run:
-          name: Export variable with a multiline string and carriage
-          command: |
-            printf '%s\n' 'export MULTILINE_STRING_CARRIAGE=$(printf "%s\\r\\n" "Line 1." "Line 2." "Line 3.")' >> "$BASH_ENV"
-      - slack/notify:
-          debug: true
-          step_name: "Notify with multiline string and carriage"
-          event: pass
-          custom: >
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "This message should show over multiple lines despite carriage: $MULTILINE_STRING_CARRIAGE"
-                  }
-                }
-              ]
-            }
-      - run:
-          name: Export variable with double quotes
-          command: |
-            printf '%s\n' 'export DOUBLE_QUOTES_STRING=$(printf "%s\\n" "Hello There! My name is \"Potato\"")' >> "$BASH_ENV"
-      - slack/notify:
-          debug: true
-          step_name: "Notify with double-quoted string"
-          event: pass
-          custom: >
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "This message should show a string between double quotes: $DOUBLE_QUOTES_STRING"
-                  }
-                }
-              ]
-            }
-      - run:
-          name: Export variable with backslashes
-          command: |
-            printf '%s\n' 'export BACKSLASHES_STRING="This is how a \ looks like"' >> "$BASH_ENV"
-      - slack/notify:
-          debug: true
-          step_name: "Notify with backslashes string"
-          event: pass
-          custom: >
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "This message should show a backslash: $BACKSLASHES_STRING"
-                  }
-                }
-              ]
-            }
-      - run:
-          name: Export value to file
-          command: |
-            printf '%s\n' "Hello There!" > /tmp/msg
-      - slack/notify:
-          debug: true
-          step_name: "Notify with custom message coming from sub-shell and template variable"
-          event: always
-          custom: |
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "Current Job: $CIRCLE_JOB"
-                  }
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "$(cat /tmp/msg)"
-                  }
-                }
-              ]
-            }
-      - slack/notify:
-          debug: true
-          step_name: "Notify with only custom message coming from sub-shell"
-          event: always
-          custom: |
-            {
-              "type": "mrkdwn",
-              "text": "$(cat /tmp/msg)"
-            }
+          branch_pattern: issue-415
+      # - slack/notify:
+      #     debug: true
+      #     step_name: "Initial message with thread"
+      #     template: basic_success_1
+      #     event: always
+      #     thread_id: orb-testing-thread-<${CIRCLE_SHA1}>
+      # - slack/notify:
+      #     debug: true
+      #     step_name: "Custom template with group mention"
+      #     event: always
+      #     custom: |
+      #       {
+      #         "blocks": [
+      #           {
+      #             "type": "section",
+      #             "text": {
+      #               "type": "mrkdwn",
+      #               "text": "Current Job: $CIRCLE_JOB"
+      #             }
+      #           },
+      #           {
+      #             "type": "section",
+      #             "text": {
+      #               "type": "mrkdwn",
+      #               "text": "This test will @ a normal user, a user ID, and normal group name: <@U8C9ETTUG>, @orbs, @gabriel"
+      #             }
+      #           }
+      #         ]
+      #       }
+      # - run:
+      #     name: Verify SLACK_JOB_STATUS is written
+      #     command: |
+      #       grep "pass" /tmp/SLACK_JOB_STATUS
+      # - slack/notify:
+      #     debug: true
+      #     step_name: "Fail template with mentions"
+      #     template: basic_fail_1
+      #     mentions: "@orbs"
+      #     event: always
+      # - slack/notify:
+      #     debug: true
+      #     step_name: "Success template with mentions"
+      #     template: basic_success_1
+      #     event: always
+      # - slack/notify:
+      #     debug: true
+      #     step_name: "Success tagged template"
+      #     template: success_tagged_deploy_1
+      #     event: always
+      # - slack/notify:
+      #     debug: true
+      #     step_name: "Basic on hold template"
+      #     template: basic_on_hold_1
+      #     event: always
+      # - slack/notify:
+      #     debug: true
+      #     step_name: "Custom template with env var in the message"
+      #     event: pass
+      #     custom: >
+      #       {
+      #         "blocks": [
+      #           {
+      #             "type": "section",
+      #             "text": {
+      #               "type": "mrkdwn",
+      #               "text": "Sample link using environment variable in markdown <${CIRCLE_BUILD_URL}|LINK >"
+      #             }
+      #           }
+      #         ]
+      #       }
+      # - slack/notify:
+      #     event: always
+      #     debug: true
+      #     step_name: "Custom template with scheduled offset"
+      #     scheduled_offset_seconds: 600 # 600 seconds after the job starts
+      #     custom: |
+      #       {
+      #         "blocks": [
+      #           {
+      #             "type": "section",
+      #             "text": {
+      #               "type": "mrkdwn",
+      #               "text": "Sample sent using schedule offset after 5 minutes >"
+      #             }
+      #           }
+      #         ]
+      #       }
+      # - run:
+      #     name: Dynamically populate the mention and export the template as an environment variable
+      #     shell: bash -eo pipefail
+      #     command: |
+      #       echo 'export COMMIT_MESSAGE="This text comes from an environment variable"' >> $BASH_ENV
+      #       echo 'export SLACK_PARAM_MENTIONS="$COMMIT_MESSAGE"' >> $BASH_ENV
+      #       echo 'export MY_ORB_TEMPLATE=$(cat src/message_templates/basic_success_1.json)' >> $BASH_ENV
+      # - slack/notify:
+      #     debug: true
+      #     step_name: "Dynamic template with environment variable"
+      #     event: always
+      #     template: MY_ORB_TEMPLATE
+      # - slack/notify:
+      #     debug: true
+      #     step_name: "Notify without template parameter"
+      # # Should run for every branch but master
+      # - slack/notify:
+      #     debug: true
+      #     step_name: "Invert match set to true on 'master' branch pattern"
+      #     branch_pattern: "master"
+      #     invert_match: true
+      # - run:
+      #     name: Export variable with a multiline string
+      #     command: |
+      #       printf '%s\n' 'export MULTILINE_STRING=$(printf "%s\\n" "Line 1." "Line 2." "Line 3.")' >> "$BASH_ENV"
+      # - slack/notify:
+      #     debug: true
+      #     step_name: "Notify with multiline string"
+      #     event: pass
+      #     custom: >
+      #       {
+      #         "blocks": [
+      #           {
+      #             "type": "section",
+      #             "text": {
+      #               "type": "mrkdwn",
+      #               "text": "This message should show over multiple lines: $MULTILINE_STRING"
+      #             }
+      #           }
+      #         ]
+      #       }
+      # - run:
+      #     name: Export variable with a multiline string and carriage
+      #     command: |
+      #       printf '%s\n' 'export MULTILINE_STRING_CARRIAGE=$(printf "%s\\r\\n" "Line 1." "Line 2." "Line 3.")' >> "$BASH_ENV"
+      # - slack/notify:
+      #     debug: true
+      #     step_name: "Notify with multiline string and carriage"
+      #     event: pass
+      #     custom: >
+      #       {
+      #         "blocks": [
+      #           {
+      #             "type": "section",
+      #             "text": {
+      #               "type": "mrkdwn",
+      #               "text": "This message should show over multiple lines despite carriage: $MULTILINE_STRING_CARRIAGE"
+      #             }
+      #           }
+      #         ]
+      #       }
+      # - run:
+      #     name: Export variable with double quotes
+      #     command: |
+      #       printf '%s\n' 'export DOUBLE_QUOTES_STRING=$(printf "%s\\n" "Hello There! My name is \"Potato\"")' >> "$BASH_ENV"
+      # - slack/notify:
+      #     debug: true
+      #     step_name: "Notify with double-quoted string"
+      #     event: pass
+      #     custom: >
+      #       {
+      #         "blocks": [
+      #           {
+      #             "type": "section",
+      #             "text": {
+      #               "type": "mrkdwn",
+      #               "text": "This message should show a string between double quotes: $DOUBLE_QUOTES_STRING"
+      #             }
+      #           }
+      #         ]
+      #       }
+      # - run:
+      #     name: Export variable with backslashes
+      #     command: |
+      #       printf '%s\n' 'export BACKSLASHES_STRING="This is how a \ looks like"' >> "$BASH_ENV"
+      # - slack/notify:
+      #     debug: true
+      #     step_name: "Notify with backslashes string"
+      #     event: pass
+      #     custom: >
+      #       {
+      #         "blocks": [
+      #           {
+      #             "type": "section",
+      #             "text": {
+      #               "type": "mrkdwn",
+      #               "text": "This message should show a backslash: $BACKSLASHES_STRING"
+      #             }
+      #           }
+      #         ]
+      #       }
+      # - run:
+      #     name: Export value to file
+      #     command: |
+      #       printf '%s\n' "Hello There!" > /tmp/msg
+      # - slack/notify:
+      #     debug: true
+      #     step_name: "Notify with custom message coming from sub-shell and template variable"
+      #     event: always
+      #     custom: |
+      #       {
+      #         "blocks": [
+      #           {
+      #             "type": "section",
+      #             "text": {
+      #               "type": "mrkdwn",
+      #               "text": "Current Job: $CIRCLE_JOB"
+      #             }
+      #           },
+      #           {
+      #             "type": "section",
+      #             "text": {
+      #               "type": "mrkdwn",
+      #               "text": "$(cat /tmp/msg)"
+      #             }
+      #           }
+      #         ]
+      #       }
+      # - slack/notify:
+      #     debug: true
+      #     step_name: "Notify with only custom message coming from sub-shell"
+      #     event: always
+      #     custom: |
+      #       {
+      #         "type": "mrkdwn",
+      #         "text": "$(cat /tmp/msg)"
+      #       }
 
 workflows:
   test-deploy:
