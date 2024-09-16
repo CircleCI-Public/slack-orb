@@ -38,7 +38,7 @@ jobs:
               ]
             }
           event: always
-          branch_pattern: ' '
+          branch_pattern: .
       # - slack/notify:
       #     debug: true
       #     step_name: "Initial message with thread"
