@@ -156,7 +156,8 @@ FilterBy() {
     if [ -z "$1" ] || [ -z "$2" ]; then
       return
     fi
-
+    echo "$1"
+    echo "$2"
     # If any pattern supplied matches the current branch or the current tag, proceed; otherwise, exit with message.
     FLAG_MATCHES_FILTER="false"
     # shellcheck disable=SC2001
