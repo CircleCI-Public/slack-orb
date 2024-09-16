@@ -299,6 +299,7 @@ executors:
       xcode: 14.0.0
   alpine:
     # This image contains both CURL and JQ
+    shell: bash -leo pipefail
     docker:
       - image: dwdraju/alpine-curl-jq
   windows:
