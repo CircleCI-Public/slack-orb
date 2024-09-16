@@ -272,7 +272,7 @@ workflows:
           filters: *filters
           matrix:
             parameters:
-              runner: [cimg, mac, alpine, windows]
+              runner: [cimg, mac, alpine, windows, machine]
       - slack/on-hold:
           context: SLACK_NOTIFICATIONS_TEST
           debug: true
@@ -291,6 +291,10 @@ workflows:
           context: orb-publisher
           filters: *release-filters
 executors:
+  machine:
+    machine:
+      image: ubuntu-2004:current
+    shell: bash -leo pipefail
   cimg:
     docker:
       - image: cimg/base:current
