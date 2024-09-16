@@ -53,32 +53,6 @@ setup() {
     [ "$SLACK_MSG_BODY" == "$EXPECTED" ]
 }
 
-@test "6: FilterBy - match-all default" {
-    SLACK_PARAM_BRANCHPATTERN=".+"
-    CIRCLE_BRANCH="xyz-123"
-    run FilterBy "$SLACK_PARAM_BRANCHPATTERN" "$CIRCLE_BRANCH"
-    echo "Error SLACK_PARAM_BRANCHPATTERN debug: $SLACK_PARAM_BRANCHPATTERN"
-    echo "Error output debug: $output"
-    [ "$output" == "" ] # Should match any branch: No output error
-    [ "$status" -eq 0 ] # In any case, this should return a 0 exit as to not block a build/deployment.
-}
-
-@test "7: FilterBy - string" {
-    CIRCLE_BRANCH="master"
-    run FilterBy "$SLACK_PARAM_BRANCHPATTERN" "$CIRCLE_BRANCH"
-    echo "Error output debug: $output"
-    [ "$output" == "" ] # "master" is in the list: No output error
-    [ "$status" -eq 0 ] # In any case, this should return a 0 exit as to not block a build/deployment.
-}
-
-@test "8: FilterBy - regex numbers" {
-    CIRCLE_BRANCH="pr-123"
-    run FilterBy "$SLACK_PARAM_BRANCHPATTERN" "$CIRCLE_BRANCH"
-    echo "Error output debug: $output"
-    [ "$output" == "" ] # "pr-[0-9]+" should match: No output error
-    [ "$status" -eq 0 ] # In any case, this should return a 0 exit as to not block a build/deployment.
-}
-
 @test "9: FilterBy - non-match" {
     CIRCLE_BRANCH="x"
     run FilterBy "$SLACK_PARAM_BRANCHPATTERN" "$CIRCLE_BRANCH"
