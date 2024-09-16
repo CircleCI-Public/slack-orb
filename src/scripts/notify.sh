@@ -153,9 +153,7 @@ InstallJq() {
 }
 
 FilterBy() {
-    echo "$1"
-    echo "$2"
-    if [ -z "$1" ] || [ -z "$2" ]; then
+    if [ -z "$1" ]; then
       return
     fi
     # If any pattern supplied matches the current branch or the current tag, proceed; otherwise, exit with message.
