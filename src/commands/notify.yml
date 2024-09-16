@@ -63,6 +63,7 @@ parameters:
       default: true
   debug:
       description: |
+       Runs scripts in debug mode for bash.
        Enable to view full payload being sent to Slack and response being received from the API call.
        Redacted content can be viewed by re-running the job with SSH and accessing the log files referenced in the job output.
        When run in a persistent build environment such as CircleCI Runner, these debug log files may remain in the system's temporary filesystem indefinitely and accumulate over time.
