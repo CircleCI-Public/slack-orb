@@ -153,10 +153,9 @@ InstallJq() {
 }
 
 FilterBy() {
-    if [ -z "$1" ] || [ -z "$2" ]; then
+    if [ -z "$1" ]; then
       return
     fi
-
     # If any pattern supplied matches the current branch or the current tag, proceed; otherwise, exit with message.
     FLAG_MATCHES_FILTER="false"
     # shellcheck disable=SC2001
