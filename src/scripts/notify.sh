@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2016,SC3043
 
+if [ "$SLACK_PARAM_DEBUG" -eq 1 ]; then
+    set -x
+fi
+
 # Import utils.
 eval "$SLACK_SCRIPT_UTILS"
 JQ_PATH=/usr/local/bin/jq
@@ -298,3 +302,4 @@ if [ "${0#*"$ORB_TEST_ENV"}" = "$0" ]; then
     BuildMessageBody
     PostToSlack
 fi
+set +x

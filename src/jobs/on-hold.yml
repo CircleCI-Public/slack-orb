@@ -42,6 +42,7 @@ parameters:
       default: $SLACK_DEFAULT_CHANNEL
   debug:
       description: |
+       Runs scripts in debug mode for bash.
        View payload and response being sent to slack api.
        Enable to view full payload being sent to slack and response being received from the API call.
       type: boolean
