@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 # shellcheck disable=SC2016,SC3043
 
 if [ "$SLACK_PARAM_DEBUG" -eq 1 ]; then
@@ -80,25 +80,7 @@ PostToSlack() {
             echo "The message body being sent to Slack can be found below. To view redacted values, rerun the job with SSH and access: ${SLACK_MSG_BODY_LOG}"
             echo "$SLACK_MSG_BODY"
         fi
-
-        if [ "${SLACK_PARAM_OFFSET:0}" -ne 0 ]; then
-            if date --version >/dev/null 2>&1; then
-                # GNU date function
-                POST_AT=$(date -d "now + ${SLACK_PARAM_OFFSET} seconds" +%s)
-            elif date -v+1S >/dev/null 2>&1; then
-                # BSD date function
-                POST_AT=$(date -v"+${SLACK_PARAM_OFFSET}S" +%s)
-            else
-                # Alpine
-                POST_AT=$(date -u +%s | awk -v sec="$SLACK_PARAM_OFFSET" '{print $1 + sec}')
-            fi
-            SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg post_at "$POST_AT" '.post_at = ($post_at|tonumber)')
-            # text is required for scheduled messages
-            SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq '.text = "Dummy fallback text"')
-            SLACK_SENT_RESPONSE=$(curl -s -f -X POST -H 'Content-type: application/json' -H "Authorization: Bearer $SLACK_ACCESS_TOKEN" --data "$SLACK_MSG_BODY" https://slack.com/api/chat.scheduleMessage)
-        else
-            SLACK_SENT_RESPONSE=$(curl -s -f -X POST -H 'Content-type: application/json' -H "Authorization: Bearer $SLACK_ACCESS_TOKEN" --data "$SLACK_MSG_BODY" https://slack.com/api/chat.postMessage)
-        fi
+        SLACK_SENT_RESPONSE=$(curl -s -f -X POST -H 'Content-type: application/json' -H "Authorization: Bearer $SLACK_ACCESS_TOKEN" --data "$SLACK_MSG_BODY" https://slack.com/api/chat.postMessage)
 
         if [ "$SLACK_PARAM_DEBUG" -eq 1 ]; then
             printf "%s\n" "$SLACK_SENT_RESPONSE" > "$SLACK_SENT_RESPONSE_LOG"
@@ -162,7 +144,6 @@ FilterBy() {
     fi
     # If any pattern supplied matches the current branch or the current tag, proceed; otherwise, exit with message.
     FLAG_MATCHES_FILTER="false"
-    # shellcheck disable=SC2001
     for i in $(echo "$1" | sed "s/,/ /g"); do
         if echo "$2" | grep -Eq "^${i}$"; then
             FLAG_MATCHES_FILTER="true"
