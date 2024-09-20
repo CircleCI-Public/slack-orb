@@ -29,14 +29,14 @@ parameters:
     default: "always"
   branch_pattern:
     description: |
-      A comma separated list of regex matchable branch names. Notifications will only be sent if sent from a job from these branches. By default ".+" will be used to match all branches. Pattern must match the full string, no partial matches.
+      A comma separated list of regex matchable branch names. Notifications will only be sent if sent from a job from these branches. Pattern must match the full string, no partial matches.
     type: string
-    default: ".+"
+    default: ""
   tag_pattern:
     description: |
-      A comma separated list of regex matchable tag names. Notifications will only be sent if sent from a job from these branches. By default ".+" will be used to match all tags. Pattern must match the full string, no partial matches.
+      A comma separated list of regex matchable tag names. Notifications will only be sent if sent from a job from these branches. Pattern must match the full string, no partial matches.
     type: string
-    default: ".+"
+    default: ""
   invert_match:
     description: |
       Invert the branch and tag patterns.
