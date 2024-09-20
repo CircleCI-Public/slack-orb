@@ -20,7 +20,7 @@ workflows:
           filters: *filters
           exclude: RC010
       - shellcheck/check:
-          shell: bash
+          shell: sh
           filters: *filters
       - bats/run:
           path: ./src/tests
