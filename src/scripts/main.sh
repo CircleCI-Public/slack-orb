@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 # Workaround for Windows Support
 # For details, see: https://github.com/CircleCI-Public/slack-orb/pull/380
