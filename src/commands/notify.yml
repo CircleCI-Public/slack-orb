@@ -86,13 +86,20 @@ parameters:
       Any subsequent `notify` usage with the same identifier will be posted within the initial message's thread.
       `thread_id` should be set to any arbitrary string to help you identify different threads. See examples for more information.
       Enabling thread messages with this parameter implies using a very small amount of cacheing: ~200 B
+  scheduled_offset_seconds:
+    type: integer
+    default: 0
+    description: |
+      When set, the notification is a scheduled message.
 steps:
   - run:
+      shell: bash -eo pipefail
       when: on_fail
       name: Slack - Detecting Job Status (FAIL)
       command: |
         echo 'export CCI_STATUS="fail"' > /tmp/SLACK_JOB_STATUS
   - run:
+      shell: bash -eo pipefail
       when: on_success
       name: Slack - Detecting Job Status (PASS)
       command: |
@@ -108,6 +115,7 @@ steps:
             when: always
   - run:
       when: always
+      shell: bash -eo pipefail
       name: << parameters.step_name >>
       environment:
         SLACK_PARAM_EVENT: "<<parameters.event>>"
@@ -122,6 +130,7 @@ steps:
         SLACK_PARAM_DEBUG: "<<parameters.debug>>"
         SLACK_PARAM_CIRCLECI_HOST: "<<parameters.circleci_host>>"
         SLACK_PARAM_THREAD: "<<parameters.thread_id>>"
+        SLACK_PARAM_OFFSET: "<<parameters.scheduled_offset_seconds>>"
         SLACK_SCRIPT_NOTIFY: "<<include(scripts/notify.sh)>>"
         SLACK_SCRIPT_UTILS: "<<include(scripts/utils.sh)>>"
         # import pre-built templates using the orb-pack local script include.

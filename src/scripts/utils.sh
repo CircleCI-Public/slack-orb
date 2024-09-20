@@ -1,5 +1,5 @@
 #!/bin/false
-# shellcheck shell=sh
+# shellcheck shell=bash
 # shellcheck disable=SC2154
 
 detect_os() {
