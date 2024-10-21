@@ -246,22 +246,58 @@ jobs:
               "type": "mrkdwn",
               "text": "$(cat /tmp/msg)"
             }
+  dummy-test:
+    parameters:
+      runner:
+        type: executor
+        default: cimg
+    executor: <<parameters.runner>>
+    steps:
+      - slack/notify:
+          debug: true
+          step_name: "Dummy Test"
+          event: always
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Current Job: $CIRCLE_JOB"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": ""
+                  }
+                }
+              ]
+            }
 
 workflows:
   test-deploy:
     jobs:
-      - integration-test-templates:
+      # - integration-test-templates:
+      #     context: SLACK_NOTIFICATIONS_TEST
+      #     filters: *filters
+      #     matrix:
+      #       parameters:
+      #         runner: [cimg, mac, alpine, windows, machine]
+      # - slack/on-hold:
+      #     context: SLACK_NOTIFICATIONS_TEST
+      #     debug: true
+      #     step_name: "On hold with thread"
+      #     template: basic_success_1
+      #     thread_id: orb-testing-thread-<${CIRCLE_SHA1}>
+      - dummy-test:
           context: SLACK_NOTIFICATIONS_TEST
           filters: *filters
           matrix:
             parameters:
-              runner: [cimg, mac, alpine, windows, machine]
-      - slack/on-hold:
-          context: SLACK_NOTIFICATIONS_TEST
-          debug: true
-          step_name: "On hold with thread"
-          template: basic_success_1
-          thread_id: orb-testing-thread-<${CIRCLE_SHA1}>
+              runner: [machine]
       - orb-tools/pack:
           filters: *release-filters
       - orb-tools/publish:
@@ -270,7 +306,7 @@ workflows:
           pub_type: production
           enable_pr_comment: true
           github_token: GHI_TOKEN
-          requires: [orb-tools/pack, integration-test-templates]
+          requires: [orb-tools/pack]
           context: orb-publisher
           filters: *release-filters
 executors:
@@ -282,7 +318,7 @@ executors:
       - image: cimg/base:current
   mac:
     macos:
-      xcode: 14.0.0
+      xcode: 15.3.0
   alpine:
     # This image contains both CURL and JQ
     docker:
