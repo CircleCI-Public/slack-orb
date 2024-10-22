@@ -91,6 +91,14 @@ parameters:
     default: 0
     description: |
       When set, the notification is a scheduled message.
+  retries:
+    type: integer
+    default: 0
+    description: The amount of retries when posting the message to slack. Defaults to zero.
+  retry_delay:
+      type: integer
+      default: 30
+      description: The amount of seconds to wait between retries. Defaults to 30.
 steps:
   - run:
       shell: bash -eo pipefail
@@ -118,6 +126,8 @@ steps:
       shell: bash -eo pipefail
       name: << parameters.step_name >>
       environment:
+        SLACK_PARAM_RETRIES: <<parameters.retries>>
+        SLACK_PARAM_RETRY_DELAY: <<parameters.retry_delay>>
         SLACK_PARAM_EVENT: "<<parameters.event>>"
         SLACK_PARAM_TEMPLATE: "<<parameters.template>>"
         SLACK_PARAM_CUSTOM: "<<parameters.custom>>"

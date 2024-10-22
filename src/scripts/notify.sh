@@ -22,10 +22,15 @@ BuildMessageBody() {
         T2="$(eval printf '%s' \""$CUSTOM_BODY_MODIFIED"\")"
     else
         # shellcheck disable=SC2154
-        if [ -n "${SLACK_PARAM_TEMPLATE:-}" ]; then TEMPLATE="\$$SLACK_PARAM_TEMPLATE"
-        elif [ "$CCI_STATUS" = "pass" ]; then TEMPLATE="\$basic_success_1"
-        elif [ "$CCI_STATUS" = "fail" ]; then TEMPLATE="\$basic_fail_1"
-        else echo "A template wasn't provided nor is possible to infer it based on the job status. The job status: '$CCI_STATUS' is unexpected."; exit 1
+        if [ -n "${SLACK_PARAM_TEMPLATE:-}" ]; then
+            TEMPLATE="\$$SLACK_PARAM_TEMPLATE"
+        elif [ "$CCI_STATUS" = "pass" ]; then
+            TEMPLATE="\$basic_success_1"
+        elif [ "$CCI_STATUS" = "fail" ]; then
+            TEMPLATE="\$basic_fail_1"
+        else
+            echo "A template wasn't provided nor is possible to infer it based on the job status. The job status: '$CCI_STATUS' is unexpected."
+            exit 1
         fi
 
         [ -z "${SLACK_PARAM_TEMPLATE:-}" ] && echo "No message template was explicitly chosen. Based on the job status '$CCI_STATUS' the template '$TEMPLATE' will be used."
@@ -42,6 +47,26 @@ BuildMessageBody() {
     SLACK_MSG_BODY="$T2"
 }
 
+NotifyWithRetries() {
+    local success_request=false
+    local retry_count=0
+    while [ "$retry_count" -lt "$SLACK_PARAM_RETRIES" ]; do
+        if SLACK_SENT_RESPONSE=$(curl -s -f -X POST -H 'Content-type: application/json' -H "Authorization: Bearer $SLACK_ACCESS_TOKEN" --data "$SLACK_MSG_BODY" "$1"); then
+            echo "Notification sent"
+            success_request=true
+            break
+        else
+            echo "Error sending notification. Retrying..."
+            retry_count=$((retry_count + 1))
+            sleep "$SLACK_PARAM_RETRY_DELAY"
+        fi
+    done
+    if [ "$success_request" = false ]; then
+        echo "Error sending notification. Max retries reached"
+        exit 1
+    fi
+}
+
 PostToSlack() {
     # Post once per channel listed by the channel parameter
     #    The channel must be modified in SLACK_MSG_BODY
@@ -50,8 +75,7 @@ PostToSlack() {
     #    <thread_id>=12345.12345
 
     # shellcheck disable=SC2001
-    for i in $(eval echo \""$SLACK_PARAM_CHANNEL"\" | sed "s/,/ /g")
-    do
+    for i in $(eval echo \""$SLACK_PARAM_CHANNEL"\" | sed "s/,/ /g"); do
         # replace non-alpha
         SLACK_PARAM_THREAD=$(echo "$SLACK_PARAM_THREAD" | sed -r 's/[^[:alpha:][:digit:].]/_/g')
         # check if the invoked `notify` command is intended to post threaded messages &
@@ -76,7 +100,7 @@ PostToSlack() {
         echo "Sending to Slack Channel: $i"
         SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg channel "$i" '.channel = $channel')
         if [ "$SLACK_PARAM_DEBUG" -eq 1 ]; then
-            printf "%s\n" "$SLACK_MSG_BODY" > "$SLACK_MSG_BODY_LOG"
+            printf "%s\n" "$SLACK_MSG_BODY" >"$SLACK_MSG_BODY_LOG"
             echo "The message body being sent to Slack can be found below. To view redacted values, rerun the job with SSH and access: ${SLACK_MSG_BODY_LOG}"
             echo "$SLACK_MSG_BODY"
         fi
@@ -95,13 +119,13 @@ PostToSlack() {
             SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg post_at "$POST_AT" '.post_at = ($post_at|tonumber)')
             # text is required for scheduled messages
             SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq '.text = "Dummy fallback text"')
-            SLACK_SENT_RESPONSE=$(curl -s -f -X POST -H 'Content-type: application/json' -H "Authorization: Bearer $SLACK_ACCESS_TOKEN" --data "$SLACK_MSG_BODY" https://slack.com/api/chat.scheduleMessage)
+            NotifyWithRetries https://slack.com/api/chat.scheduleMessage
         else
-            SLACK_SENT_RESPONSE=$(curl -s -f -X POST -H 'Content-type: application/json' -H "Authorization: Bearer $SLACK_ACCESS_TOKEN" --data "$SLACK_MSG_BODY" https://slack.com/api/chat.postMessage)
+            NotifyWithRetries https://slack.com/api/chat.postMessage
         fi
 
         if [ "$SLACK_PARAM_DEBUG" -eq 1 ]; then
-            printf "%s\n" "$SLACK_SENT_RESPONSE" > "$SLACK_SENT_RESPONSE_LOG"
+            printf "%s\n" "$SLACK_SENT_RESPONSE" >"$SLACK_SENT_RESPONSE_LOG"
             echo "The response from the API call to Slack can be found below. To view redacted values, rerun the job with SSH and access: ${SLACK_SENT_RESPONSE_LOG}"
             echo "$SLACK_SENT_RESPONSE"
         fi
@@ -122,10 +146,10 @@ PostToSlack() {
         if [ ! "$SLACK_PARAM_THREAD" = "" ]; then
             # get message thread_ts from response
             SLACK_THREAD_TS=$(echo "$SLACK_SENT_RESPONSE" | jq '.ts')
-            if [ ! "$SLACK_THREAD_TS" = "null" ] ; then
+            if [ ! "$SLACK_THREAD_TS" = "null" ]; then
                 # store the thread_ts in the specified channel for the specified thread_id
                 mkdir -p /tmp/SLACK_THREAD_INFO
-                echo "$SLACK_PARAM_THREAD=$SLACK_THREAD_TS" >> /tmp/SLACK_THREAD_INFO/"$i"
+                echo "$SLACK_PARAM_THREAD=$SLACK_THREAD_TS" >>/tmp/SLACK_THREAD_INFO/"$i"
             fi
         fi
     done
@@ -144,21 +168,27 @@ ModifyCustomTemplate() {
 InstallJq() {
     echo "Checking For JQ + CURL"
     if command -v curl >/dev/null 2>&1 && ! command -v jq >/dev/null 2>&1; then
-        uname -a | grep Darwin > /dev/null 2>&1 && JQ_VERSION=jq-osx-amd64 || JQ_VERSION=jq-linux32
+        uname -a | grep Darwin >/dev/null 2>&1 && JQ_VERSION=jq-osx-amd64 || JQ_VERSION=jq-linux32
         curl -Ls -o "$JQ_PATH" https://github.com/stedolan/jq/releases/download/jq-1.6/"${JQ_VERSION}"
         chmod +x "$JQ_PATH"
         command -v jq >/dev/null 2>&1
         return $?
     else
-        command -v curl >/dev/null 2>&1 || { echo >&2 "SLACK ORB ERROR: CURL is required. Please install."; exit 1; }
-        command -v jq >/dev/null 2>&1 || { echo >&2 "SLACK ORB ERROR: JQ is required. Please install"; exit 1; }
+        command -v curl >/dev/null 2>&1 || {
+            echo >&2 "SLACK ORB ERROR: CURL is required. Please install."
+            exit 1
+        }
+        command -v jq >/dev/null 2>&1 || {
+            echo >&2 "SLACK ORB ERROR: JQ is required. Please install"
+            exit 1
+        }
         return $?
     fi
 }
 
 FilterBy() {
     if [ -z "$1" ]; then
-      return
+        return
     fi
     # If any pattern supplied matches the current branch or the current tag, proceed; otherwise, exit with message.
     FLAG_MATCHES_FILTER="false"
@@ -170,9 +200,8 @@ FilterBy() {
         fi
     done
     # If the invert_match parameter is set, invert the match.
-    if { [ "$FLAG_MATCHES_FILTER" = "false" ] && [ "$SLACK_PARAM_INVERT_MATCH" -eq 0 ]; } || \
-        { [ "$FLAG_MATCHES_FILTER" = "true" ] && [ "$SLACK_PARAM_INVERT_MATCH" -eq 1 ]; }
-    then
+    if { [ "$FLAG_MATCHES_FILTER" = "false" ] && [ "$SLACK_PARAM_INVERT_MATCH" -eq 0 ]; } ||
+        { [ "$FLAG_MATCHES_FILTER" = "true" ] && [ "$SLACK_PARAM_INVERT_MATCH" -eq 1 ]; }; then
         # dont send message.
         echo "NO SLACK ALERT"
         echo
@@ -206,8 +235,8 @@ CheckEnvVars() {
     fi
     # If no channel is provided, quit with error
     if [ -z "${SLACK_PARAM_CHANNEL:-}" ]; then
-       echo "No channel was provided. Enter value for SLACK_DEFAULT_CHANNEL env var, or channel parameter"
-       exit 1
+        echo "No channel was provided. Enter value for SLACK_DEFAULT_CHANNEL env var, or channel parameter"
+        exit 1
     fi
 }
 
@@ -242,50 +271,62 @@ SetupLogs() {
 
 # $1: Template with environment variables to be sanitized.
 SanitizeVars() {
-  [ -z "$1" ] && { printf '%s\n' "Missing argument."; return 1; }
-  local template="$1"
+    [ -z "$1" ] && {
+        printf '%s\n' "Missing argument."
+        return 1
+    }
+    local template="$1"
 
-  # Find all environment variables in the template with the format $VAR or ${VAR}.
-  # The "|| true" is to prevent bats from failing when no matches are found.
-  local variables
-  variables="$(printf '%s\n' "$template" | grep -o -E '\$\{?[a-zA-Z_0-9]*\}?' || true)"
-  [ -z "$variables" ] && { printf '%s\n' "Nothing to sanitize."; return 0; }
+    # Find all environment variables in the template with the format $VAR or ${VAR}.
+    # The "|| true" is to prevent bats from failing when no matches are found.
+    local variables
+    variables="$(printf '%s\n' "$template" | grep -o -E '\$\{?[a-zA-Z_0-9]*\}?' || true)"
+    [ -z "$variables" ] && {
+        printf '%s\n' "Nothing to sanitize."
+        return 0
+    }
 
-  # Extract the variable names from the matches.
-  local variable_names
-  variable_names="$(printf '%s\n' "$variables" | grep -o -E '[a-zA-Z0-9_]+' || true)"
-  [ -z "$variable_names" ] && { printf '%s\n' "Nothing to sanitize."; return 0; }
+    # Extract the variable names from the matches.
+    local variable_names
+    variable_names="$(printf '%s\n' "$variables" | grep -o -E '[a-zA-Z0-9_]+' || true)"
+    [ -z "$variable_names" ] && {
+        printf '%s\n' "Nothing to sanitize."
+        return 0
+    }
 
-  # Find out what OS we're running on.
-  detect_os
+    # Find out what OS we're running on.
+    detect_os
 
-  for var in $variable_names; do
-    # The variable must be wrapped in double quotes before the evaluation.
-    # Otherwise the newlines will be removed.
-    local value
-    value="$(eval printf '%s' \"\$"$var\"")"
-    [ -z "$value" ] && { printf '%s\n' "$var is empty or doesn't exist. Skipping it..."; continue; }
+    for var in $variable_names; do
+        # The variable must be wrapped in double quotes before the evaluation.
+        # Otherwise the newlines will be removed.
+        local value
+        value="$(eval printf '%s' \"\$"$var\"")"
+        [ -z "$value" ] && {
+            printf '%s\n' "$var is empty or doesn't exist. Skipping it..."
+            continue
+        }
 
-    printf '%s\n' "Sanitizing $var..."
+        printf '%s\n' "Sanitizing $var..."
 
-    local sanitized_value="$value"
-    # Escape backslashes.
-    sanitized_value="$(printf '%s' "$sanitized_value" | awk '{gsub(/\\/, "&\\"); print $0}')"
-    # Escape newlines.
-    sanitized_value="$(printf '%s' "$sanitized_value" | tr -d '\r' | awk 'NR > 1 { printf("\\n") } { printf("%s", $0) }')"
-    # Escape double quotes.
-    if [ "$PLATFORM" = "windows" ]; then
-        sanitized_value="$(printf '%s' "$sanitized_value" | awk '{gsub(/"/, "\\\""); print $0}')"
-    else
-        sanitized_value="$(printf '%s' "$sanitized_value" | awk '{gsub(/\"/, "\\\""); print $0}')"
-    fi
+        local sanitized_value="$value"
+        # Escape backslashes.
+        sanitized_value="$(printf '%s' "$sanitized_value" | awk '{gsub(/\\/, "&\\"); print $0}')"
+        # Escape newlines.
+        sanitized_value="$(printf '%s' "$sanitized_value" | tr -d '\r' | awk 'NR > 1 { printf("\\n") } { printf("%s", $0) }')"
+        # Escape double quotes.
+        if [ "$PLATFORM" = "windows" ]; then
+            sanitized_value="$(printf '%s' "$sanitized_value" | awk '{gsub(/"/, "\\\""); print $0}')"
+        else
+            sanitized_value="$(printf '%s' "$sanitized_value" | awk '{gsub(/\"/, "\\\""); print $0}')"
+        fi
 
-    # Write the sanitized value back to the original variable.
-    # shellcheck disable=SC3045 # This is working on Alpine.
-    printf -v "$var" "%s" "$sanitized_value"
-  done
+        # Write the sanitized value back to the original variable.
+        # shellcheck disable=SC3045 # This is working on Alpine.
+        printf -v "$var" "%s" "$sanitized_value"
+    done
 
-  return 0;
+    return 0
 }
 
 # Will not run if sourced from another script.
