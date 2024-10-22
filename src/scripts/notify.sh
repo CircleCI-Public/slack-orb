@@ -50,7 +50,7 @@ BuildMessageBody() {
 NotifyWithRetries() {
     local success_request=false
     local retry_count=0
-    while [ "$retry_count" -lt "$SLACK_PARAM_RETRIES" ]; do
+    while [ "$retry_count" -le "$SLACK_PARAM_RETRIES" ]; do
         if SLACK_SENT_RESPONSE=$(curl -s -f -X POST -H 'Content-type: application/json' -H "Authorization: Bearer $SLACK_ACCESS_TOKEN" --data "$SLACK_MSG_BODY" "$1"); then
             echo "Notification sent"
             success_request=true
