@@ -5,7 +5,7 @@ description: |
 usage:
   version: 2.1
   orbs:
-    slack: circleci/slack@4.1
+    slack: circleci/slack@5.0
     node: circleci/node:4.1
   jobs:
     deploy:

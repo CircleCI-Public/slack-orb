@@ -6,11 +6,11 @@ description: |
 usage:
   version: 2.1
   orbs:
-    slack: circleci/slack@4.1
+    slack: circleci/slack@5.0
   jobs:
     notify:
       docker:
-        - image: cimg/base:stable
+        - image: cimg/base:current
       steps:
         - slack/notify:
             event: always

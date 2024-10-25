@@ -5,20 +5,20 @@ description: |
 usage:
   version: 2.1
   orbs:
-    slack: circleci/slack@4.1
+    slack: circleci/slack@5.0
   jobs:
     # This "test" job will run on every commit (as per our workflow)
     # We are ok with no notifications sent for this job.
     test:
       docker:
-        - image: cimg/base:stable
+        - image: cimg/base:current
       steps:
         - run: echo "test my app"
     # This "deploy" job will only run on a tagged commit (as per our workflow)
     # We want to be alerted both if this job fails, and when it succeeds.
     deploy:
       docker:
-        - image: cimg/base:stable
+        - image: cimg/base:current
       steps:
         - run: echo "deploy my app"
         # In the event the deployment has failed, alert the engineering team
