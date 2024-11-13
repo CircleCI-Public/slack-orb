@@ -76,6 +76,16 @@ jobs:
           step_name: "Basic on hold template"
           template: basic_on_hold_1
           event: always
+      - run:
+          name: Generate and Export Slack Message
+          command: |
+            export SLACK_MESSAGE=$(node src/tests/generate-payload.js | jq -c .)
+            echo "export SLACK_MESSAGE='$SLACK_MESSAGE'" >> $BASH_ENV          
+      - slack/notify:
+          debug: true
+          step_name: "Custom template generated dynamicly"
+          event: pass
+          custom: $SLACK_MESSAGE
       - slack/notify:
           debug: true
           step_name: "Custom template with env var in the message"

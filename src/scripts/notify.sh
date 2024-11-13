@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2016,SC3043
 
+SLACK_PARAM_CUSTOM="$(eval echo "${SLACK_PARAM_CUSTOM}" | circleci env subst)"
+SLACK_PARAM_TEMPLATE="$(eval echo "${SLACK_PARAM_TEMPLATE}" | circleci env subst)"
+SLACK_PARAM_CHANNEL="$(eval echo "${SLACK_PARAM_CUSTOM}" | circleci env subst)"
+
 if [ "$SLACK_PARAM_DEBUG" -eq 1 ]; then
     set -x
 fi
