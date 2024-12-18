@@ -323,11 +323,7 @@ SanitizeVars() {
         # Escape newlines.
         sanitized_value="$(printf '%s' "$sanitized_value" | tr -d '\r' | awk 'NR > 1 { printf("\\n") } { printf("%s", $0) }')"
         # Escape double quotes.
-        if [ "$PLATFORM" = "windows" ]; then
-            sanitized_value="$(printf '%s' "$sanitized_value" | awk '{gsub(/"/, "\\\""); print $0}')"
-        else
-            sanitized_value="$(printf '%s' "$sanitized_value" | awk '{gsub(/\"/, "\\\""); print $0}')"
-        fi
+        sanitized_value="$(printf '%s' "$sanitized_value" | awk '{gsub(/"/, "\\\""); print $0}')"
 
         # Write the sanitized value back to the original variable.
         # shellcheck disable=SC3045 # This is working on Alpine.
