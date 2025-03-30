@@ -101,8 +101,17 @@ PostToSlack() {
             # get the value of the specified thread from the environment
             # SLACK_THREAD_TS=12345.12345
             SLACK_THREAD_TS=$(eval "echo \"\$$SLACK_PARAM_THREAD\"")
-            # append the thread_ts to the body for posting the message in the correct thread
-            SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg thread_ts "$SLACK_THREAD_TS" '.thread_ts = $thread_ts')
+            if [ $SLACK_PARAM_UPDATE ]; then
+                # when updating, the key ts is used to reference the message to be updated
+                TS=$(eval "echo \"\$$SLACK_PARAM_THREAD\"")
+                SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg ts "$TS" '.ts = $ts')
+            else
+                # append the thread_ts to the body for posting the message in the correct thread
+                SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg thread_ts "$SLACK_THREAD_TS" '.thread_ts = $thread_ts')
+            fi
+        else
+            # if there isn't any thread info for an update, then revert to posting a new notification
+            SLACK_PARAM_UPDATE=false
         fi
 
         echo "Sending to Slack Channel: $i"
@@ -127,7 +136,10 @@ PostToSlack() {
             SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg post_at "$POST_AT" '.post_at = ($post_at|tonumber)')
             # text is required for scheduled messages
             SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq '.text = "Dummy fallback text"')
+            
             NotifyWithRetries https://slack.com/api/chat.scheduleMessage
+        elif [ $SLACK_PARAM_UPDATE ]; then
+            NotifyWithRetries https://slack.com/api/chat.updateMessage
         else
             NotifyWithRetries https://slack.com/api/chat.postMessage
         fi
