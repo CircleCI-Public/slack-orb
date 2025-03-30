@@ -106,6 +106,31 @@ Post replies in threads with a special parameter `thread_id`. Including this par
         }
 ```
 
+## Update Top Level Messages
+
+Update a top level message using the `thread_id` parameter. Can update the top of a threaded message or a standalone message. include the parameter `update_notification: true` to specify that this will be an update of an existing message. If the `thread_id` is missing or not found, the message will be posted as a new message instead.
+
+  ```yaml
+- slack/notify:
+      event: always
+      update_notification: true
+      custom: |
+        {
+          "blocks": [
+            {
+              "type": "section",
+              "fields": [
+                {
+                 "type": "plain_text",
+                  "text": "*This is a text notification*",
+                  "emoji": true
+                }
+              ]
+            }
+          ]
+        }
+  ```
+
 ## Scheduled Message
 
 Set the `scheduled_offset_seconds` special parameter to a number of seconds if you want to post a scheduled message. Example:
