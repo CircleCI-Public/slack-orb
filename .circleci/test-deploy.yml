@@ -146,7 +146,7 @@ jobs:
             echo "circle test" > releasenotes.txt
             echo "circle test 2" >> releasenotes.txt
             echo "circle test 3" >> releasenotes.txt
-            rnotes="$(cat releasenotes.txt | awk '{printf "%s\n", $0}')"
+            rnotes="$(cat releasenotes.txt | awk '{printf "%s\\n", $0}')"
             echo "export MULTILINE_STRING='$rnotes'" >> $BASH_ENV
       - slack/notify:
           debug: true

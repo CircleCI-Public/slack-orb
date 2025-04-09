@@ -1,3 +1,0 @@
-circle test
-circle test 2
-circle test 3
