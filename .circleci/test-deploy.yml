@@ -144,8 +144,6 @@ jobs:
           command: |
             echo 'export MY_TEMPLATE=$(jq . my_template.json)' >> $BASH_ENV
       - slack/notify:
-          channel: eng-deploys
-          thread_id: deployment
           event: always
           template: MY_TEMPLATE
       # - run:
@@ -254,12 +252,12 @@ workflows:
           matrix:
             parameters:
               runner: [cimg, mac, alpine, windows, machine]
-      - slack/on-hold:
-          context: SLACK_NOTIFICATIONS_TEST
-          debug: true
-          step_name: "On hold with thread"
-          template: basic_success_1
-          thread_id: orb-testing-thread-<${CIRCLE_SHA1}>
+      # - slack/on-hold:
+      #     context: SLACK_NOTIFICATIONS_TEST
+      #     debug: true
+      #     step_name: "On hold with thread"
+      #     template: basic_success_1
+      #     thread_id: orb-testing-thread-<${CIRCLE_SHA1}>
       - orb-tools/pack:
           filters: *release-filters
       - orb-tools/publish:
