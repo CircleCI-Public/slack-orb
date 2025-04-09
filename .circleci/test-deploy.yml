@@ -141,29 +141,13 @@ jobs:
       #     branch_pattern: "master"
       #     invert_match: true
       - run:
-          name: Export variable with a multiline string
           command: |
-            echo "circle test" > releasenotes.txt
-            echo "circle test 2" >> releasenotes.txt
-            echo "circle test 3" >> releasenotes.txt
-            rnotes="$(cat releasenotes.txt | awk '{printf "%s\\n", $0}')"
-            echo "export MULTILINE_STRING='$rnotes'" >> $BASH_ENV
+            echo 'export MY_TEMPLATE=$(jq . my_template.json)' >> $BASH_ENV
       - slack/notify:
-          debug: true
-          step_name: "Notify with multiline string"
-          event: pass
-          custom: >
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "This message should show over multiple lines: $MULTILINE_STRING"
-                  }
-                }
-              ]
-            }
+          channel: eng-deploys
+          thread_id: deployment
+          event: always
+          template: MY_TEMPLATE
       # - run:
       #     name: Export variable with a multiline string and carriage
       #     command: |
