@@ -1,0 +1,11 @@
+{
+    "blocks": [
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "$M_CHANGELOG"
+            }
+        }
+    ]
+}
