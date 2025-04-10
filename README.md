@@ -53,6 +53,26 @@ The Slack Orb comes with a number of included templates to get your started with
         }
   ```
 
+  ## Dynamically Generating or Loading Importing a Custom Message
+
+   1. Develop your code to dynamically generate a template
+   2. Write the template to a local temp file
+   3. Add that temp file to your $BASH_ENV
+   4. Use the new env value to pass your template to the `template` variable
+      (note: don't pass it to the custom parameter)
+
+  ```yaml
+  - run: ./.circleci/bin/build_template 2>&1 | tee my_template.json
+  - run:
+      command: |
+        echo 'export MY_TEMPLATE=$(jq . my_template.json)' >> $BASH_ENV
+  - slack/notify:
+      channel: eng-deploys
+      thread_id: deployment
+      event: always
+      template: MY_TEMPLATE
+  ```
+
 ## Branch or Tag Filtering
 
 Limit Slack notifications to particular branches with the "branch_pattern" or "tag_pattern" parameter.
