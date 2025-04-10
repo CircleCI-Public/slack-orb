@@ -30,6 +30,24 @@ jobs:
           thread_id: orb-testing-thread-<${CIRCLE_SHA1}>
       - slack/notify:
           debug: true
+          step_name: "Message with thread updated"
+          event: always
+          update_notification: true
+          thread_id: orb-testing-thread-<${CIRCLE_SHA1}>
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "This message should be on thread and updating thread"
+                  }
+                }
+              ]
+            }
+      - slack/notify:
+          debug: true
           step_name: "Custom template with group mention"
           event: always
           custom: |
