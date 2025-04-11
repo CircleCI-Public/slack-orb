@@ -101,7 +101,7 @@ PostToSlack() {
             # get the value of the specified thread from the environment
             # SLACK_THREAD_TS=12345.12345
             SLACK_THREAD_TS=$(eval "echo \"\$$SLACK_PARAM_THREAD\"")
-            if [ $SLACK_PARAM_UPDATE ]; then
+            if [ "$SLACK_PARAM_UPDATE" ]; then
                 # when updating, the key ts is used to reference the message to be updated
                 TS=$(eval "echo \"\$$SLACK_PARAM_THREAD\"")
                 SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg ts "$TS" '.ts = $ts')
