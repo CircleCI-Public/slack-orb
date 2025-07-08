@@ -164,3 +164,25 @@ setup() {
     printf '%s\n' "Expected: $EXPECTED" "Actual: $SLACK_MSG_BODY"
     [ "$SLACK_MSG_BODY" = "$EXPECTED" ] # CRLF should be escaped
 }
+
+@test "19: Unfurlr Link - Disable link unfurl" {
+    TESTLINKURL="http://circleci.com"
+    SLACK_PARAM_CUSTOM=$(cat $BATS_TEST_DIRNAME/sampleCustomTemplateWithLink.json)
+    SLACK_DEFAULT_CHANNEL="xyz"
+    SLACK_PARAM_UNFURL_LINKS=0
+    BuildMessageBody
+    EXPECTED=$(echo "{ \"blocks\": [ { \"type\": \"section\", \"text\": { \"type\": \"mrkdwn\", \"text\": \"Sample link using environment variable in markdown <${TESTLINKURL}|LINK >\" } } ], \"text\": \"\", \"channel\": \"$SLACK_DEFAULT_CHANNEL\", \"unfurl_links\": false }" | jq)
+    printf '%s\n' "Expected: $EXPECTED" "Actual: $SLACK_MSG_BODY"
+    [ "$SLACK_MSG_BODY" == "$EXPECTED" ]
+}
+
+@test "20: Unfurl Media - Disable media unfurl" {
+    TESTLINKURL="http://circleci.com"
+    SLACK_PARAM_CUSTOM=$(cat $BATS_TEST_DIRNAME/sampleCustomTemplateWithLink.json)
+    SLACK_DEFAULT_CHANNEL="xyz"
+    SLACK_PARAM_UNFURL_MEDIA=0
+    BuildMessageBody
+    EXPECTED=$(echo "{ \"blocks\": [ { \"type\": \"section\", \"text\": { \"type\": \"mrkdwn\", \"text\": \"Sample link using environment variable in markdown <${TESTLINKURL}|LINK >\" } } ], \"text\": \"\", \"channel\": \"$SLACK_DEFAULT_CHANNEL\", \"unfurl_media\": false }" | jq)
+    printf '%s\n' "Expected: $EXPECTED" "Actual: $SLACK_MSG_BODY"
+    [ "$SLACK_MSG_BODY" == "$EXPECTED" ]
+}
