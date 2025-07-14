@@ -273,6 +273,7 @@ jobs:
           event: pass
           thread_id: my-thread
   a-job-that-passes:
+    executor: cimg
     steps:
       - run: exit 0
       - slack/notify:
