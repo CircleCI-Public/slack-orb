@@ -91,6 +91,10 @@ parameters:
     default: 0
     description: |
       When set, the notification is a scheduled message.
+  update_notification:
+    type: boolean
+    default: false
+    description: When set, the parent notification of the thread is updated
   retries:
     type: integer
     default: 0
@@ -156,6 +160,7 @@ steps:
         SLACK_PARAM_UNFURL_LINKS: "<<parameters.unfurl_links>>"
         SLACK_PARAM_UNFURL_MEDIA: "<<parameters.unfurl_media>>"
         SLACK_SCRIPT_NOTIFY: "<<include(scripts/notify.sh)>>"
+        SLACK_PARAM_UPDATE: "<<parameters.update_notification>>"
         SLACK_SCRIPT_UTILS: "<<include(scripts/utils.sh)>>"
         # import pre-built templates using the orb-pack local script include.
         basic_fail_1: "<<include(message_templates/basic_fail_1.json)>>"

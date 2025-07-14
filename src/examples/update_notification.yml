@@ -1,0 +1,102 @@
+description: |
+  Send a Slack notification to a channel and use the same message to post replies in a thread.
+  `thread_id` parameter holds a thread identifier in case there are multiple notifications in the pipeline
+usage:
+  version: 2.1
+  orbs:
+    slack: circleci/slack@5.0
+    node: circleci/node:4.1
+  jobs:
+    test:
+      executor:
+        name: node/default
+      steps:
+        - slack/notify:
+            event: always
+            channel: engineering
+            thread_id: testing
+            custom: |
+              {
+                "blocks": [
+                  {
+                    "type": "section",
+                    "fields": [
+                      {
+                        "type": "plain_text",
+                        "text": "*Tests started.*",
+                        "emoji": true
+                      }
+                    ]
+                  }
+                ]
+              }
+        - slack/notify:
+            event: always
+            channel: engineering
+            thread_id: testing
+            update_notification: true
+            custom: |
+              {
+                "blocks": [
+                  {
+                    "type": "section",
+                    "fields": [
+                      {
+                        "type": "plain_text",
+                        "text": "*Tests finished.*",
+                        "emoji": true
+                      }
+                    ]
+                  }
+                ]
+              }
+    deploy:
+      executor:
+        name: node/default
+      steps:
+        - slack/notify:
+            event: always
+            channel: engineering
+            thread_id: deployment
+            custom: |
+              {
+                "blocks": [
+                  {
+                    "type": "section",
+                    "fields": [
+                      {
+                        "type": "plain_text",
+                        "text": "*Deployment started.*",
+                        "emoji": true
+                      }
+                    ]
+                  }
+                ]
+              }
+        - slack/notify:
+            event: always
+            channel: engineering
+            thread_id: deployment
+            update_notification: true
+            custom: |
+              {
+                "blocks": [
+                  {
+                    "type": "section",
+                    "fields": [
+                      {
+                        "type": "plain_text",
+                        "text": "*Deployment finished.*",
+                        "emoji": true
+                      }
+                    ]
+                  }
+                ]
+              }
+  workflows:
+    deploy_and_notify:
+      jobs:
+        - deploy
+        - test:
+            requires:
+              - deploy

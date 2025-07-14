@@ -70,7 +70,7 @@ NotifyWithRetries() {
     local success_request=false
     local retry_count=0
     while [ "$retry_count" -le "$SLACK_PARAM_RETRIES" ]; do
-        if SLACK_SENT_RESPONSE=$(curl -s -f -X POST -H 'Content-type: application/json' -H "Authorization: Bearer $SLACK_ACCESS_TOKEN" --data "$SLACK_MSG_BODY" "$1"); then
+        if SLACK_SENT_RESPONSE=$(curl -s -f -X POST -H 'Content-type: application/json; charset=utf-8' -H "Authorization: Bearer $SLACK_ACCESS_TOKEN" --data "$SLACK_MSG_BODY" "$1"); then
             echo "Notification sent"
             success_request=true
             break
@@ -112,8 +112,15 @@ PostToSlack() {
             # get the value of the specified thread from the environment
             # SLACK_THREAD_TS=12345.12345
             SLACK_THREAD_TS=$(eval "echo \"\$$SLACK_PARAM_THREAD\"")
-            # append the thread_ts to the body for posting the message in the correct thread
-            SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg thread_ts "$SLACK_THREAD_TS" '.thread_ts = $thread_ts')
+            if [ "$SLACK_PARAM_UPDATE" ]; then
+                # when updating, the key ts is used to reference the message to be updated
+                TS=$(eval "echo \"\$$SLACK_PARAM_THREAD\"")
+                SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg ts "$TS" '.ts = $ts')
+                SLACK_UPDATE=true
+            else
+                # append the thread_ts to the body for posting the message in the correct thread
+                SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg thread_ts "$SLACK_THREAD_TS" '.thread_ts = $thread_ts')
+            fi
         fi
 
         echo "Sending to Slack Channel: $i"
@@ -138,7 +145,10 @@ PostToSlack() {
             SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg post_at "$POST_AT" '.post_at = ($post_at|tonumber)')
             # text is required for scheduled messages
             SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq '.text = "Dummy fallback text"')
+            
             NotifyWithRetries https://slack.com/api/chat.scheduleMessage
+        elif [ $SLACK_UPDATE ]; then
+            NotifyWithRetries https://slack.com/api/chat.update
         else
             NotifyWithRetries https://slack.com/api/chat.postMessage
         fi
