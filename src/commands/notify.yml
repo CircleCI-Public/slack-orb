@@ -99,6 +99,18 @@ parameters:
       type: integer
       default: 30
       description: The amount of seconds to wait between retries. Defaults to 30.
+  unfurl_links:
+      description: |
+       Attach content preview when the message containing a link. This allows adding context and continuity to conversations.
+       Link unfurling is the default treatment for links posted in Slack. When a link is spotted, Slack crawls it and provides a preview.
+      type: boolean
+      default: true
+  unfurl_media:
+      description: |
+       Attach content preview when the message containing a media link. This allows adding context and continuity to conversations.
+       Media unfurling is the default treatment for links posted in Slack. When a media link is spotted, Slack crawls it and provides a preview.
+      type: boolean
+      default: true
 steps:
   - run:
       shell: bash -eo pipefail
@@ -141,6 +153,8 @@ steps:
         SLACK_PARAM_CIRCLECI_HOST: "<<parameters.circleci_host>>"
         SLACK_PARAM_THREAD: "<<parameters.thread_id>>"
         SLACK_PARAM_OFFSET: "<<parameters.scheduled_offset_seconds>>"
+        SLACK_PARAM_UNFURL_LINKS: "<<parameters.unfurl_links>>"
+        SLACK_PARAM_UNFURL_MEDIA: "<<parameters.unfurl_media>>"
         SLACK_SCRIPT_NOTIFY: "<<include(scripts/notify.sh)>>"
         SLACK_SCRIPT_UTILS: "<<include(scripts/utils.sh)>>"
         # import pre-built templates using the orb-pack local script include.

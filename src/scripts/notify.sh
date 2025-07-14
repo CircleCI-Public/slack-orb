@@ -52,6 +52,17 @@ BuildMessageBody() {
 
     # Insert the default channel. THIS IS TEMPORARY
     T2="$(printf '%s' "$T2" | jq ". + {\"channel\": \"$SLACK_DEFAULT_CHANNEL\"}")"
+
+    echo "Unfurl Link: $SLACK_PARAM_UNFURL_LINKS"
+    if [ "$SLACK_PARAM_UNFURL_LINKS" -eq 0 ] ; then
+        T2=$(echo "$T2" | jq '.unfurl_links = false')
+    fi
+
+    echo "Unfurl Media: $SLACK_PARAM_UNFURL_MEDIA"
+    if [ "$SLACK_PARAM_UNFURL_MEDIA" -eq 0 ] ; then
+        T2=$(echo "$T2" | jq '.unfurl_media = false')
+    fi
+
     SLACK_MSG_BODY="$T2"
 }
 
