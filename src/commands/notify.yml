@@ -129,7 +129,7 @@ steps:
         not:
           equal: [ "", <<parameters.thread_id>> ]
       steps:
-        - run: 
+        - run:
             when: always
             command: echo "VALIDATION"
             name: Validation
