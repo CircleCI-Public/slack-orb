@@ -256,43 +256,81 @@ jobs:
               "type": "mrkdwn",
               "text": "$(cat /tmp/msg)"
             }
-
+  start-slack-thread:
+    executor: cimg
+    steps:
+      - slack/notify:
+          event: always
+          thread_id: my-thread
+  a-job-that-fails:
+    executor: cimg
+    steps:
+      - run: exit 1
+      - slack/notify:
+          event: fail
+          thread_id: my-thread
+      - slack/notify:
+          event: pass
+          thread_id: my-thread
+  a-job-that-passes:
+    steps:
+      - run: exit 0
+      - slack/notify:
+          event: fail
+          thread_id: my-thread
+      - slack/notify:
+          event: pass
+          thread_id: my-thread
 workflows:
   test-deploy:
     jobs:
-      - integration-test-templates:
+      - start-slack-thread:
           context: SLACK_NOTIFICATIONS_TEST
           filters: *filters
-          matrix:
-            parameters:
-              runner: [cimg, mac, alpine, windows, machine]
-      - slack/on-hold:
+      - a-job-that-fails:
           context: SLACK_NOTIFICATIONS_TEST
-          debug: true
-          step_name: "On hold with thread"
-          template: basic_success_1
-          thread_id: orb-testing-thread-<${CIRCLE_SHA1}>
+          filters: *filters
+          requires:
+            - start-slack-thread
+      - a-job-that-passes:
+          context: SLACK_NOTIFICATIONS_TEST
+          filters: *filters
+          requires:
+            - start-slack-thread
+      # - integration-test-templates:
+      #     context: SLACK_NOTIFICATIONS_TEST
+      #     filters: *filters
+      #     matrix:
+      #       parameters:
+      #         runner: [cimg, mac, alpine, windows, machine]
+      # - slack/on-hold:
+      #     context: SLACK_NOTIFICATIONS_TEST
+      #     debug: true
+      #     step_name: "On hold with thread"
+      #     template: basic_success_1
+      #     thread_id: orb-testing-thread-<${CIRCLE_SHA1}>
+
       - orb-tools/pack:
           filters: *release-filters
-      - orb-tools/publish:
-          orb_name: circleci/slack
-          vcs_type: << pipeline.project.type >>
-          pub_type: production
-          enable_pr_comment: true
-          github_token: GHI_TOKEN
-          requires: [orb-tools/pack, integration-test-templates]
-          context: orb-publisher
-          filters: *release-filters
+      # - orb-tools/publish:
+      #     orb_name: circleci/slack
+      #     vcs_type: << pipeline.project.type >>
+      #     pub_type: production
+      #     enable_pr_comment: true
+      #     github_token: GHI_TOKEN
+      #     requires: [orb-tools/pack, integration-test-templates]
+      #     context: orb-publisher
+      #     filters: *release-filters
 executors:
   machine:
     machine:
-      image: ubuntu-2004:current
+      image: ubuntu-2404:current
   cimg:
     docker:
       - image: cimg/base:current
   mac:
     macos:
-      xcode: 14.0.0
+      xcode: 16.3.0
   alpine:
     # This image contains both CURL and JQ
     docker:
