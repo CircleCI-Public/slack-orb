@@ -129,7 +129,10 @@ steps:
         not:
           equal: [ "", <<parameters.thread_id>> ]
       steps:
-        - run: echo "VALIDATION"
+        - run: 
+            when: always
+            command: echo "VALIDATION"
+            name: Validation
         - restore_cache:
             keys:
               - cache-<< parameters.thread_id >>-{{ .Environment.CIRCLE_PIPELINE_ID }}
