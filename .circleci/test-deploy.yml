@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-  orb-tools: circleci/orb-tools@12.0
+  orb-tools: circleci/orb-tools@12.3.1
   slack: {}
 
 filters: &filters
@@ -27,6 +27,21 @@ jobs:
           step_name: "Initial message with thread"
           template: basic_success_1
           event: always
+          thread_id: orb-testing-thread-<${CIRCLE_SHA1}>
+      - slack/reaction:
+          debug: true
+          step_name: "Add reaction"
+          add_react_name: check
+          thread_id: orb-testing-thread-<${CIRCLE_SHA1}>
+      - slack/reaction:
+          debug: true
+          step_name: "Add reaction to be removed"
+          add_react_name: x
+          thread_id: orb-testing-thread-<${CIRCLE_SHA1}>
+      - slack/reaction:
+          debug: true
+          step_name: "Remove action"
+          remove_react_name: x
           thread_id: orb-testing-thread-<${CIRCLE_SHA1}>
       - slack/notify:
           debug: true
