@@ -24,7 +24,7 @@ ReactToSlack() {
 
     if [ -n "${SLACK_PARAM_REMOVE_REACT_NAME}" ]; then
         echo "Remove reaction with name=${SLACK_PARAM_REMOVE_REACT_NAME} channel=${SLACK_PARAM_CHANNEL} thread_ts=${SLACK_THREAD_TS}"
-        curl --location 'https://slack.com/api/reactions.remove' \
+        curl -X POST --location 'https://slack.com/api/reactions.remove' \
             --header 'Content-Type: application/x-www-form-urlencoded' \
             --header "Authorization: Bearer ${SLACK_ACCESS_TOKEN}" \
             --data-urlencode "channel=${SLACK_PARAM_CHANNEL}" \
@@ -34,7 +34,7 @@ ReactToSlack() {
     fi
     if [ -n "${SLACK_PARAM_ADD_REACT_NAME}" ]; then
         echo "Add reaction with name=${SLACK_PARAM_ADD_REACT_NAME} channel=${SLACK_PARAM_CHANNEL} thread_ts=${SLACK_THREAD_TS}"
-        curl --location 'https://slack.com/api/reactions.add' \
+        curl -X POST --location 'https://slack.com/api/reactions.add' \
             --header 'Content-Type: application/x-www-form-urlencoded' \
             --header "Authorization: Bearer ${SLACK_ACCESS_TOKEN}" \
             --data-urlencode "channel=${SLACK_PARAM_CHANNEL}" \
