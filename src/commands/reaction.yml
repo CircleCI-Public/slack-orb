@@ -28,8 +28,9 @@ parameters:
 steps:
   - run:
       name: << parameters.step_name >>
-      command: <<include(scripts/reaction.sh)>>
+      command: <<include(scripts/main.sh)>>
       environment:
+        SLACK_SCRIPT_NOTIFY: "<<include(scripts/reaction.sh)>>"
         SLACK_PARAM_CHANNEL: <<parameters.channel>>
         SLACK_PARAM_ADD_REACT_NAME: <<parameters.add_react_name>>
         SLACK_PARAM_REMOVE_REACT_NAME: <<parameters.remove_react_name>>
