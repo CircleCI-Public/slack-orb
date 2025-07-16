@@ -24,23 +24,29 @@ ReactToSlack() {
 
     if [ -n "${SLACK_PARAM_REMOVE_REACT_NAME}" ]; then
         echo "Remove reaction with name=${SLACK_PARAM_REMOVE_REACT_NAME} channel=${SLACK_PARAM_CHANNEL} thread_ts=${SLACK_THREAD_TS}"
-        curl -X POST --location 'https://slack.com/api/reactions.remove' \
+        REMOVE_RESULT=$(curl -X POST --location 'https://slack.com/api/reactions.remove' \
             --header 'Content-Type: application/x-www-form-urlencoded' \
             --header "Authorization: Bearer ${SLACK_ACCESS_TOKEN}" \
             --data-urlencode "channel=${SLACK_PARAM_CHANNEL}" \
             --data-urlencode "name=${SLACK_PARAM_REMOVE_REACT_NAME}" \
-            --data-urlencode "timestamp=${SLACK_THREAD_TS}"
-        echo
+            --data-urlencode "timestamp=${SLACK_THREAD_TS}")
+        if [ "$(echo "$REMOVE_RESULT" | jq '.ok')" = "false" ]; then
+            echo "Reaction not sent. $REMOVE_RESULT"
+            exit 1
+        fi
     fi
     if [ -n "${SLACK_PARAM_ADD_REACT_NAME}" ]; then
         echo "Add reaction with name=${SLACK_PARAM_ADD_REACT_NAME} channel=${SLACK_PARAM_CHANNEL} thread_ts=${SLACK_THREAD_TS}"
-        curl -X POST --location 'https://slack.com/api/reactions.add' \
+        ADD_RESULT=$(curl -X POST --location 'https://slack.com/api/reactions.add' \
             --header 'Content-Type: application/x-www-form-urlencoded' \
             --header "Authorization: Bearer ${SLACK_ACCESS_TOKEN}" \
             --data-urlencode "channel=${SLACK_PARAM_CHANNEL}" \
             --data-urlencode "name=${SLACK_PARAM_ADD_REACT_NAME}" \
-            --data-urlencode "timestamp=${SLACK_THREAD_TS}"
-        echo
+            --data-urlencode "timestamp=${SLACK_THREAD_TS}")
+        if [ "$(echo "$ADD_RESULT" | jq '.ok')" = "false" ]; then
+            echo "Reaction not sent. $ADD_RESULT"
+            exit 1
+        fi
     fi
 }
 
