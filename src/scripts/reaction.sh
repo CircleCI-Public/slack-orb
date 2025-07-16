@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-if [ "$SLACK_PARAM_DEBUG" = true ]; then
+if [ "$SLACK_PARAM_DEBUG" = 1 ]; then
     set -x
 fi
 
@@ -22,7 +22,7 @@ ReactToSlack() {
         SLACK_THREAD_TS=$(eval "echo \"\$$SLACK_PARAM_THREAD\"")
     fi
 
-    if [ "${SLACK_PARAM_REMOVE_REACT_NAME}" != "" ]; then
+    if [ -n "${SLACK_PARAM_REMOVE_REACT_NAME}" ]; then
         echo "Remove reaction with name=${SLACK_PARAM_REMOVE_REACT_NAME} channel=${SLACK_PARAM_CHANNEL} thread_ts=${SLACK_THREAD_TS}"
         curl --location 'https://slack.com/api/reactions.remove' \
             --header 'Content-Type: application/x-www-form-urlencoded' \
@@ -32,7 +32,7 @@ ReactToSlack() {
             --data-urlencode "timestamp=${SLACK_THREAD_TS}"
         echo
     fi
-    if [ "${SLACK_PARAM_REMOVE_REACT_NAME}" != "" ]; then
+    if [ -n "${SLACK_PARAM_ADD_REACT_NAME}" ]; then
         echo "Add reaction with name=${SLACK_PARAM_ADD_REACT_NAME} channel=${SLACK_PARAM_CHANNEL} thread_ts=${SLACK_THREAD_TS}"
         curl --location 'https://slack.com/api/reactions.add' \
             --header 'Content-Type: application/x-www-form-urlencoded' \
