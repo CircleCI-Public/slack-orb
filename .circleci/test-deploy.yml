@@ -322,6 +322,7 @@ workflows:
           runner: machine
           requires: ["Integration tests windows"]
       - slack/on-hold:
+          name: on-hold
           context: SLACK_NOTIFICATIONS_TEST
           debug: true
           step_name: "On hold with thread"
@@ -335,7 +336,7 @@ workflows:
           pub_type: production
           enable_pr_comment: true
           github_token: GHI_TOKEN
-          requires: [orb-tools/pack, integration-test-templates]
+          requires: [orb-tools/pack, on-hold, "Integration tests machine"]
           context: orb-publisher
           filters: *release-filters
 executors:
