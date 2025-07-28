@@ -44,22 +44,22 @@ jobs:
               ]
             }
           event: always
-          thread_id: orb-testing-reaction-<${CIRCLE_SHA1}>
+          thread_id: orb-testing-reaction-<${CIRCLE_SHA1}>-<<parameters.runner>>
       - slack/reaction:
           debug: true
           step_name: "Add reaction"
           add_react_name: robot_face
-          thread_id: orb-testing-reaction-<${CIRCLE_SHA1}>
+          thread_id: orb-testing-reaction-<${CIRCLE_SHA1}>-<<parameters.runner>>
       - slack/reaction:
           debug: true
           step_name: "Add reaction to be removed"
           add_react_name: x
-          thread_id: orb-testing-reaction-<${CIRCLE_SHA1}>
+          thread_id: orb-testing-reaction-<${CIRCLE_SHA1}>-<<parameters.runner>>
       - slack/reaction:
           debug: true
           step_name: "Remove action"
           remove_react_name: x
-          thread_id: orb-testing-reaction-<${CIRCLE_SHA1}>
+          thread_id: orb-testing-reaction-<${CIRCLE_SHA1}>-<<parameters.runner>>
       - slack/notify:
           debug: true
           step_name: "Custom template with group mention"
