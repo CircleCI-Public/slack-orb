@@ -293,11 +293,34 @@ workflows:
   test-deploy:
     jobs:
       - integration-test-templates:
+          name: Integration tests docker base
           context: SLACK_NOTIFICATIONS_TEST
           filters: *filters
-          matrix:
-            parameters:
-              runner: [cimg, mac, alpine, windows, machine]
+          runner: cimg
+      - integration-test-templates:
+          name: Integration tests mac
+          context: SLACK_NOTIFICATIONS_TEST
+          filters: *filters
+          runner: mac
+          requires: ["Integration tests docker base"]
+      - integration-test-templates:
+          name: Integration tests alpine
+          context: SLACK_NOTIFICATIONS_TEST
+          filters: *filters
+          runner: alpine
+          requires: ["Integration tests mac"]
+      - integration-test-templates:
+          name: Integration tests windows
+          context: SLACK_NOTIFICATIONS_TEST
+          filters: *filters
+          runner: windows
+          requires: ["Integration tests alpine"]
+      - integration-test-templates:
+          name: Integration tests machine
+          context: SLACK_NOTIFICATIONS_TEST
+          filters: *filters
+          runner: machine
+          requires: ["Integration tests windows"]
       - slack/on-hold:
           context: SLACK_NOTIFICATIONS_TEST
           debug: true
@@ -324,7 +347,7 @@ executors:
       - image: cimg/base:current
   mac:
     macos:
-      xcode: 14.0.0
+      xcode: 16.3.0
   alpine:
     # This image contains both CURL and JQ
     docker:
