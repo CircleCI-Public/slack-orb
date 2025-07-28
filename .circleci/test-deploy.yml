@@ -48,7 +48,7 @@ jobs:
       - slack/reaction:
           debug: true
           step_name: "Add reaction"
-          add_react_name: check
+          add_react_name: robot_face
           thread_id: orb-testing-reaction-<${CIRCLE_SHA1}>
       - slack/reaction:
           debug: true
