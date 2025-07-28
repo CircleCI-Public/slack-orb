@@ -8,6 +8,9 @@ if [[ "$SLACK_PARAM_TEMPLATE" == \$* ]]; then
     echo "Doing substitution template"
     SLACK_PARAM_TEMPLATE="$(eval echo "${SLACK_PARAM_TEMPLATE}" | circleci env subst)"
 fi
+if [[ "$SLACK_PARAM_THREAD" == \$* ]]; then
+    SLACK_PARAM_THREAD="$(eval echo "${SLACK_PARAM_THREAD}" | circleci env subst)"
+fi
 
 if [ "$SLACK_PARAM_DEBUG" -eq 1 ]; then
     set -x
