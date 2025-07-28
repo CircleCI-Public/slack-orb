@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-  orb-tools: circleci/orb-tools@12.0
+  orb-tools: circleci/orb-tools@12.3.1
   slack: {}
 
 filters: &filters
@@ -19,6 +19,8 @@ jobs:
       runner:
         type: executor
         default: cimg
+      thread:
+        type: string
     executor: <<parameters.runner>>
     steps:
       - checkout
@@ -28,6 +30,38 @@ jobs:
           template: basic_success_1
           event: always
           thread_id: orb-testing-thread-<${CIRCLE_SHA1}>
+      - slack/notify:
+          debug: true
+          step_name: "Thread for reactions"
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "This block should have reactions"
+                  }
+                }
+              ]
+            }
+          event: always
+          thread_id: orb-testing-reaction-<${CIRCLE_SHA1}>-<<parameters.thread>>
+      - slack/reaction:
+          debug: true
+          step_name: "Add reaction"
+          add_react_name: robot_face
+          thread_id: orb-testing-reaction-<${CIRCLE_SHA1}>-<<parameters.thread>>
+      - slack/reaction:
+          debug: true
+          step_name: "Add reaction to be removed"
+          add_react_name: x
+          thread_id: orb-testing-reaction-<${CIRCLE_SHA1}>-<<parameters.thread>>
+      - slack/reaction:
+          debug: true
+          step_name: "Remove action"
+          remove_react_name: x
+          thread_id: orb-testing-reaction-<${CIRCLE_SHA1}>-<<parameters.thread>>
       - slack/notify:
           debug: true
           step_name: "Custom template with group mention"
@@ -261,12 +295,41 @@ workflows:
   test-deploy:
     jobs:
       - integration-test-templates:
+          name: Integration tests docker base
           context: SLACK_NOTIFICATIONS_TEST
           filters: *filters
-          matrix:
-            parameters:
-              runner: [cimg, mac, alpine, windows, machine]
+          runner: cimg
+          thread: docker
+      - integration-test-templates:
+          name: Integration tests mac
+          context: SLACK_NOTIFICATIONS_TEST
+          filters: *filters
+          runner: mac
+          thread: mac
+          requires: ["Integration tests docker base"]
+      - integration-test-templates:
+          name: Integration tests alpine
+          context: SLACK_NOTIFICATIONS_TEST
+          filters: *filters
+          runner: alpine
+          thread: alpine
+          requires: ["Integration tests mac"]
+      - integration-test-templates:
+          name: Integration tests windows
+          context: SLACK_NOTIFICATIONS_TEST
+          filters: *filters
+          runner: windows
+          thread: windows
+          requires: ["Integration tests alpine"]
+      - integration-test-templates:
+          name: Integration tests machine
+          context: SLACK_NOTIFICATIONS_TEST
+          filters: *filters
+          runner: machine
+          thread: machine
+          requires: ["Integration tests windows"]
       - slack/on-hold:
+          name: on-hold
           context: SLACK_NOTIFICATIONS_TEST
           debug: true
           step_name: "On hold with thread"
@@ -280,7 +343,7 @@ workflows:
           pub_type: production
           enable_pr_comment: true
           github_token: GHI_TOKEN
-          requires: [orb-tools/pack, integration-test-templates]
+          requires: [orb-tools/pack, on-hold, "Integration tests machine"]
           context: orb-publisher
           filters: *release-filters
 executors:
@@ -292,7 +355,7 @@ executors:
       - image: cimg/base:current
   mac:
     macos:
-      xcode: 14.0.0
+      xcode: 16.3.0
   alpine:
     # This image contains both CURL and JQ
     docker:

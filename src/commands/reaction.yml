@@ -1,0 +1,38 @@
+description: |
+  Add a reaction to an slack message.
+
+parameters:
+  channel:
+    type: string
+    description: Select which channel in which to post to. Channel name or ID will work. Set the "SLACK_DEFAULT_CHANNEL" environment variable for the default channel.
+    default: $SLACK_DEFAULT_CHANNEL
+  add_react_name:
+    default: ''
+    type: string
+    description: The name of the reaction you want to add, e.g. check, hourglass_flowing_sand, x, etc.
+  remove_react_name:
+    type: string
+    default: ''
+    description: The name of the reaction you previsously added, e.g. check, hourglass_flowing_sand, x, etc.
+  thread_id:
+    type: string
+    description: The thread id where this reaction will be added.
+  step_name:
+    default: Add or Remove Reaction to Slack message
+    description: Specify a custom step name for this command, if desired
+    type: string
+  debug:
+    default: false
+    description: Runs scripts in debug mode for bash (set -x).
+    type: boolean
+steps:
+  - run:
+      name: << parameters.step_name >>
+      shell: bash -eo pipefail
+      command: <<include(scripts/reaction.sh)>>
+      environment:
+        SLACK_PARAM_CHANNEL: <<parameters.channel>>
+        SLACK_PARAM_ADD_REACT_NAME: <<parameters.add_react_name>>
+        SLACK_PARAM_REMOVE_REACT_NAME: <<parameters.remove_react_name>>
+        SLACK_PARAM_THREAD: <<parameters.thread_id>>
+        SLACK_PARAM_DEBUG: << parameters.debug >>
