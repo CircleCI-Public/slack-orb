@@ -4,7 +4,7 @@ description: |
 parameters:
   channel:
     type: string
-    description: Select which channel in which to post to. Channel name or ID will work. Set the "SLACK_DEFAULT_CHANNEL" environment variable for the default channel.
+    description: Select which channel in which to post to. Only Channel ID is supported for now. Set the "SLACK_DEFAULT_CHANNEL" environment variable for the default channel.
     default: $SLACK_DEFAULT_CHANNEL
   add_react_name:
     default: ''
