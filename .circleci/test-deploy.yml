@@ -1,6 +1,5 @@
 version: 2.1
 orbs:
-  orb-tools: circleci/orb-tools@12.3.1
   slack: {}
   node: circleci/node@7.1.1
 
@@ -407,6 +406,7 @@ executors:
   xcode:
     macos:
       xcode: "16.2.0"
+    shell: bash -eox pipefail
     resource_class: macos.m1.medium.gen1
   machine:
     machine:
