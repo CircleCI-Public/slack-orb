@@ -2,7 +2,7 @@ version: 2.1
 orbs:
   orb-tools: circleci/orb-tools@12.3.1
   slack: {}
-    node: circleci/node@7.1.1
+  node: circleci/node@7.1.1
 
 filters: &filters
   tags:
