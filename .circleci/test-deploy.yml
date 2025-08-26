@@ -408,7 +408,7 @@ executors:
     macos:
       xcode: "16.2.0"
     resource_class: macos.m1.medium.gen1
-    shell: bash -eox pipefail
+    # shell: bash -eox pipefail
   machine:
     machine:
       image: ubuntu-2004:current
