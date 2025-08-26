@@ -12,9 +12,9 @@ if [[ "$SLACK_PARAM_THREAD" == \$* ]]; then
     SLACK_PARAM_THREAD="$(eval echo "${SLACK_PARAM_THREAD}" | circleci env subst)"
 fi
 
-if [ "$SLACK_PARAM_DEBUG" -eq 1 ]; then
+# if [ "$SLACK_PARAM_DEBUG" -eq 1 ]; then
     set -x
-fi
+# fi
 
 # Import utils.
 eval "$SLACK_SCRIPT_UTILS"
