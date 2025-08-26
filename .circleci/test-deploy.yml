@@ -324,6 +324,7 @@ jobs:
           node-version: 'latest'
       - run: node --version
       - slack/notify:
+          debug: true
           event: "always"
           channel: "test_notifications"
           custom: |
@@ -406,7 +407,6 @@ executors:
   xcode:
     macos:
       xcode: "16.2.0"
-    # shell: bash -eox pipefail
     resource_class: macos.m1.medium.gen1
   machine:
     machine:
