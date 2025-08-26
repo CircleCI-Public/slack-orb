@@ -324,6 +324,7 @@ jobs:
           node-version: 'latest'
       - run: node --version
       - slack/notify:
+          debug: true
           event: "always"
           channel: "test_notifications"
           custom: |
