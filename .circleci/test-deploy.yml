@@ -300,7 +300,7 @@ jobs:
       - run: node --version
       - slack/notify:
           event: "always"
-          channel: "test_notifications"
+          debug: true
           custom: |
             {
               "blocks": [
@@ -324,7 +324,6 @@ jobs:
           node-version: 'latest'
       - run: node --version
       - slack/notify:
-          debug: true
           event: "always"
           channel: "test_notifications"
           custom: |
