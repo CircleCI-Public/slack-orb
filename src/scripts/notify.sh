@@ -237,7 +237,6 @@ SetupEnvVars() {
     echo "BASH_ENV file: $BASH_ENV"
     if [ -f "$BASH_ENV" ]; then
         echo "Exists. Sourcing into ENV"
-        nvm use default
         # shellcheck disable=SC1090
         . "$BASH_ENV"
     else

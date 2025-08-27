@@ -316,7 +316,7 @@ jobs:
             }
   working-job:
     executor:
-      name: node/default
+      name: cimg
     steps:
       - checkout
       - node/install:
@@ -326,7 +326,6 @@ jobs:
       - slack/notify:
           debug: true
           event: "always"
-          channel: "test_notifications"
           custom: |
             {
               "blocks": [
