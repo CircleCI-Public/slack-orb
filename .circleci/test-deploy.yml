@@ -291,7 +291,7 @@ jobs:
 #               "text": "$(cat /tmp/msg)"
 #             }
   test-488:
-    executor: cimg
+    executor: mac
     steps:
       - run: echo "HELLO WORLD"
       - slack/notify:
