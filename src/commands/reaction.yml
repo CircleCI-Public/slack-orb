@@ -28,7 +28,7 @@ parameters:
 steps:
   - run:
       name: << parameters.step_name >>
-      shell: bash --login -eo pipefail
+      shell: bash -eo pipefail
       command: <<include(scripts/reaction.sh)>>
       environment:
         SLACK_PARAM_CHANNEL: <<parameters.channel>>
