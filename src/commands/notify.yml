@@ -144,8 +144,7 @@ steps:
         - run:
             when: always
             command: |
-              echo "I am not on windows I'm on $INTERNAL_PARAM_EXECUTOR"
-              echo {{ .Environment.INTERNAL_PARAM_EXECUTOR }}
+              echo "$INTERNAL_PARAM_EXECUTOR"
 
   - when:
       condition:
