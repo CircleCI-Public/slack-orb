@@ -160,7 +160,7 @@ steps:
         basic_on_hold_1: "<<include(message_templates/basic_on_hold_1.json)>>"
         basic_success_1: "<<include(message_templates/basic_success_1.json)>>"
       # command: <<include(scripts/main.sh)>>
-      command: bash -eo pipefail main.sh
+      command: bash -eo pipefail scripts/main.sh
   - when:
       condition:
         not:
