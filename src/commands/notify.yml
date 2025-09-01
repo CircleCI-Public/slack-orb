@@ -138,12 +138,12 @@ steps:
   - when:
       condition:
         not:
-          equal: [ "", "{{ .Environment.INTERNAL_PARAM_EXECUTOR }}"" ]
+          equal: [ "windows", "{{ .Environment.INTERNAL_PARAM_EXECUTOR }}" ]
       steps:
         - run: echo "I am not on windows"
   - when:
       condition:
-        equal: [ "", "{{ .Environment.INTERNAL_PARAM_EXECUTOR }}"" ]
+        equal: [ "windows", "{{ .Environment.INTERNAL_PARAM_EXECUTOR }}" ]
       steps:
         - run: Write-Host "I am on windows"
   # - run:
