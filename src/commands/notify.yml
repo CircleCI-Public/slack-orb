@@ -112,6 +112,7 @@ parameters:
       type: boolean
       default: true
 steps:
+  - checkout
   - run:
       when: on_fail
       name: Slack - Detecting Job Status (FAIL)
