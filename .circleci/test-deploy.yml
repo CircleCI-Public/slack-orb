@@ -291,7 +291,7 @@ jobs:
   #             "type": "mrkdwn",
   #             "text": "$(cat /tmp/msg)"
   #           }
-  working:
+  linux:
     executor:
       name: node/default
     steps:
@@ -315,7 +315,30 @@ jobs:
                 }
               ]
             }
-  failing:
+  windows:
+    executor: windows
+    steps:
+      - checkout
+      - node/install:
+          install-yarn: true
+          node-version: 'latest'
+      - run: node --version
+      - slack/notify:
+          event: "always"
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "test",
+                    "emoji": true
+                  }
+                }
+              ]
+            }
+  macos:
     executor: mac
     steps:
       - checkout
@@ -394,9 +417,11 @@ workflows:
     #       context: orb-publisher
     #       filters: *release-filters
     jobs:
-      - failing:
+      - macos:
           context: SLACK_NOTIFICATIONS_TEST
-      - working:
+      - linux:
+          context: SLACK_NOTIFICATIONS_TEST
+      - windows:
           context: SLACK_NOTIFICATIONS_TEST
 executors:
   machine:
