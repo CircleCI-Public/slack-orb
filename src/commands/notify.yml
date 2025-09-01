@@ -141,12 +141,17 @@ steps:
         not:
           equal: [ "windows", "{{ .Environment.INTERNAL_PARAM_EXECUTOR }}" ]
       steps:
-        - run: echo "I am not on windows"
+        - run:
+            when: always
+            command: echo "I am not on windows"
+
   - when:
       condition:
         equal: [ "windows", "{{ .Environment.INTERNAL_PARAM_EXECUTOR }}" ]
       steps:
-        - run: Write-Host "I am on windows"
+        - run: 
+            command: Write-Host "I am on windows"
+            when: always
   # - run:
   #     when: always
   #     name: << parameters.step_name >>
