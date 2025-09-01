@@ -149,7 +149,7 @@ steps:
       condition:
         equal: [ "windows", "{{ .Environment.INTERNAL_PARAM_EXECUTOR }}" ]
       steps:
-        - run: 
+        - run:
             command: Write-Host "I am on windows"
             when: always
   # - run:
