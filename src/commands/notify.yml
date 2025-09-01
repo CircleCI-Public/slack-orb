@@ -133,6 +133,7 @@ steps:
             when: always
   - run:
       when: always
+      shell: bash -eo pipefail
       name: Get Operative System
       command: <<include(scripts/detect_os.sh)>>
   - when:
