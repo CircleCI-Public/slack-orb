@@ -139,12 +139,12 @@ steps:
   - when:
       condition:
         not:
-          equal: [ "windows", "$INTERNAL_PARAM_EXECUTOR" ]
+          equal: [ "windows", {{ .Environment.INTERNAL_PARAM_EXECUTOR }} ]
       steps:
         - run:
             when: always
             command: |
-              echo "$INTERNAL_PARAM_EXECUTOR"
+              echo "I'm on $INTERNAL_PARAM_EXECUTOR"
 
   - when:
       condition:
