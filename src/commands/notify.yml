@@ -139,7 +139,7 @@ steps:
   - when:
       condition:
         not:
-          equal: [ "windows", {{ .Environment.INTERNAL_PARAM_EXECUTOR }} ]
+          equal: [ "windows", "{{ .Environment.INTERNAL_PARAM_EXECUTOR }}"" ]
       steps:
         - run:
             when: always
