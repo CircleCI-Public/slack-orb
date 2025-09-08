@@ -32,10 +32,10 @@ jobs:
           step_name: "Initial message with thread"
           template: basic_success_1
           event: always
-          windows_execution: <<parameters.windows>>
+          windows_execution: <<parameters.windows_execution>>
           thread_id: orb-testing-thread-<${CIRCLE_SHA1}>
       - slack/notify:
-          windows_execution: <<parameters.windows>>
+          windows_execution: <<parameters.windows_execution>>
           debug: true
           step_name: "Thread for reactions"
           custom: |
@@ -53,25 +53,25 @@ jobs:
           event: always
           thread_id: orb-testing-reaction-<${CIRCLE_SHA1}>-<<parameters.thread>>
       - slack/reaction:
-          windows_execution: <<parameters.windows>>
+          windows_execution: <<parameters.windows_execution>>
           debug: true
           step_name: "Add reaction"
           add_react_name: robot_face
           thread_id: orb-testing-reaction-<${CIRCLE_SHA1}>-<<parameters.thread>>
       - slack/reaction:
-          windows_execution: <<parameters.windows>>
+          windows_execution: <<parameters.windows_execution>>
           debug: true
           step_name: "Add reaction to be removed"
           add_react_name: x
           thread_id: orb-testing-reaction-<${CIRCLE_SHA1}>-<<parameters.thread>>
       - slack/reaction:
-          windows_execution: <<parameters.windows>>
+          windows_execution: <<parameters.windows_execution>>
           debug: true
           step_name: "Remove action"
           remove_react_name: x
           thread_id: orb-testing-reaction-<${CIRCLE_SHA1}>-<<parameters.thread>>
       - slack/notify:
-          windows_execution: <<parameters.windows>>
+          windows_execution: <<parameters.windows_execution>>
           debug: true
           step_name: "Custom template with group mention"
           event: always
@@ -99,26 +99,26 @@ jobs:
           command: |
             grep "pass" /tmp/SLACK_JOB_STATUS
       - slack/notify:
-          windows_execution: <<parameters.windows>>
+          windows_execution: <<parameters.windows_execution>>
           debug: true
           step_name: "Fail template with mentions"
           template: basic_fail_1
           mentions: "@orbs"
           event: always
       - slack/notify:
-          windows_execution: <<parameters.windows>>
+          windows_execution: <<parameters.windows_execution>>
           debug: true
           step_name: "Success template with mentions"
           template: basic_success_1
           event: always
       - slack/notify:
-          windows_execution: <<parameters.windows>>
+          windows_execution: <<parameters.windows_execution>>
           debug: true
           step_name: "Success tagged template"
           template: success_tagged_deploy_1
           event: always
       - slack/notify:
-          windows_execution: <<parameters.windows>>
+          windows_execution: <<parameters.windows_execution>>
           debug: true
           step_name: "Basic on hold template"
           template: basic_on_hold_1
@@ -129,13 +129,13 @@ jobs:
             export SLACK_MESSAGE=$(node src/tests/generate-payload.js | jq -c .)
             echo "export SLACK_MESSAGE='$SLACK_MESSAGE'" >> $BASH_ENV          
       - slack/notify:
-          windows_execution: <<parameters.windows>>
+          windows_execution: <<parameters.windows_execution>>
           debug: true
           step_name: "Custom template generated dynamicly"
           event: pass
           custom: $SLACK_MESSAGE
       - slack/notify:
-          windows_execution: <<parameters.windows>>
+          windows_execution: <<parameters.windows_execution>>
           debug: true
           step_name: "Custom template with env var in the message"
           event: pass
@@ -152,7 +152,7 @@ jobs:
               ]
             }
       - slack/notify:
-          windows_execution: <<parameters.windows>>
+          windows_execution: <<parameters.windows_execution>>
           event: always
           debug: true
           step_name: "Custom template with scheduled offset"
@@ -177,18 +177,18 @@ jobs:
             echo 'export SLACK_PARAM_MENTIONS="$COMMIT_MESSAGE"' >> $BASH_ENV
             echo 'export MY_ORB_TEMPLATE=$(cat src/message_templates/basic_success_1.json)' >> $BASH_ENV
       - slack/notify:
-          windows_execution: <<parameters.windows>>
+          windows_execution: <<parameters.windows_execution>>
           debug: true
           step_name: "Dynamic template with environment variable"
           event: always
           template: MY_ORB_TEMPLATE
       - slack/notify:
-          windows_execution: <<parameters.windows>>
+          windows_execution: <<parameters.windows_execution>>
           debug: true
           step_name: "Notify without template parameter"
       # Should run for every branch but master
       - slack/notify:
-          windows_execution: <<parameters.windows>>
+          windows_execution: <<parameters.windows_execution>>
           debug: true
           step_name: "Invert match set to true on 'master' branch pattern"
           branch_pattern: "master"
@@ -198,7 +198,7 @@ jobs:
           command: |
             printf '%s\n' 'export MULTILINE_STRING=$(printf "%s\\n" "Line 1." "Line 2." "Line 3.")' >> "$BASH_ENV"
       - slack/notify:
-          windows_execution: <<parameters.windows>>
+          windows_execution: <<parameters.windows_execution>>
           debug: true
           step_name: "Notify with multiline string"
           event: pass
@@ -219,7 +219,7 @@ jobs:
           command: |
             printf '%s\n' 'export MULTILINE_STRING_CARRIAGE=$(printf "%s\\r\\n" "Line 1." "Line 2." "Line 3.")' >> "$BASH_ENV"
       - slack/notify:
-          windows_execution: <<parameters.windows>>
+          windows_execution: <<parameters.windows_execution>>
           debug: true
           step_name: "Notify with multiline string and carriage"
           event: pass
@@ -241,7 +241,7 @@ jobs:
             printf '%s\n' 'export DOUBLE_QUOTES_STRING=$(printf "%s\\n" "Hello There! My name is \"Potato\"")' >> "$BASH_ENV"
       - slack/notify:
           debug: true
-          windows_execution: <<parameters.windows>>
+          windows_execution: <<parameters.windows_execution>>
           step_name: "Notify with double-quoted string"
           event: pass
           custom: >
@@ -262,7 +262,7 @@ jobs:
             printf '%s\n' 'export BACKSLASHES_STRING="This is how a \ looks like"' >> "$BASH_ENV"
       - slack/notify:
           debug: true
-          windows_execution: <<parameters.windows>>
+          windows_execution: <<parameters.windows_execution>>
           step_name: "Notify with backslashes string"
           event: pass
           custom: >
@@ -283,7 +283,7 @@ jobs:
             printf '%s\n' "Hello There!" > /tmp/msg
       - slack/notify:
           debug: true
-          windows_execution: <<parameters.windows>>
+          windows_execution: <<parameters.windows_execution>>
           step_name: "Notify with custom message coming from sub-shell and template variable"
           event: always
           custom: |
@@ -307,7 +307,7 @@ jobs:
             }
       - slack/notify:
           debug: true
-          windows_execution: <<parameters.windows>>
+          windows_execution: <<parameters.windows_execution>>
           step_name: "Notify with only custom message coming from sub-shell"
           event: always
           custom: |
