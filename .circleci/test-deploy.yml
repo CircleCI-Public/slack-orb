@@ -16,7 +16,7 @@ release-filters: &release-filters
 jobs:
   integration-test-templates:
     parameters:
-      windows:
+      windows_execution:
         type: boolean
         default: false
       runner:
