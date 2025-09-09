@@ -4,6 +4,8 @@ if [ "$SLACK_PARAM_DEBUG" = 1 ]; then
 fi
 
 SLACK_PARAM_CHANNEL="$(echo "${SLACK_PARAM_CHANNEL}" | circleci env subst)"
+SLACK_PARAM_ADD_REACT_NAME="$(echo "${SLACK_PARAM_ADD_REACT_NAME}" | circleci env subst)"
+SLACK_PARAM_REMOVE_REACT_NAME="$(echo "${SLACK_PARAM_REMOVE_REACT_NAME}" | circleci env subst)"
 
 ReactToSlack() {
     # replace non-alpha
