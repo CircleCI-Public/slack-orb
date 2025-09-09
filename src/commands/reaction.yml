@@ -25,14 +25,36 @@ parameters:
     default: false
     description: Runs scripts in debug mode for bash (set -x).
     type: boolean
+  windows_execution:
+    description: |
+      When this command is going to be run on windows, set this to true.
+    type: boolean
+    default: false
 steps:
-  - run:
-      name: << parameters.step_name >>
-      shell: bash -eo pipefail
-      command: <<include(scripts/reaction.sh)>>
-      environment:
-        SLACK_PARAM_CHANNEL: <<parameters.channel>>
-        SLACK_PARAM_ADD_REACT_NAME: <<parameters.add_react_name>>
-        SLACK_PARAM_REMOVE_REACT_NAME: <<parameters.remove_react_name>>
-        SLACK_PARAM_THREAD: <<parameters.thread_id>>
-        SLACK_PARAM_DEBUG: << parameters.debug >>
+  - when:
+      condition:
+        equal: [ false, <<parameters.windows_execution>>]
+      steps:
+        - run:
+            name: << parameters.step_name >>
+            command: <<include(scripts/reaction.sh)>>
+            environment:
+              SLACK_PARAM_CHANNEL: <<parameters.channel>>
+              SLACK_PARAM_ADD_REACT_NAME: <<parameters.add_react_name>>
+              SLACK_PARAM_REMOVE_REACT_NAME: <<parameters.remove_react_name>>
+              SLACK_PARAM_THREAD: <<parameters.thread_id>>
+              SLACK_PARAM_DEBUG: << parameters.debug >>
+  - when:
+      condition:
+        equal: [ true, <<parameters.windows_execution>>]
+      steps:
+        - run:
+            shell: bash -eo pipefail
+            name: << parameters.step_name >>
+            command: <<include(scripts/reaction.sh)>>
+            environment:
+              SLACK_PARAM_CHANNEL: <<parameters.channel>>
+              SLACK_PARAM_ADD_REACT_NAME: <<parameters.add_react_name>>
+              SLACK_PARAM_REMOVE_REACT_NAME: <<parameters.remove_react_name>>
+              SLACK_PARAM_THREAD: <<parameters.thread_id>>
+              SLACK_PARAM_DEBUG: << parameters.debug >>

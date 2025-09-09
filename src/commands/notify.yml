@@ -111,15 +111,18 @@ parameters:
        Media unfurling is the default treatment for links posted in Slack. When a media link is spotted, Slack crawls it and provides a preview.
       type: boolean
       default: true
+  windows_execution:
+      description: |
+        When this command is going to be run on windows, set this to true.
+      type: boolean
+      default: false
 steps:
   - run:
-      shell: bash -eo pipefail
       when: on_fail
       name: Slack - Detecting Job Status (FAIL)
       command: |
         echo 'export CCI_STATUS="fail"' > /tmp/SLACK_JOB_STATUS
   - run:
-      shell: bash -eo pipefail
       when: on_success
       name: Slack - Detecting Job Status (PASS)
       command: |
@@ -133,36 +136,73 @@ steps:
             keys:
               - cache-<< parameters.thread_id >>-{{ .Environment.CIRCLE_PIPELINE_ID }}
             when: always
-  - run:
-      when: always
-      shell: bash -eo pipefail
-      name: << parameters.step_name >>
-      environment:
-        SLACK_PARAM_RETRIES: <<parameters.retries>>
-        SLACK_PARAM_RETRY_DELAY: <<parameters.retry_delay>>
-        SLACK_PARAM_EVENT: "<<parameters.event>>"
-        SLACK_PARAM_TEMPLATE: "<<parameters.template>>"
-        SLACK_PARAM_CUSTOM: "<<parameters.custom>>"
-        SLACK_PARAM_MENTIONS: "<<parameters.mentions>>"
-        SLACK_PARAM_BRANCHPATTERN: "<<parameters.branch_pattern>>"
-        SLACK_PARAM_TAGPATTERN: "<<parameters.tag_pattern>>"
-        SLACK_PARAM_INVERT_MATCH: "<<parameters.invert_match>>"
-        SLACK_PARAM_CHANNEL: "<<parameters.channel>>"
-        SLACK_PARAM_IGNORE_ERRORS: "<<parameters.ignore_errors>>"
-        SLACK_PARAM_DEBUG: "<<parameters.debug>>"
-        SLACK_PARAM_CIRCLECI_HOST: "<<parameters.circleci_host>>"
-        SLACK_PARAM_THREAD: "<<parameters.thread_id>>"
-        SLACK_PARAM_OFFSET: "<<parameters.scheduled_offset_seconds>>"
-        SLACK_PARAM_UNFURL_LINKS: "<<parameters.unfurl_links>>"
-        SLACK_PARAM_UNFURL_MEDIA: "<<parameters.unfurl_media>>"
-        SLACK_SCRIPT_NOTIFY: "<<include(scripts/notify.sh)>>"
-        SLACK_SCRIPT_UTILS: "<<include(scripts/utils.sh)>>"
-        # import pre-built templates using the orb-pack local script include.
-        basic_fail_1: "<<include(message_templates/basic_fail_1.json)>>"
-        success_tagged_deploy_1: "<<include(message_templates/success_tagged_deploy_1.json)>>"
-        basic_on_hold_1: "<<include(message_templates/basic_on_hold_1.json)>>"
-        basic_success_1: "<<include(message_templates/basic_success_1.json)>>"
-      command: <<include(scripts/main.sh)>>
+  - when:
+      condition:
+        equal: [ false, <<parameters.windows_execution>>]
+      steps:
+        - run:
+            when: always
+            name: << parameters.step_name >>
+            environment:
+              SLACK_PARAM_RETRIES: <<parameters.retries>>
+              SLACK_PARAM_RETRY_DELAY: <<parameters.retry_delay>>
+              SLACK_PARAM_EVENT: "<<parameters.event>>"
+              SLACK_PARAM_TEMPLATE: "<<parameters.template>>"
+              SLACK_PARAM_CUSTOM: "<<parameters.custom>>"
+              SLACK_PARAM_MENTIONS: "<<parameters.mentions>>"
+              SLACK_PARAM_BRANCHPATTERN: "<<parameters.branch_pattern>>"
+              SLACK_PARAM_TAGPATTERN: "<<parameters.tag_pattern>>"
+              SLACK_PARAM_INVERT_MATCH: "<<parameters.invert_match>>"
+              SLACK_PARAM_CHANNEL: "<<parameters.channel>>"
+              SLACK_PARAM_IGNORE_ERRORS: "<<parameters.ignore_errors>>"
+              SLACK_PARAM_DEBUG: "<<parameters.debug>>"
+              SLACK_PARAM_CIRCLECI_HOST: "<<parameters.circleci_host>>"
+              SLACK_PARAM_THREAD: "<<parameters.thread_id>>"
+              SLACK_PARAM_OFFSET: "<<parameters.scheduled_offset_seconds>>"
+              SLACK_PARAM_UNFURL_LINKS: "<<parameters.unfurl_links>>"
+              SLACK_PARAM_UNFURL_MEDIA: "<<parameters.unfurl_media>>"
+              SLACK_SCRIPT_NOTIFY: "<<include(scripts/notify.sh)>>"
+              SLACK_SCRIPT_UTILS: "<<include(scripts/utils.sh)>>"
+              # import pre-built templates using the orb-pack local script include.
+              basic_fail_1: "<<include(message_templates/basic_fail_1.json)>>"
+              success_tagged_deploy_1: "<<include(message_templates/success_tagged_deploy_1.json)>>"
+              basic_on_hold_1: "<<include(message_templates/basic_on_hold_1.json)>>"
+              basic_success_1: "<<include(message_templates/basic_success_1.json)>>"
+            command: <<include(scripts/main.sh)>>
+  - when:
+      condition:
+        equal: [ true, <<parameters.windows_execution>>]
+      steps:
+        - run:
+            when: always
+            shell: bash -eo pipefail
+            name: << parameters.step_name >>
+            environment:
+              SLACK_PARAM_RETRIES: <<parameters.retries>>
+              SLACK_PARAM_RETRY_DELAY: <<parameters.retry_delay>>
+              SLACK_PARAM_EVENT: "<<parameters.event>>"
+              SLACK_PARAM_TEMPLATE: "<<parameters.template>>"
+              SLACK_PARAM_CUSTOM: "<<parameters.custom>>"
+              SLACK_PARAM_MENTIONS: "<<parameters.mentions>>"
+              SLACK_PARAM_BRANCHPATTERN: "<<parameters.branch_pattern>>"
+              SLACK_PARAM_TAGPATTERN: "<<parameters.tag_pattern>>"
+              SLACK_PARAM_INVERT_MATCH: "<<parameters.invert_match>>"
+              SLACK_PARAM_CHANNEL: "<<parameters.channel>>"
+              SLACK_PARAM_IGNORE_ERRORS: "<<parameters.ignore_errors>>"
+              SLACK_PARAM_DEBUG: "<<parameters.debug>>"
+              SLACK_PARAM_CIRCLECI_HOST: "<<parameters.circleci_host>>"
+              SLACK_PARAM_THREAD: "<<parameters.thread_id>>"
+              SLACK_PARAM_OFFSET: "<<parameters.scheduled_offset_seconds>>"
+              SLACK_PARAM_UNFURL_LINKS: "<<parameters.unfurl_links>>"
+              SLACK_PARAM_UNFURL_MEDIA: "<<parameters.unfurl_media>>"
+              SLACK_SCRIPT_NOTIFY: "<<include(scripts/notify.sh)>>"
+              SLACK_SCRIPT_UTILS: "<<include(scripts/utils.sh)>>"
+              # import pre-built templates using the orb-pack local script include.
+              basic_fail_1: "<<include(message_templates/basic_fail_1.json)>>"
+              success_tagged_deploy_1: "<<include(message_templates/success_tagged_deploy_1.json)>>"
+              basic_on_hold_1: "<<include(message_templates/basic_on_hold_1.json)>>"
+              basic_success_1: "<<include(message_templates/basic_success_1.json)>>"
+            command: <<include(scripts/main.sh)>>
   - when:
       condition:
         not:
