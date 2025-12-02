@@ -3,6 +3,9 @@ if [ "$SLACK_PARAM_DEBUG" = 1 ]; then
     set -x
 fi
 
+# Import utils.
+eval "$SLACK_SCRIPT_UTILS"
+
 SLACK_PARAM_CHANNEL="$(echo "${SLACK_PARAM_CHANNEL}" | circleci env subst)"
 SLACK_PARAM_ADD_REACT_NAME="$(echo "${SLACK_PARAM_ADD_REACT_NAME}" | circleci env subst)"
 SLACK_PARAM_REMOVE_REACT_NAME="$(echo "${SLACK_PARAM_REMOVE_REACT_NAME}" | circleci env subst)"
@@ -52,5 +55,6 @@ ReactToSlack() {
     fi
 }
 
+ShouldPost
 ReactToSlack
 set +x

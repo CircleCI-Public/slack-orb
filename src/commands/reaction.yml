@@ -25,6 +25,28 @@ parameters:
     default: false
     description: Runs scripts in debug mode for bash (set -x).
     type: boolean
+  event:
+    description: |
+      In what event should this message send? Options: ["fail", "pass", "always"]
+    type: enum
+    enum: ["fail", "pass", "always"]
+    default: "always"
+  branch_pattern:
+    description: |
+      A comma separated list of regex matchable branch names. Notifications will only be sent if sent from a job from these branches. Pattern must match the full string, no partial matches.
+    type: string
+    default: ""
+  tag_pattern:
+    description: |
+      A comma separated list of regex matchable tag names. Notifications will only be sent if sent from a job from these branches. Pattern must match the full string, no partial matches.
+    type: string
+    default: ""
+  invert_match:
+    description: |
+      Invert the branch and tag patterns.
+      If set to true, notifications will only be sent if sent from a job from branches and tags that do not match the patterns.
+    type: boolean
+    default: false
   windows_execution:
     description: |
       When this command is going to be run on windows, set this to true.
@@ -36,19 +58,26 @@ steps:
         equal: [ false, <<parameters.windows_execution>>]
       steps:
         - run:
+            when: always
             name: << parameters.step_name >>
             command: <<include(scripts/reaction.sh)>>
             environment:
               SLACK_PARAM_CHANNEL: <<parameters.channel>>
               SLACK_PARAM_ADD_REACT_NAME: <<parameters.add_react_name>>
               SLACK_PARAM_REMOVE_REACT_NAME: <<parameters.remove_react_name>>
+              SLACK_PARAM_EVENT: << parameters.event >>
+              SLACK_PARAM_BRANCHPATTERN: <<parameters.branch_pattern>>
+              SLACK_PARAM_TAGPATTERN: <<parameters.tag_pattern>>
+              SLACK_PARAM_INVERT_MATCH: <<parameters.invert_match>>
               SLACK_PARAM_THREAD: <<parameters.thread_id>>
               SLACK_PARAM_DEBUG: << parameters.debug >>
+              SLACK_SCRIPT_UTILS: "<<include(scripts/utils.sh)>>"
   - when:
       condition:
         equal: [ true, <<parameters.windows_execution>>]
       steps:
         - run:
+            when: always
             shell: bash -eo pipefail
             name: << parameters.step_name >>
             command: <<include(scripts/reaction.sh)>>
@@ -56,5 +85,10 @@ steps:
               SLACK_PARAM_CHANNEL: <<parameters.channel>>
               SLACK_PARAM_ADD_REACT_NAME: <<parameters.add_react_name>>
               SLACK_PARAM_REMOVE_REACT_NAME: <<parameters.remove_react_name>>
+              SLACK_PARAM_EVENT: << parameters.event >>
+              SLACK_PARAM_BRANCHPATTERN: <<parameters.branch_pattern>>
+              SLACK_PARAM_TAGPATTERN: <<parameters.tag_pattern>>
+              SLACK_PARAM_INVERT_MATCH: <<parameters.invert_match>>
               SLACK_PARAM_THREAD: <<parameters.thread_id>>
               SLACK_PARAM_DEBUG: << parameters.debug >>
+              SLACK_SCRIPT_UTILS: "<<include(scripts/utils.sh)>>"
