@@ -61,6 +61,7 @@ InstallJq() {
     if uname -a | grep Darwin > /dev/null 2>&1; then
         echo "Checking For JQ + CURL: MacOS"
         command -v jq >/dev/null 2>&1 || HOMEBREW_NO_AUTO_UPDATE=1 brew install jq --quiet
+        command -v curl >/dev/null 2>&1 || HOMEBREW_NO_AUTO_UPDATE=1 brew install curl --quiet
         return $?
 
     elif cat /etc/issue | grep Debian > /dev/null 2>&1 || cat /etc/issue | grep Ubuntu > /dev/null 2>&1; then
@@ -69,6 +70,7 @@ InstallJq() {
             export SUDO="sudo";
         fi
         command -v jq >/dev/null 2>&1 || { $SUDO apt -qq update && $SUDO apt -qq install -y jq; }
+        command -v curl >/dev/null 2>&1 || { $SUDO apt -qq update && $SUDO apt -qq install -y curl; }
         return $?
 
     elif cat /etc/issue | grep Alpine > /dev/null 2>&1; then
