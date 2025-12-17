@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-  orb-tools: circleci/orb-tools@12.3.1
+  orb-tools: circleci/orb-tools@12.4.0
   slack: {}
 
 filters: &filters
