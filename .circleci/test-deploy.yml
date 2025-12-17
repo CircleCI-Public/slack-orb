@@ -375,18 +375,18 @@ workflows:
 executors:
   machine:
     machine:
-      image: ubuntu-2004:current
+      image: ubuntu-2404:current
   cimg:
     docker:
       - image: cimg/base:current
   mac:
     macos:
-      xcode: 16.3.0
+      xcode: 26.2.0
   alpine:
     # This image contains both CURL and JQ
     docker:
       - image: dwdraju/alpine-curl-jq
   windows:
     machine:
-      image: windows-server-2019-vs2019:current
+      image: windows-server-2025-gui:current
       resource_class: windows.medium
