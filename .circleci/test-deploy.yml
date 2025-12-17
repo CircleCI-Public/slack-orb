@@ -315,6 +315,8 @@ jobs:
               "type": "mrkdwn",
               "text": "$(cat /tmp/msg)"
             }
+  test-coordinator:
+    type: no-op
 
 workflows:
   test-deploy:
@@ -331,14 +333,12 @@ workflows:
           filters: *filters
           runner: mac
           thread: mac
-          requires: ["Integration tests docker base"]
       - integration-test-templates:
           name: Integration tests alpine
           context: SLACK_NOTIFICATIONS_TEST
           filters: *filters
           runner: alpine
           thread: alpine
-          requires: ["Integration tests mac"]
       - integration-test-templates:
           name: Integration tests windows
           context: SLACK_NOTIFICATIONS_TEST
@@ -346,14 +346,12 @@ workflows:
           runner: windows
           windows_execution: true
           thread: windows
-          requires: ["Integration tests alpine"]
       - integration-test-templates:
           name: Integration tests machine
           context: SLACK_NOTIFICATIONS_TEST
           filters: *filters
           runner: machine
           thread: machine
-          requires: ["Integration tests windows"]
       - slack/on-hold:
           name: on-hold
           context: SLACK_NOTIFICATIONS_TEST
@@ -361,6 +359,8 @@ workflows:
           step_name: "On hold with thread"
           template: basic_success_1
           thread_id: orb-testing-thread-<${CIRCLE_SHA1}>
+      - test-coordinator:
+          requires: [on-hold, "Integration tests docker base", "Integration tests mac","Integration tests alpine", "Integration tests windows", "Integration tests machine"]
       - orb-tools/pack:
           filters: *release-filters
       - orb-tools/publish:
@@ -369,7 +369,7 @@ workflows:
           pub_type: production
           enable_pr_comment: true
           github_token: GHI_TOKEN
-          requires: [orb-tools/pack, on-hold, "Integration tests machine"]
+          requires: [orb-tools/pack, on-hold, test-coordinator]
           context: orb-publisher
           filters: *release-filters
 executors:
