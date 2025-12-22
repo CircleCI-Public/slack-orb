@@ -40,7 +40,7 @@
 			],
 			"accessory": {
 				"type": "image",
-				"image_url": "https://production-cci-com.imgix.net/blog/media/circle-logo-badge-black.png",
+				"image_url": "https://images.ctfassets.net/il1yandlcjgk/1VhtXIX9wwJMh29GurJsYp/5dc5a0ea52c6c35a2b630b462c7d74dd/circle-logo-badge-black.png",
 				"alt_text": "CircleCI logo"
 			}
 		},
