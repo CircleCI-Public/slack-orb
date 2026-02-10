@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2016,SC3043
+
+# Set API_DOMAIN from parameter or default to slack.com
+API_DOMAIN="${SLACK_PARAM_API_DOMAIN:-slack.com}"
 if [[ "$SLACK_PARAM_CUSTOM" == \$* ]]; then
     echo "Doing substitution custom"
     SLACK_PARAM_CUSTOM="$(eval echo "${SLACK_PARAM_CUSTOM}" | circleci env subst)"
@@ -141,9 +144,9 @@ PostToSlack() {
             SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg post_at "$POST_AT" '.post_at = ($post_at|tonumber)')
             # text is required for scheduled messages
             SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq '.text = "Dummy fallback text"')
-            NotifyWithRetries https://slack.com/api/chat.scheduleMessage
+            NotifyWithRetries https://$API_DOMAIN/api/chat.scheduleMessage
         else
-            NotifyWithRetries https://slack.com/api/chat.postMessage
+            NotifyWithRetries https://$API_DOMAIN/api/chat.postMessage
         fi
 
         if [ "$SLACK_PARAM_DEBUG" -eq 1 ]; then

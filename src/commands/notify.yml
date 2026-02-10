@@ -116,6 +116,11 @@ parameters:
         When this command is going to be run on windows, set this to true.
       type: boolean
       default: false
+  api_domain:
+      description: |
+        Domain for the Slack API. Use slack.com for regular Slack and slack-gov.com for GovSlack.
+      type: string
+      default: "slack.com"
 steps:
   - run:
       when: on_fail
@@ -161,6 +166,7 @@ steps:
               SLACK_PARAM_OFFSET: "<<parameters.scheduled_offset_seconds>>"
               SLACK_PARAM_UNFURL_LINKS: "<<parameters.unfurl_links>>"
               SLACK_PARAM_UNFURL_MEDIA: "<<parameters.unfurl_media>>"
+              SLACK_PARAM_API_DOMAIN: "<<parameters.api_domain>>"
               SLACK_SCRIPT_NOTIFY: "<<include(scripts/notify.sh)>>"
               SLACK_SCRIPT_UTILS: "<<include(scripts/utils.sh)>>"
               # import pre-built templates using the orb-pack local script include.
@@ -195,6 +201,7 @@ steps:
               SLACK_PARAM_OFFSET: "<<parameters.scheduled_offset_seconds>>"
               SLACK_PARAM_UNFURL_LINKS: "<<parameters.unfurl_links>>"
               SLACK_PARAM_UNFURL_MEDIA: "<<parameters.unfurl_media>>"
+              SLACK_PARAM_API_DOMAIN: "<<parameters.api_domain>>"
               SLACK_SCRIPT_NOTIFY: "<<include(scripts/notify.sh)>>"
               SLACK_SCRIPT_UTILS: "<<include(scripts/utils.sh)>>"
               # import pre-built templates using the orb-pack local script include.
