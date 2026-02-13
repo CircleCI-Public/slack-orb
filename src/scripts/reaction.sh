@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+
+# Set API_DOMAIN from parameter or default to slack.com
+API_DOMAIN="${SLACK_PARAM_API_DOMAIN:-slack.com}"
 if [ "$SLACK_PARAM_DEBUG" = 1 ]; then
     set -x
 fi
@@ -29,7 +32,7 @@ ReactToSlack() {
 
     if [ -n "${SLACK_PARAM_REMOVE_REACT_NAME}" ]; then
         echo "Remove reaction with name=${SLACK_PARAM_REMOVE_REACT_NAME} channel=${SLACK_PARAM_CHANNEL} thread_ts=${SLACK_THREAD_TS}"
-        REMOVE_RESULT=$(curl -X POST --location 'https://slack.com/api/reactions.remove' \
+        REMOVE_RESULT=$(curl -X POST --location "https://$API_DOMAIN/api/reactions.remove" \
             --header 'Content-Type: application/x-www-form-urlencoded' \
             --header "Authorization: Bearer ${SLACK_ACCESS_TOKEN}" \
             --data-urlencode "channel=${SLACK_PARAM_CHANNEL}" \
@@ -42,7 +45,7 @@ ReactToSlack() {
     fi
     if [ -n "${SLACK_PARAM_ADD_REACT_NAME}" ]; then
         echo "Add reaction with name=${SLACK_PARAM_ADD_REACT_NAME} channel=${SLACK_PARAM_CHANNEL} thread_ts=${SLACK_THREAD_TS}"
-        ADD_RESULT=$(curl -X POST --location 'https://slack.com/api/reactions.add' \
+        ADD_RESULT=$(curl -X POST --location "https://$API_DOMAIN/api/reactions.add" \
             --header 'Content-Type: application/x-www-form-urlencoded' \
             --header "Authorization: Bearer ${SLACK_ACCESS_TOKEN}" \
             --data-urlencode "channel=${SLACK_PARAM_CHANNEL}" \

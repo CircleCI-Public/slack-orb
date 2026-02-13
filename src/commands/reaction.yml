@@ -52,6 +52,11 @@ parameters:
       When this command is going to be run on windows, set this to true.
     type: boolean
     default: false
+  api_domain:
+    description: |
+      Domain for the Slack API. Use slack.com for regular Slack and slack-gov.com for GovSlack.
+    type: string
+    default: "slack.com"
 steps:
   - when:
       condition:
@@ -71,6 +76,7 @@ steps:
               SLACK_PARAM_INVERT_MATCH: <<parameters.invert_match>>
               SLACK_PARAM_THREAD: <<parameters.thread_id>>
               SLACK_PARAM_DEBUG: << parameters.debug >>
+              SLACK_PARAM_API_DOMAIN: << parameters.api_domain >>
               SLACK_SCRIPT_UTILS: "<<include(scripts/utils.sh)>>"
   - when:
       condition:
@@ -91,4 +97,5 @@ steps:
               SLACK_PARAM_INVERT_MATCH: <<parameters.invert_match>>
               SLACK_PARAM_THREAD: <<parameters.thread_id>>
               SLACK_PARAM_DEBUG: << parameters.debug >>
+              SLACK_PARAM_API_DOMAIN: << parameters.api_domain >>
               SLACK_SCRIPT_UTILS: "<<include(scripts/utils.sh)>>"
