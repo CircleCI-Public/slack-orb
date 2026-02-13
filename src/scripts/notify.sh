@@ -144,9 +144,9 @@ PostToSlack() {
             SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg post_at "$POST_AT" '.post_at = ($post_at|tonumber)')
             # text is required for scheduled messages
             SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq '.text = "Dummy fallback text"')
-            NotifyWithRetries https://$API_DOMAIN/api/chat.scheduleMessage
+            NotifyWithRetries https://"$API_DOMAIN"/api/chat.scheduleMessage
         else
-            NotifyWithRetries https://$API_DOMAIN/api/chat.postMessage
+            NotifyWithRetries https://"$API_DOMAIN"/api/chat.postMessage
         fi
 
         if [ "$SLACK_PARAM_DEBUG" -eq 1 ]; then
