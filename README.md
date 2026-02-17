@@ -151,6 +151,31 @@ Set the `scheduled_offset_seconds` special parameter to a number of seconds if y
         }
   ```
 
+## GovSlack Support
+
+Set the `api_domain` parameter to specify which Slack API domain to use. Use `slack.com` for regular Slack workspaces (default) and `slack-gov.com` for GovSlack workspaces.
+
+  ```yaml
+- slack/notify:
+      event: always
+      api_domain: slack-gov.com
+      custom: |
+        {
+          "blocks": [
+            {
+              "type": "section",
+              "fields": [
+                {
+                  "type": "plain_text",
+                  "text": "*This is a text notification to GovSlack*",
+                  "emoji": true
+                }
+              ]
+            }
+          ]
+        }
+  ```
+
 
 ---
 
