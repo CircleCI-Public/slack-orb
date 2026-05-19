@@ -3,8 +3,9 @@ description: |
   duplicate notifications for a single logical test run.
   This example shows how to aggregate the results of parallel jobs into a single Slack
   notification by adding a dedicated "notify" job that:
-    1. Runs only after all parallel "test" nodes finish (using `requires` with `[success, failed]`
-       so it runs whether the parallel run passed or failed).
+    1. Runs only after all parallel "test" nodes reach a terminal state (using `requires`
+       with `terminal` so it runs whether the parallel run passed, failed, was canceled,
+       or timed out).
     2. Queries the CircleCI API v2 for the statuses of all "test" job nodes.
     3. Sends exactly one Slack notification reflecting the combined outcome.
   Note: `$CIRCLE_TOKEN` must be provided via a context. Read access to the project is required.
@@ -30,8 +31,10 @@ usage:
                 -H "Circle-Token: $CIRCLE_TOKEN" \
                 "https://circleci.com/api/v2/workflow/$CIRCLE_WORKFLOW_ID/job")
 
+              # Any non-"success" terminal status (failed, canceled, timedout, infrastructure_fail, ...)
+              # is treated as a failure for notification purposes.
               FAILED=$(echo "$JOBS" | jq '[
-                .items[] | select(.name == "test" and (.status == "failed" or .status == "failing"))
+                .items[] | select(.name == "test" and .status != "success")
               ] | length')
 
               if [ "$FAILED" -gt "0" ]; then
@@ -55,4 +58,4 @@ usage:
         - notify:
             context: slack-secrets
             requires:
-              - test: [success, failed]
+              - test: terminal
