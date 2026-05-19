@@ -1,0 +1,58 @@
+description: |
+  When using `parallelism`, `slack/notify` fires once per parallel node, resulting in
+  duplicate notifications for a single logical test run.
+  This example shows how to aggregate the results of parallel jobs into a single Slack
+  notification by adding a dedicated "notify" job that:
+    1. Runs only after all parallel "test" nodes finish (using `requires` with `[success, failed]`
+       so it runs whether the parallel run passed or failed).
+    2. Queries the CircleCI API v2 for the statuses of all "test" job nodes.
+    3. Sends exactly one Slack notification reflecting the combined outcome.
+  Note: `$CIRCLE_TOKEN` must be provided via a context. Read access to the project is required.
+usage:
+  version: 2.1
+  orbs:
+    slack: circleci/slack@5.0
+  jobs:
+    test:
+      docker:
+        - image: cimg/base:stable
+      parallelism: 6
+      steps:
+        - run: echo "run your parallel tests here"
+    notify:
+      docker:
+        - image: cimg/base:stable
+      steps:
+        - run:
+            name: Aggregate parallel test results
+            command: |
+              JOBS=$(curl -sf \
+                -H "Circle-Token: $CIRCLE_TOKEN" \
+                "https://circleci.com/api/v2/workflow/$CIRCLE_WORKFLOW_ID/job")
+
+              FAILED=$(echo "$JOBS" | jq '[
+                .items[] | select(.name == "test" and (.status == "failed" or .status == "failing"))
+              ] | length')
+
+              if [ "$FAILED" -gt "0" ]; then
+                echo "$FAILED node(s) failed."
+                exit 1
+              fi
+              echo "All nodes passed."
+        # Sends a failure notification if any parallel "test" node failed.
+        - slack/notify:
+            event: fail
+            template: basic_fail_1
+        # Sends a success notification only when every parallel "test" node succeeded.
+        - slack/notify:
+            event: pass
+            template: basic_success_1
+  workflows:
+    test-and-notify:
+      jobs:
+        - test
+        # Secure your Slack OAuth token and CircleCI API token behind a restricted context.
+        - notify:
+            context: slack-secrets
+            requires:
+              - test: [success, failed]
