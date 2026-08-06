@@ -4,6 +4,10 @@ Send Slack notifications from your CircleCI pipelines even easier with Slack Orb
 
 [What are Orbs?](https://circleci.com/orbs/)
 
+> **Note:** New to Slack notifications? We recommend using the [native CircleCI Slack integration](https://circleci.com/docs/guides/integration/slack-integration/) instead of this orb. It requires no config changes, supports [user tagging](https://circleci.com/changelog/get-tagged-in-slack-notifications/), and is where we're focusing new feature development.
+>
+> [Share feedback or feature requests here](https://circleci.canny.io/cloud-feature-requests) to help us prioritize what's next.
+
 ## Usage
 
 ### Setup
